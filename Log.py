@@ -30,7 +30,7 @@
 #### In Total today : 13.03.2024
 ############################################
 # I've installed Django and connected it to a MariaDB database.
-# I've run migrations, indicating Django project is configured correctly to communicate with  database.
+# I've run migrations, indicating Django project is configured correctly to communicate with the database.
 
 ############################################
 # NEXT: 

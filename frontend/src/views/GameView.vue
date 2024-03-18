@@ -19,7 +19,8 @@ class Player {
     // movement velocity
     this.vy = 0
     // button released
-    this.keyPressed = false //
+    this.upKeyPressed = false
+    this.downKeyPressed = false
     // color
     this.color = 'rgba(255, 166, 0, 0.8)'
 
@@ -56,17 +57,21 @@ class Player {
     ctx.fillRect(this.posX, this.posY, playerWidth, playerHeight)
   }
   update() {
-    // boundaries check
-    if (this.posY <= 0 && this.vy < 0) this.vy = 0
-    if (this.posY >= canvas.height - playerHeight && this.vy > 0) this.vy = 0
-
     // movement key is not pressed
     // DYNAMIC SPEED
     // if (this.vy >= -0.02 && this.vy <= 0.02 && !this.keyPressed) this.vy = 0
     // if (this.vy < -0.02 && !this.keyPressed) this.vy += 0.02
     // if (this.vy > 0.02 && !this.keyPressed) this.vy -= 0.02
     // STATIC SPEED
-    if (!this.keyPressed) this.vy = 0
+    // if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
+    if (this.upKeyPressed && this.downKeyPressed) this.vy = 0
+    else if (this.upKeyPressed) this.vy = -1.5
+    else if (this.downKeyPressed) this.vy = 1.5
+    else if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
+
+    // boundaries check
+    if (this.posY <= 0 && this.vy < 0) this.vy = 0
+    if (this.posY >= canvas.height - playerHeight && this.vy > 0) this.vy = 0
 
     this.posY += this.vy
     this.#draw()
@@ -228,25 +233,25 @@ onMounted(() => {
     // }
     // STATIC SPEED
     if (e.key == 'w') {
-      player1.keyPressed = true
-      player1.vy = -playerSpeed
+      player1.upKeyPressed = true
     } else if (e.key == 's') {
-      player1.keyPressed = true
-      player1.vy = playerSpeed
+      player1.downKeyPressed = true
     } else if (e.key == 'ArrowUp') {
-      player2.keyPressed = true
-      player2.vy = -playerSpeed
+      player2.upKeyPressed = true
     } else if (e.key == 'ArrowDown') {
-      player2.keyPressed = true
-      player2.vy = playerSpeed
+      player2.downKeyPressed = true
     }
   })
 
   addEventListener('keyup', (e) => {
-    if (e.key == 'w' || e.key == 's') {
-      player1.keyPressed = false
-    } else if (e.key == 'ArrowUp' || e.key == 'ArrowDown') {
-      player2.keyPressed = false
+    if (e.key == 'w') {
+      player1.upKeyPressed = false
+    } else if (e.key == 's') {
+      player1.downKeyPressed = false
+    } else if (e.key == 'ArrowUp') {
+      player2.upKeyPressed = false
+    } else if (e.key == 'ArrowDown') {
+      player2.downKeyPressed = false
     }
   })
 })

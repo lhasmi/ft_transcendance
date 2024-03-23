@@ -52,7 +52,7 @@ class Player {
     //   }
     // })
   }
-  #draw() {
+  draw() {
     ctx.fillStyle = this.color
     ctx.fillRect(this.posX, this.posY, playerWidth, playerHeight)
   }
@@ -74,7 +74,7 @@ class Player {
     if (this.posY >= canvas.height - playerHeight && this.vy > 0) this.vy = 0
 
     this.posY += this.vy
-    this.#draw()
+    this.draw()
   }
 }
 
@@ -92,7 +92,7 @@ class Ball {
     // velocity
     this.v = 1
   }
-  #draw() {
+  draw() {
     ctx.beginPath()
     ctx.arc(this.posX, this.posY, this.radius, 0, 2 * Math.PI)
     ctx.fillStyle = 'lightgrey'
@@ -158,7 +158,7 @@ class Ball {
     // modify position
     this.posX += this.dirX * this.v
     this.posY += this.dirY * this.v
-    this.#draw()
+    this.draw()
   }
 }
 
@@ -168,6 +168,7 @@ class Game {
     this.player1 = player1
     this.player2 = player2
     this.ball = ball
+    this.startGame = false
 
     // time delta
     // this.lastTime = 0
@@ -183,9 +184,15 @@ class Game {
   animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     this.#draw()
-    this.player1.update()
-    this.player2.update()
-    this.ball.update()
+    if (this.startGame) {
+      this.player1.update()
+      this.player2.update()
+      this.ball.update()
+    } else {
+      this.player1.draw()
+      this.player2.draw()
+      this.ball.draw()
+    }
 
     requestAnimationFrame(this.animate.bind(this))
   }
@@ -244,6 +251,7 @@ onMounted(() => {
   })
 
   addEventListener('keyup', (e) => {
+    console.log(e)
     if (e.key == 'w') {
       player1.upKeyPressed = false
     } else if (e.key == 's') {
@@ -252,6 +260,8 @@ onMounted(() => {
       player2.upKeyPressed = false
     } else if (e.key == 'ArrowDown') {
       player2.downKeyPressed = false
+    } else if (e.key == ' ') {
+      game.startGame = !game.startGame
     }
   })
 })
@@ -261,9 +271,9 @@ onMounted(() => {
   <main>
     <div class="top_bar">
       <RouterLink class="btn" to="/">Back</RouterLink>
-      <p class="nickname">Player1</p>
+      <p class="nickname roboto-bold">Player1</p>
       <p class="score">{{ score.player1 + ' : ' + score.player2 }}</p>
-      <p class="nickname">Player2</p>
+      <p class="nickname roboto-bold">Player2</p>
     </div>
     <canvas class="canvas" id="canvasId"> Hello </canvas>
   </main>

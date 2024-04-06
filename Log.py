@@ -38,4 +38,4 @@
 
 # For development, I can use Django's built-in server. 
 # For production, consider learning about deploying Django with Apache and mod_wsgi.
-# Consider using a virtual environment for Django development.
+# DONE  using a virtual environment for Django development.

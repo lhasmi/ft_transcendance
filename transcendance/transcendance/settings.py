@@ -30,7 +30,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'optional-default-value')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # split the ALLOWED_HOSTS string from the .env file into a Python list. 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = []
 
 
 # Application definition

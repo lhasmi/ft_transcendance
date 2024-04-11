@@ -1,33 +1,20 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { ref } from 'vue'
 import HeaderComp from './components/HeaderComp.vue'
-
-// const authorised = ref(false)
 </script>
 
 <template>
-  <div class="container">
-    <HeaderComp />
+  <main class="d-flex flex-column">
+    <HeaderComp v-if="['login', 'register'].includes($route.name) == false" />
 
-    <!-- <RouterView :userAuthorised="authorised" /> -->
     <RouterView />
-  </div>
+  </main>
 </template>
 
 <style scoped>
-.container {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
 main {
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  min-height: 100vh;
+  max-width: 100vw;
+  background: linear-gradient(145deg, #5c2a84 23%, 55%, #3b1a99 85%);
 }
 </style>

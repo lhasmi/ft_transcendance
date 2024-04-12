@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'rest_framework', 
+	'myapp',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +58,15 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'transcendance.urls'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+#In REST_FRAMEWORK settings, consider adding throttling to prevent abuse of your API.
 
 TEMPLATES = [
     {
@@ -116,6 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
+# If application needs to support multiple languages or specific time zones, configure accordingly.
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'

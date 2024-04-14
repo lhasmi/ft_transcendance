@@ -4,8 +4,9 @@ import { ref, onMounted } from 'vue'
 let canvas
 let ctx
 const playerWidth = 4
-const playerHeight = 116
-const playerSpeed = 4
+const playerHeight = 100
+const playerSpeed = 1.5
+
 
 const score = ref({
   player1: 0,
@@ -22,7 +23,7 @@ class Player {
     this.upKeyPressed = false
     this.downKeyPressed = false
     // color
-    this.color = 'rgba(255, 166, 0, 0.8)'
+    this.color = '#F58562'
 
     //
     // addEventListener('keydown', (e) => {
@@ -95,7 +96,7 @@ class Ball {
   draw() {
     ctx.beginPath()
     ctx.arc(this.posX, this.posY, this.radius, 0, 2 * Math.PI)
-    ctx.fillStyle = 'lightgrey'
+    ctx.fillStyle = 'white'
     ctx.fill()
   }
   #checkCircleRectCollision(player) {
@@ -176,9 +177,11 @@ class Game {
     // this.timer = 0
   }
   #draw() {
+    ctx.beginPath()
     ctx.moveTo(canvas.width / 2, 0)
     ctx.lineTo(canvas.width / 2, canvas.height)
-    ctx.strokeStyle = 'rgba(255, 166, 0, 0.5)'
+    ctx.lineWidth = 2
+    ctx.strokeStyle = '#F58562'
     ctx.stroke()
   }
   animate(timeStamp) {
@@ -204,8 +207,8 @@ class Game {
 onMounted(() => {
   canvas = document.getElementById('canvasId')
   ctx = canvas.getContext('2d')
-  canvas.width = 720
-  canvas.height = 480
+  canvas.width = 700
+  canvas.height = 466
 
   const player1 = new Player(32, canvas.height / 2 - playerHeight / 2)
   const player2 = new Player(canvas.width - playerWidth - 32, canvas.height / 2 - playerHeight / 2)
@@ -254,7 +257,6 @@ onMounted(() => {
   })
 
   addEventListener('keyup', (e) => {
-    console.log(e)
     if (e.key == 'w') {
       player1.upKeyPressed = false
     } else if (e.key == 's') {
@@ -271,68 +273,59 @@ onMounted(() => {
 </script>
 
 <template>
-  <main>
-    <div class="top_bar">
-      <RouterLink class="btn" to="/">Back</RouterLink>
-      <p class="nickname roboto-bold">Player1</p>
-      <p class="score">{{ score.player1 + ' : ' + score.player2 }}</p>
-      <p class="nickname roboto-bold">Player2</p>
+  <section
+    class="container flex-grow-1 d-flex flex-column justify-content-center align-items-center"
+  >
+    <div class="scoreboard col-6 mx-auto d-flex justify-content-around align-items-center">
+      <p class="text-white fs-4 mb-0 roboto-medium">pvznuzda</p>
+      <p class="text-white fs-2 mb-0 roboto-bold">{{ score.player1 }} : {{ score.player2 }}</p>
+      <p class="text-white fs-4 mb-0 roboto-medium">opponent</p>
     </div>
-    <canvas class="canvas" id="canvasId"> Hello </canvas>
-  </main>
+    <canvas class="canvas" id="canvasId"></canvas>
+    <button
+      class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
+      style="width: 64px; height: 64px"
+    >
+      ?
+    </button>
+  </section>
 </template>
 
 <style scoped>
 .canvas {
-  border: 4px solid rgba(255, 166, 0, 0.5);
+  border: 5px solid #f58562;
   border-right: none;
   border-left: none;
 }
 
-.top_bar {
+.btn-primary {
+  --bs-btn-active-color: #f58562;
+  --bs-btn-active-bg: rgba(255, 255, 255, 0.1);
+  background-color: var(--bs-btn-active-bg);
+  border: none;
+  box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.2s ease;
+}
+.btn-primary:hover,
+.btn-primary:active {
+  color: #f58562;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translate(2px, -2px);
+  box-shadow: -8px 8px 8px 0px rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary:disabled {
+  --bs-btn-active-color: rgba(255, 255, 255, 0.5);
+  --bs-btn-active-bg: rgba(255, 255, 255, 0.07);
   position: relative;
-  width: 64%;
-  display: flex;
-  margin: 6px 0 22px 0;
-  /* margin-bottom: 14px; */
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  font-size: 26px;
-  color: lightgrey;
+  color: var(--bs-btn-active-color);
+  background-color: var(--bs-btn-active-bg);
+  pointer-events: all;
 }
-
-.nickname:first-of-type {
-  margin-left: 120px;
-}
-.nickname:last-of-type {
-  margin-right: 120px;
-}
-
-.score {
-  font-weight: bold;
-  font-size: 40px;
-}
-
-.btn {
-  left: 0;
-  position: absolute;
-  text-decoration: none;
-  width: fit-content;
-  padding: 5px 12px;
-  margin-left: 20px;
-  /* margin-bottom: 20px; */
-  font-size: 22px;
-  background-color: rgb(40, 40, 40);
-  color: rgba(255, 166, 0, 0.8);
-  cursor: pointer;
-  background-color: rgb(40, 40, 40);
-  border-radius: 16px;
-  border: solid rgb(62, 62, 62);
-  transition: all 0.1s ease-in-out;
-}
-.btn:hover {
-  transform: scale(1.05);
-  box-shadow: 4px 4px 6px rgb(8, 8, 8);
+.btn-primary:hover:disabled {
+  transform: none;
+  box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
 }
 </style>

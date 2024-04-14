@@ -7,6 +7,7 @@ const playerWidth = 4
 const playerHeight = 100
 const playerSpeed = 1.5
 
+
 const score = ref({
   player1: 0,
   player2: 0
@@ -65,8 +66,8 @@ class Player {
     // STATIC SPEED
     // if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
     if (this.upKeyPressed && this.downKeyPressed) this.vy = 0
-    else if (this.upKeyPressed) this.vy = -1.5
-    else if (this.downKeyPressed) this.vy = 1.5
+    else if (this.upKeyPressed) this.vy = -playerSpeed
+    else if (this.downKeyPressed) this.vy = playerSpeed
     else if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
 
     // boundaries check
@@ -90,7 +91,7 @@ class Ball {
     this.dirX = 1
     this.dirY = 2
     // velocity
-    this.v = 1
+    this.v = 2
   }
   draw() {
     ctx.beginPath()
@@ -171,7 +172,7 @@ class Game {
     this.startGame = false
 
     // time delta
-    // this.lastTime = 0
+    this.lastTime = 0
     // this.interval = 1000 / 60
     // this.timer = 0
   }
@@ -183,7 +184,10 @@ class Game {
     ctx.strokeStyle = '#F58562'
     ctx.stroke()
   }
-  animate() {
+  animate(timeStamp) {
+	const timeDelta = timeStamp - this.lastTime
+	this.lastTime = timeStamp
+	console.log(timeDelta)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     this.#draw()
     if (this.startGame) {

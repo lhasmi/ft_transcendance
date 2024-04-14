@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import ButtonComp from './ButtonComp.vue'
 
 // test data
@@ -7,15 +7,89 @@ const data = {
   username: 'pvznuzda',
   email: 'pashavznuzdajev@gmail.com',
   password: '12345',
-  rating: 425,
-  gameHistory: [1, 0, 1, 1, 0, 1, 1, 0, 0, 1]
+  gameHistory: [
+    {
+      id: 8,
+      player1: 'pvznuzda',
+      player2: 'test1',
+      score1: 6,
+      score2: 7,
+      date: '11.04.2024 14:35'
+    },
+    {
+      id: 7,
+      player1: 'pvznuzda',
+      player2: 'test2',
+      score1: 7,
+      score2: 5,
+      date: '11.04.2024 14:35'
+    },
+    {
+      id: 6,
+      player1: 'pvznuzda',
+      player2: 'test3',
+      score1: 7,
+      score2: 2,
+      date: '11.04.2024 14:35'
+    },
+    {
+      id: 5,
+      player1: 'pvznuzda',
+      player2: 'test1',
+      score1: 4,
+      score2: 7,
+      date: '11.04.2024 14:35'
+    },
+    {
+      id: 4,
+      player1: 'pvznuzda',
+      player2: 'test1',
+      score1: 7,
+      score2: 2,
+      date: '11.04.2024 14:35'
+    },
+    {
+      id: 3,
+      player1: 'pvznuzda',
+      player2: 'test3',
+      score1: 2,
+      score2: 7,
+      date: '11.04.2024 14:35'
+    },
+    {
+      id: 2,
+      player1: 'pvznuzda',
+      player2: 'test2',
+      score1: 6,
+      score2: 5,
+      date: '11.04.2024 14:35'
+    },
+    { id: 1, player1: 'pvznuzda', player2: 'test2', score1: 7, score2: 5, date: '11.04.2024 14:35' }
+  ]
 }
 
 // variables
-const editProfileMode = ref(false)
-const gameHistoryMode = ref(false)
+const editProfile = ref(false)
+const gameHistory = ref(false)
+const title = ref('profile')
 
 // functions
+const toEditProfile = () => {
+  editProfile.value = true
+  title.value = 'edit profile'
+}
+
+const toGameHistory = () => {
+  gameHistory.value = true
+  title.value = 'game history'
+}
+
+const backProfileModal = () => {
+  title.value = 'profile'
+  editProfile.value = false
+  gameHistory.value = false
+}
+
 const shortEmail = (email) => {
   const atSignPos = email.search('@')
   let first
@@ -23,6 +97,13 @@ const shortEmail = (email) => {
     first = email.substring(0, 8) + '...'
   }
   return first + email.substring(atSignPos)
+}
+
+const getCircleColor = (index) => {
+  if (index >= data.gameHistory.length) return 'background: rgba(255, 255, 255, 0.1)'
+  return data.gameHistory[index].score1 > data.gameHistory[index].score2
+    ? 'background: #66bf6a'
+    : 'background: #da4834'
 }
 
 const changePicture = (e) => {
@@ -36,35 +117,46 @@ const changePicture = (e) => {
   <!-- Modal -->
   <div
     class="modal fade"
-    id="exampleModal"
+    id="profileModal"
     tabindex="-1"
-    aria-labelledby="exampleModalLabel"
+    aria-labelledby="profileModalLabel"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
       <div class="profile-modal modal-content myshadow border-0 rounded-4">
         <div class="modal-header border-0 d-flex flex-column m-0 p-0">
           <div class="d-flex position-relative w-100">
+            <button
+              v-if="editProfile || gameHistory"
+              @click="backProfileModal"
+              type="button"
+              class="icon-back"
+            >
+              <span class="material-symbols-outlined" style="font-size: 2.5rem">
+                keyboard_backspace
+              </span>
+            </button>
+
             <h1
               class="profile-modal-title modal-title fs-3 my-2 mx-auto roboto-bold"
-              id="exampleModalLabel"
+              id="profileModalLabel"
             >
-              profile
+              {{ title }}
             </h1>
             <button
-              @click="editProfileMode = gameHistoryMode = false"
+              @click="backProfileModal"
               type="button"
               class="icon-close"
               data-bs-dismiss="modal"
               aria-label="Close"
             >
-              <span class="material-symbols-outlined fs-2"> close </span>
+              <span class="material-symbols-outlined" style="font-size: 2rem"> close </span>
             </button>
           </div>
           <hr class="splitter col-9 mx-auto m-0 mb-2" />
         </div>
         <!-- EDIT PROFILE -->
-        <div v-if="editProfileMode" class="modal-body p-0 d-flex flex-column">
+        <div v-if="editProfile" class="modal-body p-0 d-flex flex-column">
           <div class="d-flex mb-2">
             <img
               src="../assets/profile_img.png"
@@ -122,17 +214,38 @@ const changePicture = (e) => {
             </div>
           </form>
           <div class="d-flex col-9 col-md-7 mx-auto justify-content-around mb-4">
-            <ButtonComp @click="editProfileMode = false" class="save-btn fs-6">
-              save changes
-            </ButtonComp>
-            <ButtonComp @click="editProfileMode = false" class="cancel-btn fs-6">
-              cancel
-            </ButtonComp>
+            <ButtonComp @click="backProfileModal" class="save-btn fs-6"> save changes </ButtonComp>
+            <ButtonComp @click="backProfileModal" class="cancel-btn fs-6"> cancel </ButtonComp>
           </div>
         </div>
 
         <!-- GAME HISTORY -->
-        <div v-else-if="gameHistoryMode" class="modal-body p-0 d-flex flex-column">history</div>
+        <div
+          v-else-if="gameHistory"
+          class="modal-body p-0 d-flex flex-column mb-3"
+          style="height: 396px"
+        >
+          <div class="col-9 col-md-7 mx-auto mb-1" v-for="item in data.gameHistory" :key="item.id">
+            <p class="game-date text-center text-white roboto-regular mb-1">{{ item.date }}</p>
+            <div class="d-flex justify-content-center position-relative">
+              <p class="player-left text-white roboto-regular fs-5">{{ item.player1 }}</p>
+              <p class="text-white roboto-bold fs-5">
+                <span
+                  class="roboto-bold"
+                  :style="item.score1 > item.score2 ? 'color: #f58562' : ''"
+                  >{{ item.score1 }}</span
+                >
+                :
+                <span
+                  class="roboto-bold"
+                  :style="item.score2 > item.score1 ? 'color: #f58562' : ''"
+                  >{{ item.score2 }}</span
+                >
+              </p>
+              <p class="player-right text-white roboto-regular fs-5">{{ item.player2 }}</p>
+            </div>
+          </div>
+        </div>
 
         <!-- PROFILE -->
         <div v-else class="modal-body p-0 d-flex flex-column">
@@ -150,20 +263,20 @@ const changePicture = (e) => {
             e-mail:
             <span class="fs-6 ms-1">{{ shortEmail(data.email) }}</span>
           </p>
-          <ButtonComp @click="editProfileMode = true" class="fs-6 col-9 col-md-7 mx-auto mb-4">
+          <ButtonComp @click="toEditProfile" class="fs-6 col-9 col-md-7 mx-auto mb-4">
             edit profile
           </ButtonComp>
           <hr class="splitter col-9 mx-auto m-0" />
           <h2 class="profile-modal-title fs-3 my-3 mx-auto roboto-bold">last games</h2>
           <div class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3">
-            <div class="circle" style="background-color: #66bf6a"></div>
-            <div class="circle" style="background-color: #da4834"></div>
-            <div class="circle" style="background-color: #66bf6a"></div>
-            <div class="circle" style="background-color: #66bf6a"></div>
-            <div class="circle" style="background-color: #da4834"></div>
+            <div class="circle" :style="getCircleColor(4)"></div>
+            <div class="circle" :style="getCircleColor(3)"></div>
+            <div class="circle" :style="getCircleColor(2)"></div>
+            <div class="circle" :style="getCircleColor(1)"></div>
+            <div class="circle" :style="getCircleColor(0)"></div>
           </div>
-          <ButtonComp @click="gameHistoryMode = true" class="fs-6 col-9 col-md-7 mx-auto mb-4">
-            view full history
+          <ButtonComp @click="toGameHistory" class="fs-6 col-9 col-md-7 mx-auto mb-4">
+            game history
           </ButtonComp>
         </div>
       </div>
@@ -181,7 +294,6 @@ const changePicture = (e) => {
 .profile-modal {
   background: linear-gradient(145deg, rgba(60, 26, 153, 0.9) 23%, 55%, rgba(92, 42, 132, 0.9) 85%);
   backdrop-filter: blur(2px);
-  /* height: 460px; */
 }
 
 .profile-modal-title {
@@ -199,12 +311,25 @@ const changePicture = (e) => {
   position: absolute;
   background: none;
   border: none;
-  top: 0.8rem;
-  right: 0.8rem;
+  top: 0.7rem;
+  right: 0.7rem;
   color: white;
   transition: all 0.2s ease;
 }
 .icon-close:hover {
+  color: #f58562;
+}
+
+.icon-back {
+  position: absolute;
+  background: none;
+  border: none;
+  top: 0.5rem;
+  left: 1rem;
+  color: white;
+  transition: all 0.2s ease;
+}
+.icon-back:hover {
   color: #f58562;
 }
 
@@ -275,4 +400,26 @@ input:-webkit-autofill:focus {
 }
 
 /* !Edit profile */
+
+/* Game History */
+.player-left {
+  position: absolute;
+  left: 0;
+}
+
+.player-right {
+  position: absolute;
+  right: 0;
+}
+
+.game-date {
+  border-bottom: 1px solid white;
+}
+
+.modal-body {
+  scrollbar-color: rgba(255, 255, 255, 0.1) rgba(255, 255, 255, 0.1);
+  scrollbar-width: thin;
+}
+
+/* !Game History */
 </style>

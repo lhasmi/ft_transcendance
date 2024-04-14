@@ -1,5 +1,6 @@
 <script setup>
 import ProfileModalComp from './ProfileModalComp.vue'
+import FriendsModalComp from './FriendsModalComp.vue'
 import { store } from '../store/store.js'
 
 const logout = () => {
@@ -37,11 +38,17 @@ const logout = () => {
             <button
               class="nav-link mx-4 fs-5 roboto-regular align-self-center"
               data-bs-toggle="modal"
-              data-bs-target="#exampleModal"
+              data-bs-target="#profileModal"
             >
               profile
             </button>
-            <button class="nav-link mx-4 fs-5 roboto-regular align-self-center">friends</button>
+            <button
+              class="nav-link mx-4 fs-5 roboto-regular align-self-center"
+              data-bs-toggle="modal"
+              data-bs-target="#friendsModal"
+            >
+              friends
+            </button>
             <button @click="logout" class="nav-link mx-4 fs-5 roboto-regular align-self-center">
               logout
             </button>
@@ -51,6 +58,7 @@ const logout = () => {
     </nav>
 
     <ProfileModalComp />
+    <FriendsModalComp />
   </header>
   <!-- !Header -->
 </template>

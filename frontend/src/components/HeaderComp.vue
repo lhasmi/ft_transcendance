@@ -6,6 +6,13 @@ import { store } from '../store/store.js'
 const logout = () => {
   store.userAuthorised = false
 }
+
+const profileOpen = async () => {
+    console.log('opened')
+    const response = await fetch('http://127.0.0.1:8000/players/')
+    const user = await response.json()
+    console.log(user)
+}
 </script>
 
 <template>
@@ -36,6 +43,7 @@ const logout = () => {
           </div>
           <div v-else class="d-flex">
             <button
+              @click="profileOpen"
               class="nav-link mx-4 fs-5 roboto-regular align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#profileModal"

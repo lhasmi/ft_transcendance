@@ -31,8 +31,15 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # split the ALLOWED_HOSTS string from the .env file into a Python list. 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
+ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1']
+
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+        'http://localhost:5173',
+)
 
 # Application definition
 
@@ -45,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'rest_framework', 
 	'myapp',
+	'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'transcendance.urls'

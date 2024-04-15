@@ -24,7 +24,8 @@ const props = defineProps({
   transition: all 0.2s ease;
 }
 .btn-primary:hover,
-.btn-primary:active {
+.btn-primary:active,
+.btn-primary:focus {
   color: #f58562;
   background-color: rgba(255, 255, 255, 0.1);
   transform: translate(2px, -2px);

@@ -1,18 +1,22 @@
 <script setup>
+import { ref } from 'vue'
 import ProfileModalComp from './ProfileModalComp.vue'
 import FriendsModalComp from './FriendsModalComp.vue'
 import { store } from '../store/store.js'
 
+// variables
+
+// functions
 const logout = () => {
   store.userAuthorised = false
 }
 
-const profileOpen = async () => {
-    console.log('opened')
-    const response = await fetch('http://127.0.0.1:8000/players/')
-    const user = await response.json()
-    console.log(user)
-}
+// const profileOpen = async () => {
+//     console.log('opened')
+//     const response = await fetch('http://127.0.0.1:8000/players/')
+//     const user = await response.json()
+//     console.log(user)
+// }
 </script>
 
 <template>
@@ -43,7 +47,6 @@ const profileOpen = async () => {
           </div>
           <div v-else class="d-flex">
             <button
-              @click="profileOpen"
               class="nav-link mx-4 fs-5 roboto-regular align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#profileModal"

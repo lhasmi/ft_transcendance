@@ -1,9 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import ButtonComp from './ButtonComp.vue'
 
 // test data
-const data = {
+let data = {
   username: 'pvznuzda',
   email: 'pashavznuzdajev@gmail.com',
   password: '12345',
@@ -72,8 +72,19 @@ const data = {
 const editProfile = ref(false)
 const gameHistory = ref(false)
 const title = ref('profile')
+const loader = ref(true)
 
 // functions
+const loadData = async () => {
+	loader.value = true
+	// const response = await fetch("127.0.0.1:8000/profile")
+	// data = await response.json()
+	setTimeout(() => {
+		loader.value = false
+	}, 2000);
+
+}
+
 const toEditProfile = () => {
   editProfile.value = true
   title.value = 'edit profile'
@@ -111,6 +122,17 @@ const changePicture = (e) => {
   console.log(URL.createObjectURL(e.target.files[0]))
   document.getElementById('profile_img').src = URL.createObjectURL(e.target.files[0])
 }
+
+onMounted(() => {
+	const profileModal = document.getElementById('profileModal')
+	profileModal.addEventListener('show.bs.modal', e => {
+		loadData()
+	})
+	profileModal.addEventListener('hidden.bs.modal', e => {
+		loader.value = true
+		// abort fetch if its still ongoing
+	})
+})
 </script>
 
 <template>
@@ -155,8 +177,15 @@ const changePicture = (e) => {
           </div>
           <hr class="splitter col-9 mx-auto m-0 mb-2" />
         </div>
+
+				<!-- SPINNER -->
+				<div v-if="loader" class="modal-body p-0 d-flex justify-content-center">
+					<div class="spinner-border text-white my-5" role="status">
+  					<span class="visually-hidden">Loading...</span>
+					</div>
+				</div>
         <!-- EDIT PROFILE -->
-        <div v-if="editProfile" class="modal-body p-0 d-flex flex-column">
+        <div v-else-if="editProfile" class="modal-body p-0 d-flex flex-column">
           <div class="d-flex mb-2">
             <img
               src="../assets/profile_img.png"
@@ -304,7 +333,6 @@ const changePicture = (e) => {
   border: solid 3px #f58562;
   height: 80px;
   width: 80px;
-  /* border-radius: 50%; */
 }
 
 .icon-close {

@@ -42,30 +42,6 @@ import ButtonComp from '../components/ButtonComp.vue'
     </div>
   </section>
   <!-- !Home View -->
-
-  <!-- <section>
-    <div class="options">
-      <RouterLink class="btn roboto-regular" to="/game">Play</RouterLink>
-      <RouterLink class="btn roboto-regular" to="/game">Tournament</RouterLink>
-      <p class="mode roboto-regular">Offline</p>
-    </div>
-    <div v-if="store.userAuthorised" class="options">
-      <p class="mode roboto-regular">Online</p>
-      <RouterLink class="btn roboto-regular" to="/game">Play</RouterLink>
-      <RouterLink class="btn roboto-regular" to="/game">Tournament</RouterLink>
-    </div>
-    <div v-else class="options options-unauthorised">
-      <p class="mode roboto-regular">Online</p>
-      <button class="btn-unauthorised roboto-regular" to="/game">
-        Play
-        <span class="tooltip roboto-regular">Log in to play online</span>
-      </button>
-      <button class="btn-unauthorised roboto-regular" to="/game">
-        Tournament
-        <span class="tooltip roboto-regular">Log in to play online</span>
-      </button>
-    </div>
-  </section> -->
 </template>
 
 <style scoped>

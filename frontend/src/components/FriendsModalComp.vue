@@ -1,6 +1,9 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+import ButtonComp from './ButtonComp.vue';
+
 // test data
-const data = {
+let data = {
   friends: [
     { username: 'friend1', status: 'online' },
     { username: 'friend2', status: 'online' },
@@ -10,11 +13,35 @@ const data = {
   ]
 }
 
+// variables
+const loader = ref(true)
+
 // funcions
+const loadData = async () => {
+	loader.value = true
+	// const response = await fetch("127.0.0.1:8000/friends")
+	// data = await response.json()
+	setTimeout(() => {
+		loader.value = false
+	}, 2000);
+}
+
 const getStatusColor = (status) => {
   if (status === 'online') return 'background: #66bf6a'
   else return 'background: rgba(255, 255, 255, 0.1)'
 }
+
+onMounted(() => {
+	const friendsModal = document.getElementById('friendsModal')
+	friendsModal.addEventListener('show.bs.modal', e => {
+		loadData()
+	})
+	friendsModal.addEventListener('hidden.bs.modal', e => {
+		loader.value = true
+		// abort fetch if its still ongoing
+	})
+})
+
 </script>
 
 <template>
@@ -41,7 +68,19 @@ const getStatusColor = (status) => {
           </div>
           <hr class="splitter col-9 mx-auto m-0 mb-2" />
         </div>
-        <div class="modal-body p-0 d-flex flex-column mb-3" style="height: 396px">
+
+				<!-- SPINNER -->
+				<div v-if="loader" class="modal-body p-0 d-flex justify-content-center">
+					<div class="spinner-border text-white my-5" role="status">
+  					<span class="visually-hidden">Loading...</span>
+					</div>
+				</div>
+
+				<!-- FRIENDS -->
+        <div v-else class="modal-body p-0 d-flex flex-column" style="max-height: 396px">
+					<div v-if="data.friends.length === 0" class="col-9 col-md-7 mx-auto text-white text-center roboto-regular my-4">
+						friend list is empty
+					</div>
           <div
             class="friend-item col-9 col-md-7 mx-auto d-flex justify-content-center my-2"
             v-for="item in data.friends"
@@ -51,6 +90,14 @@ const getStatusColor = (status) => {
             <div class="friend-status ms-3 my-auto" :style="getStatusColor(item.status)"></div>
           </div>
         </div>
+				<div v-if="!loader" class="modal-footer">
+					<hr class="splitter col-9 mx-auto m-0 mb-2" />	
+					<div class="col-9 col-md-7 mx-auto d-flex flex-column">
+							<label class="roboto-bold fs-5 text-center mb-1" style="color: #f58562" for="addFriend">add friend</label>
+							<input class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center" type="text" id="addFriend" placeholder="username"/>
+						<ButtonComp class="">add</ButtonComp>
+					</div>
+      	</div>
       </div>
     </div>
   </div>
@@ -114,5 +161,34 @@ const getStatusColor = (status) => {
   height: 16px;
   width: 16px;
   border-radius: 50%;
+}
+
+.modal-footer {
+	border: none;
+}
+
+input {
+  width: 100%;
+  padding-left: 0.4rem;
+  background: none;
+  border: none;
+  color: white;
+}
+input::placeholder {
+  color: white;
+  font-family: 'Roboto';
+}
+input:focus {
+  outline: none;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: white;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.text-input {
+  border-bottom: solid 2px white;
 }
 </style>

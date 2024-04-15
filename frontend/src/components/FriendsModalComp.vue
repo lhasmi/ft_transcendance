@@ -15,15 +15,21 @@ let data = {
 
 // variables
 const loader = ref(true)
+const friendToAdd = ref('') 
 
 // funcions
 const loadData = async () => {
 	loader.value = true
 	// const response = await fetch("127.0.0.1:8000/friends")
 	// data = await response.json()
-	setTimeout(() => {
+	setTimeout(() => { // test
 		loader.value = false
 	}, 2000);
+}
+
+const addFriend = async () => {
+	// send "post" request to try to add a new friend
+	// on success fetch new friends list to rerender it
 }
 
 const getStatusColor = (status) => {
@@ -93,8 +99,8 @@ onMounted(() => {
 				<div v-if="!loader" class="modal-footer">
 					<hr class="splitter col-9 mx-auto m-0 mb-2" />	
 					<div class="col-9 col-md-7 mx-auto d-flex flex-column">
-							<label class="roboto-bold fs-5 text-center mb-1" style="color: #f58562" for="addFriend">add friend</label>
-							<input class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center" type="text" id="addFriend" placeholder="username"/>
+						<label class="roboto-bold fs-5 text-center mb-1" style="color: #f58562" for="addFriend">add friend</label>
+						<input v-model="friendToAdd" class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center" type="text" id="addFriend" placeholder="username"/>
 						<ButtonComp class="">add</ButtonComp>
 					</div>
       	</div>

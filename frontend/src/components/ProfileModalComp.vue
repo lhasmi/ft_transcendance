@@ -79,7 +79,7 @@ const loadData = async () => {
 	loader.value = true
 	// const response = await fetch("127.0.0.1:8000/profile")
 	// data = await response.json()
-	setTimeout(() => {
+	setTimeout(() => { // test
 		loader.value = false
 	}, 2000);
 
@@ -130,6 +130,7 @@ onMounted(() => {
 	})
 	profileModal.addEventListener('hidden.bs.modal', e => {
 		loader.value = true
+		backProfileModal()
 		// abort fetch if its still ongoing
 	})
 })

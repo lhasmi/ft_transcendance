@@ -1,15 +1,25 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import ProfileModalComp from './ProfileModalComp.vue'
 import FriendsModalComp from './FriendsModalComp.vue'
 import { store } from '../store/store.js'
 
 // variables
+const language = ref('')
 
 // functions
 const logout = () => {
   store.userAuthorised = false
 }
+
+watch(language, () => {
+	localStorage.setItem('lang', language.value)
+	store.lang = language.value
+})
+
+onMounted(() => {
+	language.value = localStorage.getItem('lang') || 'EN'
+})
 
 // const profileOpen = async () => {
 //     console.log('opened')
@@ -64,6 +74,12 @@ const logout = () => {
               logout
             </button>
           </div>
+					<div class="d-flex me-3">
+						<select v-model="language" class="language text-white" name="language" id="language">
+								<option>EN</option>
+								<option>RU</option>
+						</select>
+					</div>
         </div>
       </div>
     </nav>
@@ -98,6 +114,11 @@ const logout = () => {
 
 .myshadow {
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
+}
+
+.language {
+	border: none;
+	background: none;
 }
 /* !Header */
 </style>

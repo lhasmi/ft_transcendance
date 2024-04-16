@@ -4,7 +4,7 @@ import ButtonComp from '../components/ButtonComp.vue'
 
 <template>
   <section
-    class="container-lg flex-grow-1 d-flex flex-column justify-content-center align-items-center"
+    class="container-xxl flex-grow-1 d-flex flex-column justify-content-center align-items-center"
     style="height: 100%"
   >
     <div
@@ -60,7 +60,7 @@ import ButtonComp from '../components/ButtonComp.vue'
         </span>
       </div>
       <ButtonComp class="btn-lg fs-5 col-6 mx-auto mt-4">register</ButtonComp>
-      <div class="login col-8 mx-auto text-white roboto-regular my-4 text-center">
+      <div class="login col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">
         already have an account?
         <RouterLink class="login-link ps-1 roboto-bold" to="/login">login</RouterLink>
       </div>

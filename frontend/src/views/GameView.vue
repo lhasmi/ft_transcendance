@@ -5,7 +5,8 @@ let canvas
 let ctx
 const playerWidth = 4
 const playerHeight = 100
-const playerSpeed = 1.5
+const playerSpeed = 3
+const ballSpeed = 2
 
 const score = ref({
   player1: 0,
@@ -65,8 +66,8 @@ class Player {
     // STATIC SPEED
     // if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
     if (this.upKeyPressed && this.downKeyPressed) this.vy = 0
-    else if (this.upKeyPressed) this.vy = -1.5
-    else if (this.downKeyPressed) this.vy = 1.5
+    else if (this.upKeyPressed) this.vy = -playerSpeed
+    else if (this.downKeyPressed) this.vy = playerSpeed
     else if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
 
     // boundaries check
@@ -90,7 +91,7 @@ class Ball {
     this.dirX = 1
     this.dirY = 2
     // velocity
-    this.v = 1
+    this.v = ballSpeed
   }
   draw() {
     ctx.beginPath()

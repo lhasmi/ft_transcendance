@@ -15,28 +15,14 @@ curl -X POST http://localhost:8000/players/ \
 
 # Replace localhost:8000 with your actual server’s URL if not testing locally.
 
-#### Testing with Postman
+#### creating a new user using the Django shell.
 
-#    Get Request:
-        First,download and install Postman from Postman's official site.
-Setting Up a GET Request in Postman
+python manage.py shell
 
- to set up a GET request:
+# in the shell prompt:
 
-    Create a New Request
-        Click on the "New" button or the "+" tab to create a new request tab.
-
-    Set the HTTP Method to GET
-        To the left of the URL field, there is a dropdown menu that likely says "GET" by default. If it is set to another method (like POST), click the dropdown and change it to GET.
-
-    Enter the Request URL
-        In the URL field, enter the full URL of the API endpoint you wish to test. For example: http://localhost:8000/players/
-        Enter the URL http://localhost:8000/players/.
-        Hit send and see the JSON response.
-
-#    Post Request:
-        Set the method to POST.
-        Enter the URL http://localhost:8000/players/.
-        Under Headers, set Content-Type to application/json.
-        In the body, select raw and input a JSON object: {"username": "newplayer", "email": "player@example.com"}.
-        Hit send to create a new entry.
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+user = User.objects.create_user('newuser' 'test@example.com', 'password123')
+token, created = Token.objects.get_or_create(user=user)
+print(token.key)

@@ -1,8 +1,10 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import ProfileModalComp from './ProfileModalComp.vue'
 import FriendsModalComp from './FriendsModalComp.vue'
+import ButtonComp from './ButtonComp.vue'
 import { store } from '../store/store.js'
+import { getText } from '../language/language.js'
 
 // variables
 const language = ref('')
@@ -12,21 +14,21 @@ const logout = () => {
   store.userAuthorised = false
 }
 
-watch(language, () => {
-	localStorage.setItem('lang', language.value)
+const toggleLanguage = () => {
+	const languages = ['en', 'de', 'ru']
+	const index = languages.indexOf(language.value)
+
+	language.value = index !== languages.length - 1 ? languages[index + 1] : languages[0]
 	store.lang = language.value
-})
+	localStorage.setItem('lang', language.value)
+}
 
 onMounted(() => {
-	language.value = localStorage.getItem('lang') || 'EN'
+	language.value = localStorage.getItem('lang') || 'en'
+	store.lang = language.value
+	localStorage.setItem('lang', language.value)
 })
 
-// const profileOpen = async () => {
-//     console.log('opened')
-//     const response = await fetch('http://127.0.0.1:8000/players/')
-//     const user = await response.json()
-//     console.log(user)
-// }
 </script>
 
 <template>
@@ -49,10 +51,10 @@ onMounted(() => {
         <div class="navbar-nav ms-auto">
           <div v-if="!store.userAuthorised" class="d-flex">
             <RouterLink class="nav-link mx-4 fs-5 roboto-medium align-self-center" to="/register"
-              >register</RouterLink
+              >{{ getText('register', language) }}</RouterLink
             >
             <RouterLink class="nav-link mx-4 fs-5 roboto-regular align-self-center" to="/login"
-              >login</RouterLink
+              >{{ getText('login', language) }}</RouterLink
             >
           </div>
           <div v-else class="d-flex">
@@ -61,25 +63,26 @@ onMounted(() => {
               data-bs-toggle="modal"
               data-bs-target="#profileModal"
             >
-              profile
+              {{ getText('profile', language) }}
             </button>
             <button
               class="nav-link mx-4 fs-5 roboto-regular align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#friendsModal"
             >
-              friends
+              {{ getText('friends', language) }}
             </button>
             <button @click="logout" class="nav-link mx-4 fs-5 roboto-regular align-self-center">
-              logout
+              {{ getText('logout', language) }}
             </button>
           </div>
-					<div class="d-flex me-3">
+					<ButtonComp @click="toggleLanguage" class="mx-4" style="width: 40px;">{{ language }}</ButtonComp>
+					<!-- <div class="d-flex me-3">
 						<select v-model="language" class="language text-white" name="language" id="language">
 								<option>EN</option>
 								<option>RU</option>
 						</select>
-					</div>
+					</div> -->
         </div>
       </div>
     </nav>

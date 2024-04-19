@@ -1,5 +1,33 @@
 <script setup>
+import {ref} from 'vue'
 import ButtonComp from '../components/ButtonComp.vue'
+
+// variables
+const username = ref('')
+const email = ref('')
+const password = ref('')
+const password2 = ref('')
+
+// funcions
+const submit = async () => {
+	const response = await fetch('http://127.0.0.1:8000/register/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        // username: 'newuser123',
+        // password: 'securepassword',
+        // email: 'user@example.com'
+				username: username.value,
+        password: password.value,
+        email: email.value
+    })
+	})
+	const data = await response.json()
+	console.log(data)
+}
+
 </script>
 
 <template>
@@ -22,7 +50,7 @@ import ButtonComp from '../components/ButtonComp.vue'
       <div
         class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
       >
-        <input autocomplete="off" type="text" id="username" placeholder="username" />
+        <input v-model="username" autocomplete="off" type="text" id="username" placeholder="username" />
         <span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
           person
         </span>
@@ -30,7 +58,7 @@ import ButtonComp from '../components/ButtonComp.vue'
       <div
         class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
       >
-        <input autocomplete="off" type="email" id="email" placeholder="e-mail" />
+        <input v-model="email" autocomplete="off" type="email" id="email" placeholder="e-mail" />
         <span
           class="icon material-symbols-outlined"
           style="font-size: 22px; color: white; margin-right: 1px"
@@ -41,7 +69,7 @@ import ButtonComp from '../components/ButtonComp.vue'
       <div
         class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
       >
-        <input autocomplete="off" type="password" id="password" placeholder="password" />
+        <input v-model="password" autocomplete="off" type="password" id="password" placeholder="password" />
         <span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
           lock
         </span>
@@ -59,7 +87,7 @@ import ButtonComp from '../components/ButtonComp.vue'
           lock
         </span>
       </div>
-      <ButtonComp class="btn-lg fs-5 col-6 mx-auto mt-4">register</ButtonComp>
+      <ButtonComp @click="submit" class="btn-lg fs-5 col-6 mx-auto mt-4">register</ButtonComp>
       <div class="login col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">
         already have an account?
         <RouterLink class="login-link ps-1 roboto-bold" to="/login">login</RouterLink>

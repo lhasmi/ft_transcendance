@@ -1,5 +1,7 @@
 <script setup>
 import {ref} from 'vue'
+import { store } from '../store/store.js'
+import { getText } from '../language/language.js'
 import ButtonComp from '../components/ButtonComp.vue'
 
 // variables
@@ -16,9 +18,6 @@ const submit = async () => {
         'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-        // username: 'newuser123',
-        // password: 'securepassword',
-        // email: 'user@example.com'
 				username: username.value,
         password: password.value,
         email: email.value
@@ -44,21 +43,21 @@ const submit = async () => {
             keyboard_backspace
           </span>
         </RouterLink>
-        <h2 class="text-center roboto-bold my-2">register</h2>
+        <h2 class="text-center roboto-bold my-2">{{ getText('register', store.lang) }}</h2>
       </div>
       <hr class="splitter col-9 mx-auto m-0 mb-2" />
       <div
         class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
       >
-        <input v-model="username" autocomplete="off" type="text" id="username" placeholder="username" />
+        <input v-model="username" autocomplete="off" type="text" id="username" :placeholder="getText('username', store.lang)" />
         <span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
-          person
+				person
         </span>
       </div>
       <div
         class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
       >
-        <input v-model="email" autocomplete="off" type="email" id="email" placeholder="e-mail" />
+        <input v-model="email" autocomplete="off" type="email" id="email" :placeholder="getText('email', store.lang)" />
         <span
           class="icon material-symbols-outlined"
           style="font-size: 22px; color: white; margin-right: 1px"
@@ -69,7 +68,7 @@ const submit = async () => {
       <div
         class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
       >
-        <input v-model="password" autocomplete="off" type="password" id="password" placeholder="password" />
+        <input v-model="password" autocomplete="off" type="password" id="password" :placeholder="getText('password', store.lang)" />
         <span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
           lock
         </span>
@@ -78,19 +77,20 @@ const submit = async () => {
         class="input-container col-8 mx-auto mt-4 mb-4 d-flex justify-content-around align-items-center"
       >
         <input
+				v-model="password2"
           autocomplete="off"
           type="password"
-          id="passwordRepeat"
-          placeholder="repeat password"
+          id="password2"
+          :placeholder="getText('password', store.lang)"
         />
         <span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
           lock
         </span>
       </div>
-      <ButtonComp @click="submit" class="btn-lg fs-5 col-6 mx-auto mt-4">register</ButtonComp>
+      <ButtonComp @click="submit" class="btn-lg fs-5 col-6 mx-auto mt-4">{{ getText('register', store.lang) }}</ButtonComp>
       <div class="login col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">
-        already have an account?
-        <RouterLink class="login-link ps-1 roboto-bold" to="/login">login</RouterLink>
+        {{ getText('alreadyHaveAcc', store.lang) }}
+        <RouterLink class="login-link	roboto-bold" to="/login">{{ getText('login', store.lang) }}</RouterLink>
       </div>
     </div>
   </section>

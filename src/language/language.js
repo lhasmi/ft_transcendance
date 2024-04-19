@@ -43,6 +43,31 @@ const translations = {
 		en: 'login to play online',
 		de: 'loggen zu spielen online',
 		ru: 'войди чтобы играть онлайн'
+	},
+	alreadyHaveAcc: {
+		en: 'already have an account?',
+		de: 'habt ein Konto?',
+		ru: 'уже есть аккаунт?'
+	},
+	dontHaveAcc: {
+		en: 'don’t have an account?',
+		de: 'habt kein Konto?',
+		ru: 'еще не зарегестрирован?'
+	},
+	username: {
+		en: 'username',
+		de: 'username',
+		ru: 'имя пользователя'
+	},
+	email: {
+		en: 'email',
+		de: 'email',
+		ru: 'э-почта'
+	},
+	password: {
+		en: 'password',
+		de: 'passwort',
+		ru: 'пароль'
 	}
 }
 

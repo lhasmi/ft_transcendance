@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import router from '@/router'
 import { store } from '../store/store.js'
+import { getText } from '../language/language.js'
+import router from '@/router'
 import ButtonComp from '../components/ButtonComp.vue'
 
 const username = ref('')
@@ -35,14 +36,14 @@ const submit = (e) => {
             keyboard_backspace
           </span>
         </RouterLink>
-        <h2 class="text-center roboto-bold my-2">login</h2>
+        <h2 class="text-center roboto-bold my-2">{{ getText('login', store.lang) }}</h2>
       </div>
       <hr class="splitter col-9 mx-auto m-0 mb-2" />
 			<form class="d-flex flex-column" action="">
 				<div
 					class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
 				>
-					<input v-model="username" type="text" id="username" placeholder="username" required />
+					<input v-model="username" type="text" id="username" :placeholder="getText('username', store.lang)" required />
 					<span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
 						person
 					</span>
@@ -50,16 +51,16 @@ const submit = (e) => {
 				<div
 					class="input-container col-8 mx-auto mt-4 mb-4 d-flex justify-content-around align-items-center"
 				>
-					<input v-model="password" type="password" id="password" placeholder="password" required />
+					<input v-model="password" type="password" id="password" :placeholder="getText('password', store.lang)" required />
 					<span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
 						lock
 					</span>
 				</div>
-				<ButtonComp @click="submit" class="btn-lg fs-5 col-6 mx-auto mt-4">login</ButtonComp>
+				<ButtonComp @click="submit" class="btn-lg fs-5 col-6 mx-auto mt-4">{{ getText('login', store.lang) }}</ButtonComp>
 			</form>
       <div class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">
-        don’t have an account?
-        <RouterLink class="register-link ps-1 roboto-bold" to="/register">register</RouterLink>
+        {{ getText('dontHaveAcc', store.lang) }}
+        <RouterLink class="register-link roboto-bold" to="/register">{{ getText('register', store.lang) }}</RouterLink>
       </div>
     </div>
   </section>

@@ -16,8 +16,8 @@ const testData = {
 const submit = (e) => {
 	e.preventDefault()
   if (username.value == testData.username && password.value == testData.password) {
+		store.userAuthorised = true
     router.push('/')
-    store.userAuthorised = true
   }
 }
 </script>

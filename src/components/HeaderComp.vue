@@ -77,12 +77,6 @@ onMounted(() => {
             </button>
           </div>
 					<ButtonComp @click="toggleLanguage" class="mx-4" style="width: 40px;">{{ language }}</ButtonComp>
-					<!-- <div class="d-flex me-3">
-						<select v-model="language" class="language text-white" name="language" id="language">
-								<option>EN</option>
-								<option>RU</option>
-						</select>
-					</div> -->
         </div>
       </div>
     </nav>

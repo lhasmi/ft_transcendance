@@ -83,7 +83,7 @@ const loadData = async () => {
 	// data = await response.json()
 	setTimeout(() => { // test
 		loader.value = false
-	}, 2000);
+	}, 1000);
 
 }
 
@@ -107,7 +107,7 @@ const shortEmail = (email) => {
   const atSignPos = email.search('@')
   let first
   if (atSignPos >= 10) {
-    first = email.substring(0, 8) + '...'
+		first = email.substring(0, 8) + '...'
   }
   return first + email.substring(atSignPos)
 }
@@ -163,7 +163,8 @@ onMounted(() => {
             </button>
 
             <h1
-              class="profile-modal-title modal-title fs-3 my-2 mx-auto roboto-bold"
+              class="modal-title fs-3 my-2 mx-auto roboto-bold"
+							style="color:#f58562"
               id="profileModalLabel"
             >
               {{ getText(title, store.lang) }}
@@ -299,7 +300,7 @@ onMounted(() => {
             {{ getText('editProfile', store.lang) }}
           </ButtonComp>
           <hr class="splitter col-9 mx-auto m-0" />
-          <h2 class="profile-modal-title fs-3 my-3 mx-auto roboto-bold">{{ getText('lastGames', store.lang) }}</h2>
+          <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">{{ getText('lastGames', store.lang) }}</h2>
           <div class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3">
             <div class="circle" :style="getCircleColor(4)"></div>
             <div class="circle" :style="getCircleColor(3)"></div>
@@ -326,10 +327,6 @@ onMounted(() => {
 .profile-modal {
   background: linear-gradient(145deg, rgba(60, 26, 153, 0.9) 23%, 55%, rgba(92, 42, 132, 0.9) 85%);
   backdrop-filter: blur(2px);
-}
-
-.profile-modal-title {
-  color: #f58562;
 }
 
 .profile-img {

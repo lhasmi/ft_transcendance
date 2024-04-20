@@ -58,13 +58,11 @@ const submit = async (e) => {
 					email: email.value
 			})
 		})
+		const data = await response.json()
+		console.log(data)
 		if (!response.ok) {
-			const data = await response.json()
-			console.log(data)
 			errorMsg.value = data.error
 		} else {
-			const data = await response.json()
-			console.log(data)
 			// store token, set userAuthorised to true, route to HomeView
 			store.userAuthorised = true
 			router.push('/')
@@ -196,9 +194,6 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
   -webkit-text-fill-color: white;
   transition: background-color 5000s ease-in-out 0s;
-}
-
-.error-msg {
 }
 
 .login {

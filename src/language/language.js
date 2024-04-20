@@ -29,6 +29,11 @@ const texts = {
 		de: 'anmeldung',
 		ru: 'регистрация'
 	},
+	status: {
+		en: 'status',
+		de: 'status',
+		ru: 'статус'
+	},
 	offline: {
 		en: 'offline',
 		de: 'offline',

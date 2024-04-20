@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import ButtonComp from './ButtonComp.vue';
+import ButtonComp from './ButtonComp.vue'
+import { store } from '../store/store.js'
+import { getText } from '../language/language.js'
 
 // test data
 let data = {
@@ -66,7 +68,7 @@ onMounted(() => {
               class="friends-modal-title modal-title fs-3 my-2 mx-auto roboto-bold"
               id="friendsModalLabel"
             >
-              friends
+              {{ getText('friends', store.lang) }}
             </h1>
             <button type="button" class="icon-close" data-bs-dismiss="modal" aria-label="Close">
               <span class="material-symbols-outlined" style="font-size: 2rem"> close </span>
@@ -85,7 +87,7 @@ onMounted(() => {
 				<!-- FRIENDS -->
         <div v-else class="modal-body p-0 d-flex flex-column" style="max-height: 396px">
 					<div v-if="data.friends.length === 0" class="col-9 col-md-7 mx-auto text-white text-center roboto-regular my-4">
-						friend list is empty
+						{{ getText('friendsListEmpty', store.lang) }}
 					</div>
           <div
             class="friend-item col-9 col-md-7 mx-auto d-flex justify-content-center my-2"
@@ -99,9 +101,9 @@ onMounted(() => {
 				<div v-if="!loader" class="modal-footer">
 					<hr class="splitter col-9 mx-auto m-0 mb-2" />	
 					<div class="col-9 col-md-7 mx-auto d-flex flex-column">
-						<label class="roboto-bold fs-5 text-center mb-1" style="color: #f58562" for="addFriend">add friend</label>
-						<input v-model="friendToAdd" class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center" type="text" id="addFriend" placeholder="username"/>
-						<ButtonComp class="">add</ButtonComp>
+						<label class="roboto-bold fs-5 text-center mb-1" style="color: #f58562" for="addFriend">{{ getText('addFriend', store.lang) }}</label>
+						<input v-model="friendToAdd" class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center" type="text" id="addFriend" :placeholder="getText('username', store.lang)"/>
+						<ButtonComp class="">{{ getText('add', store.lang) }}</ButtonComp>
 					</div>
       	</div>
       </div>

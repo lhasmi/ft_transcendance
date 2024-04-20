@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import ButtonComp from './ButtonComp.vue'
+import { store } from '../store/store.js'
+import { getText } from '../language/language.js'
 
 // test data
 let data = {
@@ -70,7 +72,7 @@ let data = {
 
 // variables
 const editProfile = ref(false)
-const gameHistory = ref(false)
+const gamesHistory = ref(false)
 const title = ref('profile')
 const loader = ref(true)
 
@@ -87,18 +89,18 @@ const loadData = async () => {
 
 const toEditProfile = () => {
   editProfile.value = true
-  title.value = 'edit profile'
+  title.value = 'editProfile'
 }
 
-const toGameHistory = () => {
-  gameHistory.value = true
-  title.value = 'game history'
+const toGamesHistory = () => {
+  gamesHistory.value = true
+  title.value = 'gamesHistory'
 }
 
 const backProfileModal = () => {
   title.value = 'profile'
   editProfile.value = false
-  gameHistory.value = false
+  gamesHistory.value = false
 }
 
 const shortEmail = (email) => {
@@ -150,7 +152,7 @@ onMounted(() => {
         <div class="modal-header border-0 d-flex flex-column m-0 p-0">
           <div class="d-flex position-relative w-100">
             <button
-              v-if="editProfile || gameHistory"
+              v-if="editProfile || gamesHistory"
               @click="backProfileModal"
               type="button"
               class="icon-back"
@@ -164,7 +166,7 @@ onMounted(() => {
               class="profile-modal-title modal-title fs-3 my-2 mx-auto roboto-bold"
               id="profileModalLabel"
             >
-              {{ title }}
+              {{ getText(title, store.lang) }}
             </h1>
             <button
               @click="backProfileModal"
@@ -197,7 +199,7 @@ onMounted(() => {
           </div>
           <form action="">
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
-              <label for="picture" class="roboto-bold text-white fs-6">picture:</label>
+              <label for="picture" class="roboto-bold text-white fs-6">{{ getText('picture', store.lang) }}:</label>
               <input
                 @change="changePicture"
                 class="picture-input text-white roboto-regular fs-6 ms-2"
@@ -207,7 +209,7 @@ onMounted(() => {
               />
             </div>
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
-              <label for="username" class="roboto-bold text-white fs-6">username:</label>
+              <label for="username" class="roboto-bold text-white fs-6">{{ getText('username', store.lang) }}:</label>
               <input
                 class="text-input text-white roboto-regular fs-6 ms-2"
                 type="text"
@@ -216,7 +218,7 @@ onMounted(() => {
               />
             </div>
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
-              <label for="email" class="roboto-bold text-white fs-6">email:</label>
+              <label for="email" class="roboto-bold text-white fs-6">{{ getText('email', store.lang) }}:</label>
               <input
                 class="text-input text-white roboto-regular fs-6 ms-2"
                 type="email"
@@ -225,7 +227,7 @@ onMounted(() => {
               />
             </div>
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
-              <label for="password" class="roboto-bold text-white fs-6">password:</label>
+              <label for="password" class="roboto-bold text-white fs-6">{{ getText('password', store.lang) }}:</label>
               <input
                 class="text-input text-white roboto-regular fs-6 ms-2"
                 type="password"
@@ -234,7 +236,7 @@ onMounted(() => {
               />
             </div>
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-3 mb-md-4">
-              <label for="passwordRepeat" class="roboto-bold text-white fs-6">password:</label>
+              <label for="passwordRepeat" class="roboto-bold text-white fs-6">{{ getText('password', store.lang) }}:</label>
               <input
                 class="text-input text-white roboto-regular fs-6 ms-2"
                 type="password"
@@ -244,14 +246,14 @@ onMounted(() => {
             </div>
           </form>
           <div class="d-flex col-9 col-md-7 mx-auto justify-content-around mb-4">
-            <ButtonComp @click="backProfileModal" class="save-btn fs-6"> save changes </ButtonComp>
-            <ButtonComp @click="backProfileModal" class="cancel-btn fs-6"> cancel </ButtonComp>
+            <ButtonComp @click="backProfileModal" class="save-btn fs-6">{{ getText('saveChanges', store.lang) }}</ButtonComp>
+            <!-- <ButtonComp @click="backProfileModal" class="cancel-btn fs-6">{{ getText('cancel', store.lang) }}</ButtonComp> -->
           </div>
         </div>
 
         <!-- GAME HISTORY -->
         <div
-          v-else-if="gameHistory"
+          v-else-if="gamesHistory"
           class="modal-body p-0 d-flex flex-column mb-3"
           style="height: 396px"
         >
@@ -287,17 +289,17 @@ onMounted(() => {
             />
           </div>
           <p class="col-9 col-md-7 mx-auto roboto-bold mb-2 mb-md-3 text-white fs-6">
-            username: <span class="fs-6 ms-1">{{ data.username }}</span>
+            {{ getText('username', store.lang) }}: <span class="fs-6 ms-1">{{ data.username }}</span>
           </p>
           <p class="col-9 col-md-7 mx-auto roboto-bold mb-2 mb-md-3 text-white fs-6">
-            e-mail:
+            {{ getText('email', store.lang) }}:
             <span class="fs-6 ms-1">{{ shortEmail(data.email) }}</span>
           </p>
           <ButtonComp @click="toEditProfile" class="fs-6 col-9 col-md-7 mx-auto mb-4">
-            edit profile
+            {{ getText('editProfile', store.lang) }}
           </ButtonComp>
           <hr class="splitter col-9 mx-auto m-0" />
-          <h2 class="profile-modal-title fs-3 my-3 mx-auto roboto-bold">last games</h2>
+          <h2 class="profile-modal-title fs-3 my-3 mx-auto roboto-bold">{{ getText('lastGames', store.lang) }}</h2>
           <div class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3">
             <div class="circle" :style="getCircleColor(4)"></div>
             <div class="circle" :style="getCircleColor(3)"></div>
@@ -305,8 +307,8 @@ onMounted(() => {
             <div class="circle" :style="getCircleColor(1)"></div>
             <div class="circle" :style="getCircleColor(0)"></div>
           </div>
-          <ButtonComp @click="toGameHistory" class="fs-6 col-9 col-md-7 mx-auto mb-4">
-            game history
+          <ButtonComp @click="toGamesHistory" class="fs-6 col-9 col-md-7 mx-auto mb-4">
+            {{ getText('gamesHistory', store.lang) }}
           </ButtonComp>
         </div>
       </div>

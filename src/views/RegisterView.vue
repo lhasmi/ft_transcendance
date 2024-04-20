@@ -1,7 +1,7 @@
 <script setup>
 import {ref} from 'vue'
 import { store } from '../store/store.js'
-import { getText } from '../language/language.js'
+import { getText, getError } from '../language/language.js'
 import router from '@/router'
 import ButtonComp from '../components/ButtonComp.vue'
 
@@ -22,27 +22,26 @@ const errorMsg = ref('')
 // funcions
 const submit = async (e) => {
 	e.preventDefault()
-
 	// client side validation
 	// TODO: check username format and password format ???
 	if (!username.value) {
-		errorMsg.value = 'username is empty'
+		errorMsg.value = getError('usernameEmpty', store.lang)
 		return
 	}
 	if (!email.value) {
-		errorMsg.value = 'email is empty'
+		errorMsg.value = getError('emailEmpty', store.lang)
 		return
 	}
 	if (!validateEmail(email.value)) {
-		errorMsg.value = 'email is invalid'
+		errorMsg.value = getError('emailInvalid', store.lang)
 		return
 	}
 	if (!password.value) {
-		errorMsg.value = 'password is empty'
+		errorMsg.value = getError('passwordEmpty', store.lang)
 		return
 	}
 	if (password.value != password2.value) {
-		errorMsg.value = 'passwords doesn\'t match'
+		errorMsg.value = getError('passwordsDontMatch', store.lang)
 		return
 	}
 	errorMsg.value = ''

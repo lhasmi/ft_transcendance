@@ -114,6 +114,7 @@ const toFriendProfile = (friendItem) => {
 const backFriendsModal = () => {
   title.value = 'friends'
 	friendProfile.value = false
+	loadFriends()
 }
 
 onMounted(() => {
@@ -163,7 +164,7 @@ onMounted(() => {
               <span class="material-symbols-outlined" style="font-size: 2rem"> close </span>
             </button>
           </div>
-          <hr class="splitter col-9 mx-auto m-0 mb-2" />
+          <hr class="splitter col-12 mx-auto m-0 mb-2" />
         </div>
 
 				<!-- SPINNER -->
@@ -177,7 +178,7 @@ onMounted(() => {
 				<FriendProfileComp v-else-if="friendProfile" :data="friendData"/>
 
 				<!-- FRIENDS -->
-        <div v-else class="modal-body p-0 d-flex flex-column" style="max-height: 396px">
+        <div v-else class="modal-body p-0 d-flex flex-column" style="max-height: 326px">
 					<div v-if="data.friends.length === 0" class="col-9 col-md-7 mx-auto text-white text-center roboto-regular my-4">
 						{{ getText('friendsListEmpty', store.lang) }}
 					</div>
@@ -192,7 +193,7 @@ onMounted(() => {
 				</button>
         </div>
 				<div v-if="!loader && !friendProfile" class="modal-footer">
-					<hr class="splitter col-9 mx-auto m-0 mb-2" />	
+					<hr class="splitter col-12 mx-auto m-0 mb-2" />	
 					<div class="col-9 col-md-7 mx-auto d-flex flex-column">
 						<label class="roboto-bold fs-5 text-center mb-1" style="color: #f58562" for="addFriend">{{ getText('addFriend', store.lang) }}</label>
 						<input v-model="friendToAdd" class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center" type="text" id="addFriend" :placeholder="getText('username', store.lang)"/>

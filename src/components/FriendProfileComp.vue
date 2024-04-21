@@ -1,8 +1,6 @@
 <script setup>
-import { ref } from 'vue'
 import { store } from '../store/store.js'
 import { getText } from '../language/language.js'
-import ButtonComp from './ButtonComp.vue'
 
 const props = defineProps({
 	data: Object
@@ -41,7 +39,7 @@ const getCircleColor = (index) => {
 			{{ getText('status', store.lang) }}: <span class="fs-6 ms-1">{{ getText(props.data.status, store.lang) }}</span>
 			<div class="friend-status ms-2 my-auto" :style="getStatusColor(props.data.status)"></div>
 		</div>
-		<hr class="splitter col-9 mx-auto m-0" />
+		<hr class="splitter col-12 mx-auto m-0" />
 		<h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">{{ getText('lastGames', store.lang) }}</h2>
 		<div class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3">
 			<div class="circle" :style="getCircleColor(4)"></div>
@@ -50,7 +48,7 @@ const getCircleColor = (index) => {
 			<div class="circle" :style="getCircleColor(1)"></div>
 			<div class="circle" :style="getCircleColor(0)"></div>
 		</div>
-		<hr class="splitter col-9 mx-auto m-0 mt-3" />
+		<hr class="splitter col-12 mx-auto m-0 mt-3" />
 		<h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">{{ getText('gamesHistory', store.lang) }}</h2>
 		<div class="col-9 col-md-7 mx-auto mb-1" v-for="item in props.data.gamesHistory" :key="item.id">
 			<p class="game-date text-center text-white roboto-regular mb-1">{{ item.date }}</p>

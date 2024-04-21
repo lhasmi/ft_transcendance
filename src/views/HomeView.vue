@@ -16,7 +16,7 @@ import ButtonComp from '../components/ButtonComp.vue'
         class="offline-group d-flex flex-column justify-content-center align-content-center col-8 mx-auto"
       >
         <ButtonComp class="btn-lg fs-3" linkTo="/game">1 vs 1</ButtonComp>
-        <ButtonComp class="btn-lg fs-3 mt-3" linkTo="/game">{{ getText('tournament', store.lang) }}</ButtonComp>
+        <ButtonComp class="btn-lg fs-3 mt-3" linkTo="/tournament">{{ getText('tournament', store.lang) }}</ButtonComp>
         <h3 class="align-self-center my-1 roboto-bold fs-2">{{ getText('offline', store.lang) }}</h3>
       </div>
       <hr class="mode-splitter my-0 col-10 mx-auto" />

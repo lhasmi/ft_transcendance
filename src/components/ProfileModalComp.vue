@@ -9,7 +9,7 @@ let data = {
   username: 'pvznuzda',
   email: 'pashavznuzdajev@gmail.com',
   password: '12345',
-  gameHistory: [
+  gamesHistory: [
     {
       id: 8,
       player1: 'pvznuzda',
@@ -113,8 +113,8 @@ const shortEmail = (email) => {
 }
 
 const getCircleColor = (index) => {
-  if (index >= data.gameHistory.length) return 'background: rgba(255, 255, 255, 0.1)'
-  return data.gameHistory[index].score1 > data.gameHistory[index].score2
+  if (index >= data.gamesHistory.length) return 'background: rgba(255, 255, 255, 0.1)'
+  return data.gamesHistory[index].score1 > data.gamesHistory[index].score2
     ? 'background: #66bf6a'
     : 'background: #da4834'
 }
@@ -179,7 +179,7 @@ onMounted(() => {
               <span class="material-symbols-outlined" style="font-size: 2rem"> close </span>
             </button>
           </div>
-          <hr class="splitter col-9 mx-auto m-0 mb-2" />
+          <hr class="splitter col-12 mx-auto m-0 mb-2" />
         </div>
 
 				<!-- SPINNER -->
@@ -258,7 +258,7 @@ onMounted(() => {
           class="modal-body p-0 d-flex flex-column mb-3"
           style="height: 396px"
         >
-          <div class="col-9 col-md-7 mx-auto mb-1" v-for="item in data.gameHistory" :key="item.id">
+          <div class="col-9 col-md-7 mx-auto mb-1" v-for="item in data.gamesHistory" :key="item.id">
             <p class="game-date text-center text-white roboto-regular mb-1">{{ item.date }}</p>
             <div class="d-flex justify-content-center position-relative">
               <p class="player-left text-white roboto-regular fs-5">{{ item.player1 }}</p>
@@ -299,7 +299,7 @@ onMounted(() => {
           <ButtonComp @click="toEditProfile" class="fs-6 col-9 col-md-7 mx-auto mb-4">
             {{ getText('editProfile', store.lang) }}
           </ButtonComp>
-          <hr class="splitter col-9 mx-auto m-0" />
+          <hr class="splitter col-12 mx-auto m-0" />
           <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">{{ getText('lastGames', store.lang) }}</h2>
           <div class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3">
             <div class="circle" :style="getCircleColor(4)"></div>

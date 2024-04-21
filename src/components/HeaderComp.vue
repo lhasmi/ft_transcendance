@@ -33,8 +33,8 @@ onMounted(() => {
 
 <template>
   <!-- Header -->
-  <header class="container mt-2">
-    <nav class="navbar navbar-expand-md bg-white bg-opacity-10 m-auto myshadow rounded-4 py-1">
+  <header class="container-md mt-2">
+    <nav class="navbar navbar-expand-lg bg-white bg-opacity-10 m-auto myshadow rounded-4 py-1">
       <RouterLink class="navbar-brand ms-5 fs-3 roboto-medium" to="/">ft_transcendence</RouterLink>
       <button
         class="navbar-toggler me-3"

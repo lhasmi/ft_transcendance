@@ -1,31 +1,68 @@
 <script setup>
 import { ref } from 'vue'
 import { store } from '../store/store.js'
-import { getText } from '../language/language.js'
+import { getText, getError } from '../language/language.js'
 import router from '@/router'
 import ButtonComp from '../components/ButtonComp.vue'
 
-const username = ref('')
-const password = ref('')
 
 const testData = {
-  username: 'pvznuzda',
+	username: 'pvznuzda',
   password: '12345'
 }
 
-const submit = (e) => {
+// variables
+const username = ref('')
+const password = ref('')
+const errorMsg = ref('')
+
+// functions
+const submit = async (e) => {
 	e.preventDefault()
-  if (username.value == testData.username && password.value == testData.password) {
+  if (username.value == testData.username && password.value == testData.password) { // test
 		store.userAuthorised = true
     router.push('/')
   }
+
+	if (!username.value) {
+		errorMsg.value = getError('usernameEmpty', store.lang)
+		return
+	}
+	if (!password.value) {
+		errorMsg.value = getError('passwordEmpty', store.lang)
+		return
+	}
+	errorMsg.value = ''
+
+	// try {
+	// 	const response = await fetch('http://127.0.0.1:8000/login/', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 				'Content-Type': 'application/json',
+	// 		},
+	// 		body: JSON.stringify({
+	// 				username: username.value,
+	// 				password: password.value,
+	// 		})
+	// 	})
+	// 	const data = await response.json()
+	// 	console.log(data)
+	// 	if (!response.ok) {
+	// 		errorMsg.value = data.error
+	// 	} else {
+	// 		store.userAuthorised = true
+	// 		router.push('/')
+	// 	}
+	// } catch {
+	// 	errorMsg.value = 'fetch request failed'
+	// }
 }
+
 </script>
 
 <template>
   <section
-    class="container-xxl flex-grow-1 d-flex flex-column justify-content-center align-items-center"
-    style="height: 100%"
+    class="container-md flex-grow-1 d-flex flex-column justify-content-center align-items-center"
   >
     <div
       class="col-8 col-md-6 col-lg-4 col-xl-4 bg-white bg-opacity-10 rounded-4 myshadow d-flex flex-column"
@@ -38,8 +75,8 @@ const submit = (e) => {
         </RouterLink>
         <h2 class="text-center roboto-bold my-2">{{ getText('login', store.lang) }}</h2>
       </div>
-      <hr class="splitter col-9 mx-auto m-0 mb-2" />
-			<form class="d-flex flex-column" action="">
+      <hr class="splitter col-12 mx-auto m-0 mb-2" />
+			<form class="d-flex flex-column">
 				<div
 					class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
 				>
@@ -56,6 +93,7 @@ const submit = (e) => {
 						lock
 					</span>
 				</div>
+				<div v-if="errorMsg" class="my-1 fs-6 roboto-bold text-center" style="color: #da4834;">{{ errorMsg }}</div>
 				<ButtonComp @click="submit" class="btn-lg fs-5 col-6 mx-auto mt-4">{{ getText('login', store.lang) }}</ButtonComp>
 			</form>
       <div class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">

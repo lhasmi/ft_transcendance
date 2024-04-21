@@ -97,7 +97,7 @@ const validateEmail = (str) => {
         </RouterLink>
         <h2 class="text-center roboto-bold my-2">{{ getText('register', store.lang) }}</h2>
       </div>
-      <hr class="splitter col-9 mx-auto m-0 mb-2" />
+      <hr class="splitter col-12 mx-auto m-0 mb-2" />
 			<form class="col-9 col-md-8 mx-auto">
 				<div
 					class="input-container mt-4 mb-2 d-flex justify-content-around align-items-center"
@@ -134,7 +134,7 @@ const validateEmail = (str) => {
 						lock
 					</span>
 				</div>
-				<div v-if="errorMsg" class="error-msg my-1 fs-6 roboto-bold text-center" style="color: #da4834;">{{ errorMsg }}</div>
+				<div v-if="errorMsg" class="my-1 fs-6 roboto-bold text-center" style="color: #da4834;">{{ errorMsg }}</div>
 				<ButtonComp @click="submit" class="btn-lg mt-4 fs-5 d-flex mx-auto">{{ getText('register', store.lang) }}</ButtonComp>
 			</form>
       <div class="login col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">

@@ -11,7 +11,11 @@ import HeaderComp from './components/HeaderComp.vue'
   </main>
 </template>
 
-<style scoped>
+<style>
+body {
+	background: #3b1a99;
+}
+
 main {
   min-height: 100vh;
   max-width: 100vw;

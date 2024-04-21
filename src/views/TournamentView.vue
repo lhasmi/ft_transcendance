@@ -5,25 +5,32 @@ import ButtonComp from '../components/ButtonComp.vue'
 // variables
 const players = ref([])
 const playersAmount = ref(0)
-const tournamentRegistrationState = ref(false)
-const tournamentGameState = ref(false)
-const tournamentTableState = ref(false)
+const tournamentState = ref('')
+
 const errorMsg = ref('')
 const upcomingMatches = ref([])
+
+const states = Object.freeze({
+	registration: 'registrationState',
+	table: 'tableState',
+	game: 'gameState'
+})
 
 // functions
 const toRegistrationState = (number) => {
 	playersAmount.value = number
-	tournamentRegistrationState.value = true
+	tournamentState.value = states.registration
 }
 
 const toTableState = () => {
 	if (!validateInput()) return
-	tournamentTableState.value = true
-	tournamentGameState.value = false
-	tournamentRegistrationState.value = false
-
 	generateUpcomingMatches()
+	tournamentState.value = states.table
+}
+
+const toGameState = () => {
+	tournamentState.value = states.game
+
 }
 
 const generateUpcomingMatches = () => {
@@ -66,7 +73,7 @@ const validateInput = () => {
 <template>
 	<div class="container d-flex flex-grow-1 justify-content-center align-items-center ">
 		<!-- TOURNAMENT REGISTRATION -->
-		<div v-if="tournamentRegistrationState" class="myshadow bg-white bg-opacity-10 col-11 col-sm-10 col-md-8 col-lg-6 rounded-4">
+		<div v-if="tournamentState === states.registration" class="myshadow bg-white bg-opacity-10 col-11 col-sm-10 col-md-8 col-lg-6 rounded-4">
 			<p class="m-0 mt-3 mb-2 fs-3 roboto-bold text-center" style="color:#f58562">tournament registration</p>
 			<hr class="splitter col-12 mx-auto m-0 mb-4" />
 			<div v-for="n in playersAmount / 2" :key="n" class="row">
@@ -83,17 +90,24 @@ const validateInput = () => {
 			<ButtonComp @click="toTableState" class="btn-lg mt-3 mb-4 fs-5 d-flex justify-content-center mx-auto col-6 col-lg-4">ready</ButtonComp>
 		</div>
 		<!-- TOURNAMENT TABLE -->
-		<div class="myshadow bg-white bg-opacity-10 col-11 col-sm-8 col-md-6 col-lg-4 rounded-4" v-else-if="tournamentTableState">
+		<div v-else-if="tournamentState === states.table" class="myshadow bg-white bg-opacity-10 col-11 col-sm-8 col-md-6 col-lg-4 rounded-4">
 			<p class="m-0 mt-3 mb-2 fs-3 roboto-bold text-center" style="color:#f58562">upcoming matches</p>
 			<hr class="splitter col-12 mx-auto m-0 mb-4" />
-			<div v-for="match in upcomingMatches" :key="match[0]">
-				<p class="fs-4 text-white text-center roboto-bold">{{ match[0] }} <span style="color: #f58562;">vs</span> {{ match[1] }}</p>
+			<div v-for="match in upcomingMatches" :key="match[0]" class="match-item col-11 col-sm-9 mx-auto">
+				<div class="row">
+					<div class="col text-end roboto-bold fs-4 text-white my-2 text-break">{{ match[0] }}</div>
+					<div class="col-2 text-center roboto-bold fs-4 my-2 align-self-center" style="color: #f58562;">vs</div>
+					<div class="col text-start roboto-bold fs-4 text-white my-2 text-break">{{ match[1] }}</div>
+				</div>
+				<!-- <p class="fs-4 m-0 my-2 text-white text-center roboto-bold">{{ match[0] }} <span style="color: #f58562;">vs</span> {{ match[1] }}</p> -->
 			</div>
-			<ButtonComp class="btn-lg mt-3 mb-4 fs-5 d-flex justify-content-center mx-auto col-7 col-lg-5">start</ButtonComp>
+			<ButtonComp @click="toGameState" class="btn-lg mt-3 mb-4 fs-5 d-flex justify-content-center mx-auto col-7 col-lg-5">start</ButtonComp>
 		</div>
 
 		<!-- TOURNAMENT GAME -->
-		<div v-else-if="tournamentGameState">tournament game</div>
+		<div v-else-if="tournamentState === states.game">
+			tournament game
+		</div>
 
 		<!-- CHOOSE AMOUNT OF PLAYERS -->
 		<div v-else class="myshadow bg-white bg-opacity-10 col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4 rounded-4 d-flex flex-column align-items-center">
@@ -149,6 +163,13 @@ input:-webkit-autofill:focus {
 
 .numeric {
   border-bottom: solid 2px #f58562;
+}
+
+.match-item {
+	border-bottom: 2px solid white;
+}
+.match-item:last-of-type {
+	border: none;
 }
 
 </style>

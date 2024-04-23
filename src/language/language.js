@@ -118,6 +118,56 @@ const texts = {
 		en: 'add',
 		de: 'hinzufügen',
 		ru: 'добавить'
+	},
+	isEmpty: {
+		en: 'is empty',
+		de: 'ist leer',
+		ru: 'пусто'
+	},
+	and: {
+		en: 'and',
+		de: 'und',
+		ru: 'и'
+	},
+	areSame: {
+		en: 'are the same',
+		de: 'sind gleich',
+		ru: 'одинаковы'
+	},
+	tournamentRegistration: {
+		en: 'tournament registration',
+		de: 'turnieranmeldung',
+		ru: 'регистрация на турнир'
+	},
+	upcomingMatches: {
+		en: 'upcoming matches',
+		de: 'bevorstehende spiele',
+		ru: 'следующие матчи'
+	},
+	tournamentFinished: {
+		en: 'tournament finished',
+		de: 'turnier beendet',
+		ru: 'турнир окончен'
+	},
+	chooseAmountPlayers: {
+		en: 'choose amount of players',
+		de: 'anzahl der spieler',
+		ru: 'выбери кол-во игроков'
+	},
+	ready: {
+		en: 'ready',
+		de: 'bereit',
+		ru: 'готово'
+	},
+	start: {
+		en: 'start',
+		de: 'starten',
+		ru: 'старт'
+	},
+	isWinner: {
+		en: 'is the winner',
+		de: 'ist gewinner',
+		ru: 'победитель'
 	}
 }
 

@@ -34,8 +34,8 @@ onMounted(() => {
 <template>
   <!-- Header -->
   <header class="container-md mt-2">
-    <nav class="navbar navbar-expand-lg bg-white bg-opacity-10 m-auto myshadow rounded-4 py-1">
-      <RouterLink class="navbar-brand ms-5 fs-3 roboto-medium" to="/">ft_transcendence</RouterLink>
+    <nav class="navbar navbar-expand-lg bg-white bg-opacity-10 m-auto myshadow rounded-4 py-2" style="width: 100%;">
+      <RouterLink class="navbar-brand ms-5 fs-2 roboto-bold" to="/">ft_transcendence</RouterLink>
       <button
         class="navbar-toggler me-3"
         type="button"
@@ -50,29 +50,29 @@ onMounted(() => {
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav ms-auto">
           <div v-if="!store.userAuthorised" class="d-flex">
-            <RouterLink class="nav-link mx-4 fs-5 roboto-medium align-self-center" to="/register"
+            <RouterLink class="nav-link mx-4 fs-4 roboto-medium align-self-center" to="/register"
               >{{ getText('register', language) }}</RouterLink
             >
-            <RouterLink class="nav-link mx-4 fs-5 roboto-regular align-self-center" to="/login"
+            <RouterLink class="nav-link mx-4 fs-4 roboto-medium align-self-center" to="/login"
               >{{ getText('login', language) }}</RouterLink
             >
           </div>
           <div v-else class="d-flex">
             <button
-              class="nav-link mx-4 fs-5 roboto-regular align-self-center"
+              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#profileModal"
             >
               {{ getText('profile', language) }}
             </button>
             <button
-              class="nav-link mx-4 fs-5 roboto-regular align-self-center"
+              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#friendsModal"
             >
               {{ getText('friends', language) }}
             </button>
-            <button @click="logout" class="nav-link mx-4 fs-5 roboto-regular align-self-center">
+            <button @click="logout" class="nav-link mx-4 fs-4 roboto-medium align-self-center">
               {{ getText('logout', language) }}
             </button>
           </div>

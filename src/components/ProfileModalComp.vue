@@ -8,7 +8,8 @@ import { getText } from '../language/language.js'
 let data = {
   username: 'pvznuzda',
   email: 'pashavznuzdajev@gmail.com',
-  password: '12345',
+  // password: '12345',
+	picture: '',
   gamesHistory: [
     {
       id: 8,
@@ -75,6 +76,12 @@ const editProfile = ref(false)
 const gamesHistory = ref(false)
 const title = ref('profile')
 const loader = ref(true)
+const newUsername = ref('')
+const newEmail = ref('')
+const newPicture = ref('') // TODO LATER
+const newPassword = ref('')
+const newPassword2 = ref('')
+const errorMsg = ref('')
 
 // functions
 const loadData = async () => {
@@ -85,6 +92,12 @@ const loadData = async () => {
 		loader.value = false
 	}, 1000);
 
+}
+
+// decide how to send data (send object with only updated fields or send object with all fields and leave unmodified empty?)
+const saveChanges = async () => {
+	// validate new input
+	// send post request with updated fields
 }
 
 const toEditProfile = () => {
@@ -212,6 +225,7 @@ onMounted(() => {
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
               <label for="username" class="roboto-bold text-white fs-6">{{ getText('username', store.lang) }}:</label>
               <input
+								v-model="newUsername"
                 class="text-input text-white roboto-regular fs-6 ms-2"
                 type="text"
                 id="username"
@@ -221,6 +235,7 @@ onMounted(() => {
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
               <label for="email" class="roboto-bold text-white fs-6">{{ getText('email', store.lang) }}:</label>
               <input
+								v-model="newEmail"
                 class="text-input text-white roboto-regular fs-6 ms-2"
                 type="email"
                 id="email"
@@ -230,26 +245,27 @@ onMounted(() => {
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
               <label for="password" class="roboto-bold text-white fs-6">{{ getText('password', store.lang) }}:</label>
               <input
-                class="text-input text-white roboto-regular fs-6 ms-2"
+								v-model="newPassword"
+								class="text-input text-white roboto-regular fs-6 ms-2"
                 type="password"
                 id="password"
-                :placeholder="data.password.replace(/[ -~]/g, '*')"
               />
             </div>
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-3 mb-md-4">
               <label for="passwordRepeat" class="roboto-bold text-white fs-6">{{ getText('password', store.lang) }}:</label>
               <input
+								v-model="newPassword2"
                 class="text-input text-white roboto-regular fs-6 ms-2"
                 type="password"
                 id="passwordRepeat"
-                :placeholder="data.password.replace(/[ -~]/g, '*')"
               />
             </div>
-          </form>
-          <div class="d-flex col-9 col-md-7 mx-auto justify-content-around mb-4">
-            <ButtonComp @click="backProfileModal" class="save-btn fs-6">{{ getText('saveChanges', store.lang) }}</ButtonComp>
-            <!-- <ButtonComp @click="backProfileModal" class="cancel-btn fs-6">{{ getText('cancel', store.lang) }}</ButtonComp> -->
-          </div>
+						<div v-if="errorMsg" class="my-1 fs-6 roboto-bold text-center" style="color: #da4834;">{{ errorMsg }}</div>
+						<div class="d-flex col-9 col-md-7 mx-auto justify-content-around my-4">
+							<ButtonComp @click="backProfileModal" class="save-btn fs-6">{{ getText('saveChanges', store.lang) }}</ButtonComp>
+							<!-- <ButtonComp @click="backProfileModal" class="cancel-btn fs-6">{{ getText('cancel', store.lang) }}</ButtonComp> -->
+						</div>
+					</form>
         </div>
 
         <!-- GAME HISTORY -->

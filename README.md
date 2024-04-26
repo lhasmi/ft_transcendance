@@ -149,3 +149,5 @@ myapp.Player.profile_picture: (fields.E210) Cannot use ImageField because Pillow
 ### Additional Tips
 - **Testing:** I recommend using tools like Postman or similar to thoroughly test these endpoints before integrating them into the frontend.
 
+##### For the form handling profile pictures
+ the frontend form that submits to this API should use enctype="multipart/form-data" 

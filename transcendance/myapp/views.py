@@ -4,14 +4,16 @@ from .serializers import PlayerSerializer, GameSerializer
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework import permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-
-# using ModelViewSet, which provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
+from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
+# using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
 #    Serializer Class:  linked to their respective serializers.
 class PlayerViewSet(viewsets.ModelViewSet):
@@ -67,14 +69,25 @@ class UserLoginAPIView(APIView):
             return Response({'error': 'Invalid Credentials'}, status=status.HTTP_404_NOT_FOUND)
 
 
+def validate_image(image):
+    max_size = 2 * 1024 * 1024  # 2MB
+    if image.size > max_size:
+        raise ValidationError("The maximum file size that can be uploaded is 2MB")
+    if not image.name.endswith(('.png', '.jpg', '.jpeg')):
+        raise ValidationError("Only JPEG and PNG files are allowed.")
+
+
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser,)  # to handle file upload
 
-    def put(self, request):
+    def put(self, request, *args, **kwargs):
         user = request.user
+        player = user.player  # Accessing the Player model of this User
         username = request.data.get('username')
         email = request.data.get('email')
-        password = request.data.get('password')  # Optional: handle changing password securely
+        password = request.data.get('password')
+        profile_picture = request.FILES.get('profile_picture')  # Get uploaded image
 
         if username:
             user.username = username
@@ -82,6 +95,13 @@ class UserProfileUpdateAPIView(APIView):
             user.email = email
         if password:
             user.set_password(password)
+        if profile_picture:
+            try:
+                validate_image(profile_picture)
+                player.profile_picture = profile_picture
+            except ValidationError as e:
+                raise DRFValidationError({'profile_picture': e.message})
         
         user.save()
+        player.save()
         return Response({'message': 'User profile updated successfully'}, status=status.HTTP_200_OK)

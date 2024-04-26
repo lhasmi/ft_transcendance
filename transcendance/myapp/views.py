@@ -79,6 +79,12 @@ class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser,)  # to handle file upload
 
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        player = user.player
+        serializer = PlayerSerializer(player)
+        return Response(serializer.data)
+    
     def put(self, request, *args, **kwargs):
         user = request.user
         player = user.player  # Accessing the Player model of this User

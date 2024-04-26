@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 # Foreign Key Relations: using related_name for backwards navigation in relations.
 
 class Game(models.Model):
@@ -9,7 +10,10 @@ class Game(models.Model):
     game_over = models.BooleanField(default=False)
 
 class Player(models.Model):
-    username = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', default='default.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    #any reference to username or email can directly use player.user.username and player.user.email.
+    def __str__(self):
+        return f"{self.user.username}'s Player Profile"

@@ -69,3 +69,83 @@ python manage.py createsuperuser
 python manage.py migrate
 python manage.py runserver
 
+
+### Before you start
+myapp.Player.profile_picture: (fields.E210) Cannot use ImageField because Pillow is not installed.
+        HINT: Get Pillow at https://pypi.org/project/Pillow/ or run command "python -m pip install Pillow".
+
+#### Integration in Frontend : few tips (26.04.2024)
+
+**Base URL:** The base URL for accessing the API is `http://127.0.0.1:8000/`. 
+
+**1. User Registration**
+- **Endpoint:** `POST /register/`
+- **Payload:**
+  ```json
+  {
+    "username": "newuser",
+    "password": "password123",
+    "email": "user@example.com"
+  }
+  ```
+- **Success Response:** HTTP 201 (Created) with token
+  ```json
+  {
+    "message": "User created successfully",
+    "token": "abc123xyz"
+  }
+  ```
+- **Error Response:** HTTP 400 (Bad Request) with error message
+  ```json
+  {
+    "error": "A user with that username already exists."
+  }
+  ```
+
+**2. User Login**
+- **Endpoint:** `POST /login/`
+- **Payload:**
+  ```json
+  {
+    "username": "existinguser",
+    "password": "password123"
+  }
+  ```
+- **Success Response:** HTTP 200 (OK) with token
+  ```json
+  {
+    "token": "xyz123abc"
+  }
+  ```
+- **Error Response:** HTTP 404 (Not Found) with error message
+  ```json
+  {
+    "error": "Invalid Credentials"
+  }
+  ```
+
+**3. Update User Profile**
+- **Endpoint:** `PUT /update-profile/`
+- **Required:** User must be authenticated.
+- **Payload:**
+  ```json
+  {
+    "username": "updateduser",
+    "email": "newemail@example.com",
+    "password": "newpassword123"  // Optional
+  }
+  ```
+- **Success Response:** HTTP 200 (OK) with confirmation message
+  ```json
+  {
+    "message": "User profile updated successfully"
+  }
+  ```
+- **Headers:** Include the Authorization header with the token.
+  ```
+  Authorization: Token xyz123abc
+  ```
+
+### Additional Tips
+- **Testing:** I recommend using tools like Postman or similar to thoroughly test these endpoints before integrating them into the frontend.
+

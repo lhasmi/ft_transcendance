@@ -34,28 +34,29 @@ const submit = async (e) => {
 	}
 	errorMsg.value = ''
 
-	// try {
-	// 	const response = await fetch('http://127.0.0.1:8000/login/', {
-	// 		method: 'POST',
-	// 		headers: {
-	// 				'Content-Type': 'application/json',
-	// 		},
-	// 		body: JSON.stringify({
-	// 				username: username.value,
-	// 				password: password.value,
-	// 		})
-	// 	})
-	// 	const data = await response.json()
-	// 	console.log(data)
-	// 	if (!response.ok) {
-	// 		errorMsg.value = data.error
-	// 	} else {
-	// 		store.userAuthorised = true
-	// 		router.push('/')
-	// 	}
-	// } catch {
-	// 	errorMsg.value = 'fetch request failed'
-	// }
+	try {
+		const response = await fetch('http://127.0.0.1:8000/login/', {
+			method: 'POST',
+			headers: {
+					'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+					username: username.value,
+					password: password.value,
+			})
+		})
+		const data = await response.json()
+		console.log(data)
+		if (!response.ok) {
+			errorMsg.value = data.error
+		} else {
+			localStorage.setItem('token', data.token)
+			store.userAuthorised = true
+			router.push('/')
+		}
+	} catch {
+		errorMsg.value = 'fetch request failed'
+	}
 }
 
 </script>

@@ -94,9 +94,30 @@ const loadFriend = async (id) => {
 	}, 1000)
 }
 
-const addFriend = async () => {
+const addFriend = async (target) => {
 	// send "post" request to try to add a new friend
 	// on success fetch new friends list to rerender it
+	// try {
+	// 	const response = await fetch('127.0.0.1:8000/add-friend', {
+	// 		method: 'PUT',
+	// 		headers: {
+	// 			'Authorization': `Token ${localStorage.getItem('token')}`,
+	// 			'Content-Type': 'application/json'
+	// 		},
+	// 		body: JSON.stringify({
+	// 			username: target
+	// 		})
+	// 	})
+	// 	const data = response.json()
+	// 	if (!response.ok) {
+	// 		errorMsg.value = data.error
+	// 	} else {
+
+	// 	}
+	// } catch {
+	// 	console.log('fetch request failed')
+	// 	errorMsg.value = 'fetch request failed'
+	// }
 }
 
 const getStatusColor = (status) => {

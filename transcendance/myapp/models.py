@@ -11,7 +11,7 @@ class Game(models.Model):
 
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', default='default.jpg')
+    profile_picture = models.ImageField(upload_to='media/', default='default.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
 
     #any reference to username or email can directly use player.user.username and player.user.email.

@@ -61,7 +61,7 @@ ALTER ROLE lh_db CREATEDB;
 CREATE DATABASE "djangotrans_db";
 \l
 \q
-
+python -m pip install Pillow
 python manage.py migrate
 
 python manage.py createsuperuser

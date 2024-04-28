@@ -6,7 +6,7 @@ import { getText } from '../language/language.js'
 
 // test data
 let data = {
-  username: 'pvznuzda',
+  username: 'pvznuzdaTest',
   email: 'pashavznuzdajev@gmail.com',
   // password: '12345',
 	picture: '',
@@ -78,7 +78,7 @@ const title = ref('profile')
 const loader = ref(true)
 const newUsername = ref('')
 const newEmail = ref('')
-const newPicture = ref('') // TODO LATER
+const newPicture = ref(null)
 const newPassword = ref('')
 const newPassword2 = ref('')
 const errorMsg = ref('')
@@ -86,18 +86,89 @@ const errorMsg = ref('')
 // functions
 const loadData = async () => {
 	loader.value = true
-	// const response = await fetch("127.0.0.1:8000/profile")
-	// data = await response.json()
-	setTimeout(() => { // test
-		loader.value = false
-	}, 1000);
+	try {
+		console.log('fetch profile')
+		const response = await fetch('http://127.0.0.1:8000/update-profile/', {
+			method: 'GET',
+			cache: 'no-cache',
+			headers: {
+				'Authorization': `Token ${localStorage.getItem('token')}`,
+			}
+		})
+		const newData = await response.json()
+		console.log(newData)
+		if (!response.ok) {
+			errorMsg.value = newData.error
+		} else {
+			data.username = newData.user.username
+			data.email = newData.user.email
+			data.picture = 'http://127.0.0.1:8000' + newData.profile_picture
+		}
+	} catch {
+		console.log('fetch error')
+		errorMsg.value = 'fetch request failed'
+	}
+	loader.value = false
 
+	// setTimeout(() => { // test
+	// 	loader.value = false
+	// }, 1000);
 }
 
-// decide how to send data (send object with only updated fields or send object with all fields and leave unmodified empty?)
-const saveChanges = async () => {
-	// validate new input
-	// send post request with updated fields
+const saveChanges = async (e) => {
+	e.preventDefault()
+	const formData = new FormData()
+	
+	if (!newUsername.value && !newEmail.value && !newPassword.value && !newPicture.value) {
+		errorMsg.value = 'no changes'
+		return
+	}
+
+	if (newUsername.value && newUsername.value === data.username) {
+		errorMsg.value = 'new username is same as old'
+		return
+	}
+	if (newEmail.value && newEmail.value === data.email) {
+		errorMsg.value = 'new email is same as old'
+		return
+	}
+	if (newPassword.value && newPassword.value !== newPassword2.value) {
+		errorMsg.value = 'passwords don\'t match'
+		return
+	}
+
+	if (newUsername.value)
+		formData.append('username', newUsername.value)
+	if (newEmail.value)
+		formData.append('email', newEmail.value)
+	if (newPassword.value)
+		formData.append('password', newPassword.value)
+	if (newPicture.value)
+		formData.append('profile_picture', newPicture.value, newPicture.value.name)
+
+	errorMsg.value = ''
+
+	try {
+		const response = await fetch('http://127.0.0.1:8000/update-profile/', {
+			method: 'PUT',
+			headers: {
+				'Authorization': `Token ${localStorage.getItem('token')}`,
+			},
+			body: formData
+		})
+		const newData = await response.json()
+		if (!response.ok) {
+			errorMsg.value = newData.error
+		} else {
+			console.log('profile updated')
+		}
+	} catch {
+		console.log('fetch error')
+		errorMsg.value = 'fetch request failed'
+	}
+	loadData()
+	backProfileModal()
+
 }
 
 const toEditProfile = () => {
@@ -121,7 +192,9 @@ const shortEmail = (email) => {
   let first
   if (atSignPos >= 10) {
 		first = email.substring(0, 8) + '...'
-  }
+  } else {
+		return email
+	}
   return first + email.substring(atSignPos)
 }
 
@@ -136,6 +209,7 @@ const changePicture = (e) => {
   console.log(e.target.files[0])
   console.log(URL.createObjectURL(e.target.files[0]))
   document.getElementById('profile_img').src = URL.createObjectURL(e.target.files[0])
+	newPicture.value = e.target.files[0]
 }
 
 onMounted(() => {
@@ -205,11 +279,19 @@ onMounted(() => {
         <div v-else-if="editProfile" class="modal-body p-0 d-flex flex-column">
           <div class="d-flex mb-2">
             <img
+              :src="data.picture"
+              alt="profile image"
+              id="profile_img"
+              class="profile-img my-2 mx-auto rounded-4"
+            />
+<!--             
+						<img
               src="../assets/profile_img.png"
               alt="profile image"
               id="profile_img"
               class="profile-img my-2 mx-auto rounded-4"
             />
+						 -->
           </div>
           <form action="">
             <div class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3">
@@ -262,7 +344,7 @@ onMounted(() => {
             </div>
 						<div v-if="errorMsg" class="my-1 fs-6 roboto-bold text-center" style="color: #da4834;">{{ errorMsg }}</div>
 						<div class="d-flex col-9 col-md-7 mx-auto justify-content-around my-4">
-							<ButtonComp @click="backProfileModal" class="save-btn fs-6">{{ getText('saveChanges', store.lang) }}</ButtonComp>
+							<ButtonComp @click="saveChanges" class="save-btn fs-6">{{ getText('saveChanges', store.lang) }}</ButtonComp>
 							<!-- <ButtonComp @click="backProfileModal" class="cancel-btn fs-6">{{ getText('cancel', store.lang) }}</ButtonComp> -->
 						</div>
 					</form>
@@ -300,7 +382,14 @@ onMounted(() => {
         <div v-else class="modal-body p-0 d-flex flex-column">
           <div class="d-flex">
             <img
+							v-if="!data.picture"
               src="../assets/profile_img.png"
+              alt="profile image"
+              class="profile-img my-2 mx-auto rounded-4"
+            />
+            <img
+							v-else
+              :src="data.picture"
               alt="profile image"
               class="profile-img my-2 mx-auto rounded-4"
             />

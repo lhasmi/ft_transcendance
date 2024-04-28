@@ -1,0 +1,2 @@
+=== backend ===
+* update-profile -> validate email on update attempt (currently can pass any value)

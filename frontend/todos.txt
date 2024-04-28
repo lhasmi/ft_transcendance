@@ -1,0 +1,28 @@
+=== backend ===
+* update-profile -> validate email on update attempt (currently can pass any value)
+* friends -> get request to receive a friend list of authenticated user
+* add-friend -> post/put request to add a friend to friend list if target user exists
+* friends/${friendId} or friend-profile -> get request to get profile data of a friend
+* on register or login -> increment user's online status counter by 1
+* on logout -> decrease user's online status by 1
+* ---
+* django-channels for online status
+* django-channels for remote players ?
+
+=== frontend ===
+* language support for profile (edit profile errorMsg)
+* abort fetch if modal is closed or switched to different view
+* invite a friend
+* remove a friend
+* check friends profile
+* online/offline status
+* logout
+* ---
+* JWT
+* 2FA
+* 42 API ?
+
+=== game ===
+* responsive
+* remote players ?
+* threej.s ?

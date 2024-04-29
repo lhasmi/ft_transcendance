@@ -2,7 +2,6 @@
 
 from django.db import migrations
 
-from django.db import migrations
 
 def create_missing_profiles_and_tokens(apps, schema_editor):
     User = apps.get_model('auth', 'User')
@@ -19,7 +18,8 @@ class Migration(migrations.Migration):
         ('myapp', '0006_alter_player_profile_picture'),  
         ('authtoken', '0004_alter_tokenproxy_options'),  # last one of output of 'python manage.py showmigrations authtoken'
     ]
-
+    # free the cash or open an incognito window and run both ends again 
+    # Run 'python manage.py collectstatic' to make sure all static files are gathered in the location from which they are served.
     operations = [
         migrations.RunPython(create_missing_profiles_and_tokens, reverse_code=migrations.RunPython.noop),
     ]

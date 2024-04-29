@@ -14,6 +14,8 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
 #    Serializer Class:  linked to their respective serializers.
+
+
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all().select_related('user') 
     serializer_class = PlayerSerializer

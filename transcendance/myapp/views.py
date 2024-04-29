@@ -7,10 +7,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
+from django.db import transaction
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
 #    Serializer Class:  linked to their respective serializers.
@@ -26,27 +27,21 @@ class GameViewSet(viewsets.ModelViewSet):
 
 class UserRegistrationAPIView(APIView):
     permission_classes = [AllowAny]
-
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
         email = request.data.get('email')
-
         if not username or not password or not email:
             return Response({"error": "Username, password, and email are required fields."},
                             status=status.HTTP_400_BAD_REQUEST)
-
         if User.objects.filter(username=username).exists():
             return Response({"error": "A user with that username already exists."},
                             status=status.HTTP_400_BAD_REQUEST)
-
         if User.objects.filter(email=email).exists():
             return Response({"error": "A user with that email already exists."},
                             status=status.HTTP_400_BAD_REQUEST)
-
         user = User.objects.create_user(username=username, email=email, password=password)
         token = Token.objects.get(user=user).key
-        
         return Response({"message": "User created successfully", "token": token},
                         status=status.HTTP_201_CREATED)
 
@@ -83,31 +78,65 @@ class UserProfileUpdateAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        player = user.player
-        serializer = PlayerSerializer(player)
-        return Response(serializer.data)
+        try:
+            player = user.player
+            serializer = PlayerSerializer(player)
+            return Response(serializer.data)
+        except Player.DoesNotExist:
+            return Response({"error": "Player profile does not exist"}, status=status.HTTP_404_NOT_FOUND)
     
     def put(self, request, *args, **kwargs):
         user = request.user
-        player = user.player  # Accessing the Player model of this User
+        try:
+            player = user.player  # Accessing the Player model of this User
+        except Player.DoesNotExist:
+            return Response({"error": "Player profile does not exist"}, status=status.HTTP_404_NOT_FOUND)
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
         profile_picture = request.FILES.get('profile_picture')  # Get uploaded image
 
-        if username:
-            user.username = username
-        if email:
-            user.email = email
-        if password:
-            user.set_password(password)
-        if profile_picture:
-            try:
-                validate_image(profile_picture)
-                player.profile_picture = profile_picture
-            except ValidationError as e:
-                raise DRFValidationError({'profile_picture': e.message})
+        try:
+            with transaction.atomic():
+                if username and username != user.username:
+                    if User.objects.filter(username=username).exists():
+                        return Response({"error": "This username is already taken."}, status=status.HTTP_400_BAD_REQUEST)
+                    user.username = username
+                if email and email != user.email:
+                    if User.objects.exclude(id=user.id).filter(email=email).exists():# Check if any other user has this email
+                        return Response({"error": "This email is already in use by another user."}, status=status.HTTP_400_BAD_REQUEST)
+                    user.email = email
+                if password:
+                    user.set_password(password)
+                    user.save()
+                    logout(request)  # Log out from all sessions after password change
+                if profile_picture:
+                    try:
+                        validate_image(profile_picture)
+                    except ValidationError as ve:
+                        raise DRFValidationError({'profile_picture': [str(ve)]})
+                    player.profile_picture = profile_picture
+                user.save()
+                player.save()
+            return Response({'message': 'User profile updated successfully'}, status=status.HTTP_200_OK)
+        except ValidationError as ve:
+            return Response({'error': str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': 'Failed to update profile due to an unexpected error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # if username:
+        #     user.username = username
+        # if email:
+        #     user.email = email
+        # if password:
+        #     user.set_password(password)
+        # if profile_picture:
+        #     try:
+        #         validate_image(profile_picture)
+        #         player.profile_picture = profile_picture
+        #     except ValidationError as e:
+        #         raise DRFValidationError({'profile_picture': e.message})
         
-        user.save()
-        player.save()
-        return Response({'message': 'User profile updated successfully'}, status=status.HTTP_200_OK)
+        # user.save()
+        # player.save()
+        # return Response({'message': 'User profile updated successfully'}, status=status.HTTP_200_OK)

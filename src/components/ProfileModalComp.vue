@@ -159,16 +159,27 @@ const saveChanges = async (e) => {
 		const newData = await response.json()
 		if (!response.ok) {
 			errorMsg.value = newData.error
+			console.log(newData.error)
+			return
 		} else {
 			console.log('profile updated')
 		}
 	} catch {
-		console.log('fetch error')
+		console.log('fetch request failed')
 		errorMsg.value = 'fetch request failed'
 	}
 	loadData()
 	backProfileModal()
 
+}
+
+const resetInput = () => {
+	newUsername.value = ''
+	newEmail.value = ''
+	newPassword.value = ''
+	newPassword2.value = ''
+	newPicture.value = null
+	errorMsg.value = null
 }
 
 const toEditProfile = () => {
@@ -185,6 +196,7 @@ const backProfileModal = () => {
   title.value = 'profile'
   editProfile.value = false
   gamesHistory.value = false
+	resetInput()
 }
 
 const shortEmail = (email) => {

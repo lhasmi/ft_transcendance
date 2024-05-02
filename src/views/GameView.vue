@@ -1,5 +1,37 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import ButtonComp from '../components/ButtonComp.vue';
+
+const testMode = ref(false)
+const player1 = ref('pvznuzda')
+const player2 = ref('opponent')
+const score = ref({
+  player1: 0,
+  player2: 0
+})
+
+const sendTestData = async () => {
+	
+	const response = await fetch('https://127.0.0.1:8000/game/', {
+		method: "POST",
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Token ${localStorage.getItem('token')}`,
+		},
+		body: JSON.stringify({
+			player1: player1.value,
+			player2: player2.value,
+			score: [score.value.player1, score.value.player2],
+		})
+	})
+
+	const data = await response.json()
+	if (!response.ok) {
+		console.log('error: ' + data.error)
+	}
+}
+
+// GAME
 
 let canvas
 let ctx
@@ -7,11 +39,6 @@ const playerWidth = 4
 const playerHeight = 100
 const playerSpeed = 3
 const ballSpeed = 2
-
-const score = ref({
-  player1: 0,
-  player2: 0
-})
 
 class Player {
   constructor(x = 0, y = 0) {
@@ -273,11 +300,30 @@ onMounted(() => {
   <section
     class="container flex-grow-1 d-flex flex-column justify-content-center align-items-center"
   >
+
+		<!-- TEST -->
+		<ButtonComp @click="testMode = !testMode" class="mb-3">test mode</ButtonComp>
+		<div v-if="testMode" class="row test-form py-2">
+			<div class="col d-flex">
+				<div class="d-flex flex-column justify-content-center align-items-center">
+					<label class="text-white roboto-regular fs-6" for="player1">{{ player1 }}</label>
+					<input v-model="score.player1" class="text-center" type="text" id="player1" :placeholder="player1">
+				</div>
+				<div class="d-flex flex-column justify-content-center align-items-center">
+					<label class="text-white roboto-regular fs-6" for="player2">{{ player2 }}</label>
+					<input v-model="score.player2" class="ms-2 text-center" type="text" id="player2" :placeholder="player2">
+				</div>
+				<ButtonComp @click="sendTestData" class="ms-2">send</ButtonComp>
+			</div>
+		</div>
+
+
     <div class="scoreboard col-6 mx-auto d-flex justify-content-around align-items-center">
       <p class="text-white fs-4 mb-0 roboto-medium">pvznuzda</p>
       <p class="text-white fs-2 mb-0 roboto-bold">{{ score.player1 }} : {{ score.player2 }}</p>
       <p class="text-white fs-4 mb-0 roboto-medium">opponent</p>
     </div>
+
     <canvas class="canvas" id="canvasId"></canvas>
     <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
@@ -325,4 +371,11 @@ onMounted(() => {
   transform: none;
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
 }
+
+/* test */
+.test-form {
+	border-bottom: 1px solid #f58562;
+	border-top: 1px solid #f58562;
+}
+
 </style>

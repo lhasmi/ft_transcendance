@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status, permissions
 from .models import Player, FriendRequest, Match
-from .serializers import PlayerSerializer, GameSerializer
+from .serializers import PlayerSerializer, MatchSerializer
 from django.contrib.auth.models import User
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response

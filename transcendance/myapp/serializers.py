@@ -4,7 +4,7 @@
 #  Fields Specification: enumerating fields that should be serialized/deserialized. 
 #   Meta Class Usage: Standard practice for DRF serializers.
 from rest_framework import serializers
-from .models import Player, Game
+from .models import Player, Match
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,10 +17,8 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['id', 'user', 'profile_picture', 'created_at']
-        extra_kwargs = {
-            'profile_picture': {'required': False}
-        }
+        fields = ['id', 'user', 'profile_picture', 'created_at', 'display_name', 'online_status']
+        extra_kwargs = {'profile_picture': {'required': False}}
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', None)
@@ -28,16 +26,14 @@ class PlayerSerializer(serializers.ModelSerializer):
             user_serializer = UserSerializer(instance.user, data=user_data, partial=True)
             if user_serializer.is_valid(raise_exception=True):
                 user_serializer.save()
-        
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         return instance
 
-class GameSerializer(serializers.ModelSerializer):
-    player1 = PlayerSerializer(read_only=True)
-    player2 = PlayerSerializer(read_only=True)
+class MatchSerializer(serializers.ModelSerializer):
+    players = PlayerSerializer(read_only=True, many=True)
 
     class Meta:
-        model = Game
-        fields = ['id', 'player1', 'player2', 'score1', 'score2', 'game_over']
+        model = Match
+        fields = ['id', 'players',  'winner', 'played_on', 'details']

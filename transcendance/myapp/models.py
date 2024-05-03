@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 # Foreign Key Relations: using related_name for backwards navigation in relations.
 
 
-
+# In Player model, we link every player with a specific user instance, which allows to add custom 
+# fields like profile_picture. This design indeed inherits and extends the base User model capabilities
+# by association rather than by modifying the existing User model. It is called a One-to-One relationship
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     display_name = models.CharField(max_length=255, unique=True, null=True, blank=True)

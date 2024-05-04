@@ -59,9 +59,17 @@ const errorMsg = ref('')
 
 // funcions
 const loadFriends = async () => {
+	console.log("load friends")
 	loader.value = true
 	try {
-		const response = await fetch('127.0.0.1:8000/friends')
+		console.log('1')
+		const response = await fetch('http://127.0.0.1:8000/list-online-friends/', {
+			method: "GET",
+			headers: {
+				'Authorization': `Token ${localStorage.getItem('token')}`,
+			}
+		})
+		console.log('2')
 		const data = await response.json()
 		console.log(data)
 		if (!response.ok) {
@@ -70,9 +78,10 @@ const loadFriends = async () => {
 	} catch {
 		errorMsg.value = 'fetch request failed'
 	}
-	setTimeout(() => { // test
-		loader.value = false
-	}, 1000);
+	loader.value = false
+	// setTimeout(() => { // test
+	// 	loader.value = false
+	// }, 1000);
 }
 
 const loadFriend = async (id) => {
@@ -97,27 +106,28 @@ const loadFriend = async (id) => {
 const addFriend = async (target) => {
 	// send "post" request to try to add a new friend
 	// on success fetch new friends list to rerender it
-	// try {
-	// 	const response = await fetch('127.0.0.1:8000/add-friend', {
-	// 		method: 'PUT',
-	// 		headers: {
-	// 			'Authorization': `Token ${localStorage.getItem('token')}`,
-	// 			'Content-Type': 'application/json'
-	// 		},
-	// 		body: JSON.stringify({
-	// 			username: target
-	// 		})
-	// 	})
-	// 	const data = response.json()
-	// 	if (!response.ok) {
-	// 		errorMsg.value = data.error
-	// 	} else {
+	try {
+		const response = await fetch('http://127.0.0.1:8000/send-friend-request/17/', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Token ${localStorage.getItem('token')}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username: target
+			})
+		})
+		const data = response.json()
+		console.log(data)
+		if (!response.ok) {
+			errorMsg.value = data.error
+		} else {
 
-	// 	}
-	// } catch {
-	// 	console.log('fetch request failed')
-	// 	errorMsg.value = 'fetch request failed'
-	// }
+		}
+	} catch {
+		console.log('fetch request failed')
+		errorMsg.value = 'fetch request failed'
+	}
 }
 
 const getStatusColor = (status) => {
@@ -135,13 +145,14 @@ const toFriendProfile = (friendItem) => {
 const backFriendsModal = () => {
   title.value = 'friends'
 	friendProfile.value = false
-	loadFriends()
+	// loadFriends()
 }
 
 onMounted(() => {
 	const friendsModal = document.getElementById('friendsModal')
 	friendsModal.addEventListener('show.bs.modal', e => {
 		loadFriends()
+		addFriend('test')
 	})
 	friendsModal.addEventListener('hidden.bs.modal', e => {
 		loader.value = true
@@ -166,7 +177,10 @@ onMounted(() => {
           <div class="d-flex position-relative w-100">
 						<button
               v-if="friendProfile"
-              @click="backFriendsModal"
+              @click="() => {
+								loadFriends()
+								backFriendsModal()
+							}"
               type="button"
               class="icon-back"
             >
@@ -213,7 +227,7 @@ onMounted(() => {
             <div class="friend-status ms-3 my-auto" :style="getStatusColor(item.status)"></div>
 				</button>
         </div>
-				<div v-if="!loader && !friendProfile" class="modal-footer">
+				<div v-if="!loader && !friendProfile" class="modal-footer p-0 pb-3 mt-2">
 					<hr class="splitter col-12 mx-auto m-0 mb-2" />	
 					<div class="col-9 col-md-7 mx-auto d-flex flex-column">
 						<label class="roboto-bold fs-5 text-center mb-1" style="color: #f58562" for="addFriend">{{ getText('addFriend', store.lang) }}</label>

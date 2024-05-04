@@ -317,11 +317,10 @@ onMounted(() => {
 			</div>
 		</div>
 
-
     <div class="scoreboard col-6 mx-auto d-flex justify-content-around align-items-center">
-      <p class="text-white fs-4 mb-0 roboto-medium">pvznuzda</p>
+      <p class="text-white fs-4 mb-0 roboto-medium">{{ player1 }}</p>
       <p class="text-white fs-2 mb-0 roboto-bold">{{ score.player1 }} : {{ score.player2 }}</p>
-      <p class="text-white fs-4 mb-0 roboto-medium">opponent</p>
+      <p class="text-white fs-4 mb-0 roboto-medium">{{ player2 }}</p>
     </div>
 
     <canvas class="canvas" id="canvasId"></canvas>

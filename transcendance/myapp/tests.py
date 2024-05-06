@@ -70,7 +70,6 @@ class MatchHistoryAPITestCase(APITestCase):
         self.assertTrue(len(response.data) > 0)
 
 
-
 class UserStatsAPITestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='player1', password='password1')

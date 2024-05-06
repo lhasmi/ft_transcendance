@@ -172,7 +172,7 @@ class FriendRequestAPIView(APIView):
             return Response({'error': 'Already friends'}, status=status.HTTP_409_CONFLICT)
         
         request.user.player.friends.add(friend_player)
-        friend_player.friends.add(request.user.player)
+        #friend_player.friends.add(request.user.player) #no need for this line since now symmetrical is true
 
         return Response({'message': 'Friend added successfully'}, status=status.HTTP_200_OK)
 

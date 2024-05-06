@@ -12,16 +12,16 @@ class Player(models.Model):
     profile_picture = models.ImageField(upload_to='media/', default='default.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
     online_status = models.BooleanField(default=False)
-    friends = models.ManyToManyField('self', blank=True)
+    friends = models.ManyToManyField('self', blank=True, symmetrical=False)
     #any reference to username or email can directly use player.user.username and player.user.email.
     def __str__(self):
         return f"{self.user.username}'s Player Profile"
 
 
-class FriendRequest(models.Model):
-    from_user = models.ForeignKey(Player, related_name="friend_requests_sent", on_delete=models.CASCADE)
-    to_user = models.ForeignKey(Player, related_name="friend_requests_received", on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
+# class FriendRequest(models.Model):
+#     from_user = models.ForeignKey(Player, related_name="friend_requests_sent", on_delete=models.CASCADE)
+#     to_user = models.ForeignKey(Player, related_name="friend_requests_received", on_delete=models.CASCADE)
+#     timestamp = models.DateTimeField(auto_now_add=True)
 
 class Match(models.Model):
     players = models.ManyToManyField(Player, related_name="matches")

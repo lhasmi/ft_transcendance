@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Player, Match, FriendRequest
+from .models import Player, Match
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
@@ -27,17 +27,17 @@ class MatchAdmin(admin.ModelAdmin):
         return ", ".join([player.user.username for player in obj.players.all()])
     display_players.short_description = 'Players'
 
-class FriendRequestAdmin(admin.ModelAdmin):
-    list_display = ('from_user', 'to_user', 'timestamp')
-    search_fields = ('from_user__user__username', 'to_user__user__username')
-    list_filter = ('timestamp',)
+# class FriendRequestAdmin(admin.ModelAdmin):
+#     list_display = ('from_user', 'to_user', 'timestamp')
+#     search_fields = ('from_user__user__username', 'to_user__user__username')
+#     list_filter = ('timestamp',)
 
-    def from_user(self, obj):
-        return obj.from_user.user.username
+#     def from_user(self, obj):
+#         return obj.from_user.user.username
 
-    def to_user(self, obj):
-        return obj.to_user.user.username
+#     def to_user(self, obj):
+#         return obj.to_user.user.username
 
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Match, MatchAdmin)
-admin.site.register(FriendRequest, FriendRequestAdmin)
+# admin.site.register(FriendRequest, FriendRequestAdmin)

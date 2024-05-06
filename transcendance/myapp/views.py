@@ -53,8 +53,11 @@ class UserRegistrationAPIView(APIView):
         if User.objects.filter(email=email).exists():
             return Response({"error": "A user with that email already exists."}, status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.create_user(username=username, email=email, password=password)
-        player = Player.objects.create(user=user, display_name=display_name)
-        token = Token.objects.get(user=user).key
+        # player = Player.objects.create(user=user, display_name=display_name) # will be created in signals.py
+        token = Token.objects.get_or_create(user=user)[0].key
+        if display_name:
+            user.player.display_name = display_name
+            user.player.save()
         return Response({"message": "User created successfully", "token": token}, status=status.HTTP_201_CREATED)
 
 
@@ -188,9 +191,9 @@ class UserStatsAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        wins = Match.objects.filter(winner=user).count()
-        total_games = user.matches.count()
+        player = request.user.player
+        wins = Match.objects.filter(winner=player).count()
+        total_games = player.matches.count()
         data = {'wins': wins, 'losses': total_games - wins}
         return Response(data, status=status.HTTP_200_OK)
 

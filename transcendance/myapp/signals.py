@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=User)
 def create_player_profile(sender, instance=None, created=False, **kwargs):
-    if created:
+    if created and not Player.objects.filter(user=instance).exists():
         try:
             with transaction.atomic():
                 Player.objects.create(user=instance)

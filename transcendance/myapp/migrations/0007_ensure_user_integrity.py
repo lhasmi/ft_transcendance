@@ -3,14 +3,6 @@
 from django.db import migrations
 
 
-def create_missing_profiles_and_tokens(apps, schema_editor):
-    User = apps.get_model('auth', 'User')
-    Player = apps.get_model('myapp', 'Player')
-    Token = apps.get_model('authtoken', 'Token')
-
-    for user in User.objects.all():
-        Player.objects.get_or_create(user=user)
-        Token.objects.get_or_create(user=user)
 
 class Migration(migrations.Migration):
 
@@ -21,5 +13,4 @@ class Migration(migrations.Migration):
     # free the cash or open an incognito window and run both ends again 
     # Run 'python manage.py collectstatic' to make sure all static files are gathered in the location from which they are served.
     operations = [
-        migrations.RunPython(create_missing_profiles_and_tokens, reverse_code=migrations.RunPython.noop),
     ]

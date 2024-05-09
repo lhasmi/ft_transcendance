@@ -1,5 +1,4 @@
 # Unit tests for online/offline status and WebSocket, run with 'python manage.py test myapp' (09.05.2024 lhasmi)
-# tests.py
 
 from django.urls import reverse
 from rest_framework import status, permissions

@@ -18,6 +18,7 @@ class PlayerAdmin(admin.ModelAdmin):
         return obj.user.email
     get_email.admin_order_field = 'user__email'
     get_email.short_description = 'Email'
+
 class MatchAdmin(admin.ModelAdmin):
     list_display = ('id', 'display_players', 'winner', 'played_on', 'details')
     search_fields = ('players__user__username', 'winner__user__username')
@@ -26,6 +27,10 @@ class MatchAdmin(admin.ModelAdmin):
     def display_players(self, obj):
         return ", ".join([player.user.username for player in obj.players.all()])
     display_players.short_description = 'Players'
+
+
+admin.site.register(Player, PlayerAdmin)
+admin.site.register(Match, MatchAdmin)
 
 # class FriendRequestAdmin(admin.ModelAdmin):
 #     list_display = ('from_user', 'to_user', 'timestamp')
@@ -37,7 +42,4 @@ class MatchAdmin(admin.ModelAdmin):
 
 #     def to_user(self, obj):
 #         return obj.to_user.user.username
-
-admin.site.register(Player, PlayerAdmin)
-admin.site.register(Match, MatchAdmin)
 # admin.site.register(FriendRequest, FriendRequestAdmin)

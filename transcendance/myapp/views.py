@@ -202,9 +202,14 @@ class UpdateOnlineStatusAPIView(APIView):
 
     def post(self, request):
         player = request.user.player
-        player.online_status = True
-        player.save()
-        return Response({'message': 'Online status updated.'})
+        status = request.data.get('status', 'online')
+        if status == 'online':
+            player.set.online()
+        else:
+            player.set.offline()
+        #player.online_status = True
+        #player.save()
+        return Response({'message': f'Player is now {status}.'})
 
 class ListFriendsAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]

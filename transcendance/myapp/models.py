@@ -16,6 +16,12 @@ class Player(models.Model):
     #any reference to username or email can directly use player.user.username and player.user.email.
     def __str__(self):
         return f"{self.user.username}'s Player Profile"
+    def set_online(self):## For status online tracking
+        self.online_status = True
+        self.save()
+    def set_offline(self):## For status offline tracking
+        self.online_status = False
+        self.save()
 
 class Match(models.Model):
     players = models.ManyToManyField(Player, related_name="matches")
@@ -23,6 +29,7 @@ class Match(models.Model):
     played_on = models.DateTimeField(auto_now_add=True)
     details = models.TextField()
 
+# For status online/offline tracking
 
 # class FriendRequest(models.Model):
 #     from_user = models.ForeignKey(Player, related_name="friend_requests_sent", on_delete=models.CASCADE)

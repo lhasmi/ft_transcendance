@@ -151,3 +151,22 @@ myapp.Player.profile_picture: (fields.E210) Cannot use ImageField because Pillow
 
 ##### For the form handling profile pictures
  the frontend form that submits to this API should use enctype="multipart/form-data" 
+
+
+#### ################################################################################################# 
+### Dependencies to incorporate real-time functionality and WebSocket integration with Django Channels,
+#### ##################################################################################################
+
+#  Install Django Channels and ASGI Redis and daphne for testing
+pip install channels channels-redis daphne
+
+# on  macos install redis
+brew install redis
+
+# start redis manually you should see "==> Successfully started `redis` (label: homebrew.mxcl.redis)"
+brew services start redis
+# verify redis is running
+redis-cli ping
+
+
+

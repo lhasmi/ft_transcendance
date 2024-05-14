@@ -50,7 +50,8 @@ const submit = async (e) => {
 		if (!response.ok) {
 			errorMsg.value = data.error
 		} else {
-			localStorage.setItem('token', data.token)
+			localStorage.setItem('access', data.access)
+			localStorage.setItem('refresh', data.refresh)
 			store.userAuthorised = true
 			router.push('/')
 		}

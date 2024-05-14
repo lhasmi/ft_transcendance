@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import ButtonComp from './ButtonComp.vue'
 import { store } from '../store/store.js'
 import { getText } from '../language/language.js'
+import { refreshAccessToken, fetchWithJWT } from '../utils/utils.js'
 
 // test data
 let data = {
@@ -88,13 +89,7 @@ const loadData = async () => {
 	loader.value = true
 	try {
 		console.log('fetch profile')
-		const response = await fetch('http://127.0.0.1:8000/update-profile/', {
-			method: 'GET',
-			cache: 'no-cache',
-			headers: {
-				'Authorization': `Token ${localStorage.getItem('token')}`,
-			}
-		})
+		const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
 		const newData = await response.json()
 		console.log(newData)
 		if (!response.ok) {
@@ -149,13 +144,7 @@ const saveChanges = async (e) => {
 	errorMsg.value = ''
 
 	try {
-		const response = await fetch('http://127.0.0.1:8000/update-profile/', {
-			method: 'PUT',
-			headers: {
-				'Authorization': `Token ${localStorage.getItem('token')}`,
-			},
-			body: formData
-		})
+		const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/', 'PUT', formData)
 		const newData = await response.json()
 		if (!response.ok) {
 			errorMsg.value = newData.error

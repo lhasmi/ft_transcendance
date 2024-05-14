@@ -64,7 +64,8 @@ const submit = async (e) => {
 			errorMsg.value = data.error
 		} else {
 			// store token, set userAuthorised to true, route to HomeView
-			localStorage.setItem('token', data.token)
+			localStorage.setItem('access', data.access)
+			localStorage.setItem('refresh', data.refresh)
 			store.userAuthorised = true
 			router.push('/')
 		}

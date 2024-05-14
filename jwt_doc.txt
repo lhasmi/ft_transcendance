@@ -2,10 +2,8 @@
 	pip install djangorestframework-simplejwt
 
 2. settings.py -> REST_FRAMEWORK:
-	remove
-		'rest_framework.authentication.TokenAuthentication',
-	add
-		'rest_framework_simplejwt.authentication.JWTAuthentication',
+	replace: 'rest_framework.authentication.TokenAuthentication',
+	with: 'rest_framework_simplejwt.authentication.JWTAuthentication',
 
 3. root urls.py:
 	add import:
@@ -78,9 +76,3 @@
 
 		replace: return Response({'token': token.key}, status=status.HTTP_200_OK)
 		with: return Response({'access': str(token.access_token), 'refresh': str(token)}, status=status.HTTP_200_OK)
-
-6. add logout logic:
-	in myapp/views.py add a new view for logout
-
-
-

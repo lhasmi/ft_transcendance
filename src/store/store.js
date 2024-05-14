@@ -1,6 +1,9 @@
 import { reactive } from 'vue'
 
 export const store = reactive({
-  userAuthorised: true,
-	lang: ''
+  userAuthorised: false,
+	lang: '',
+	username: '',
+	email: '',
+	picture: ''
 })

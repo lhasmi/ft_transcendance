@@ -1,4 +1,4 @@
-export const refreshAccessToken = async () => {
+const refreshAccessToken = async () => {
 	const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
 		method: 'POST',
 		headers: {
@@ -26,7 +26,7 @@ export const fetchWithJWT = async (url, method='GET', data=null) => {
 		...(data) && {body: data}
 	})
 
-	if (!response.ok && response.status === 401) { // and unauthorized error
+	if (!response.ok && response.status === 401) {
 		console.log(response)
 		await refreshAccessToken()
 		response = await fetch(url, {

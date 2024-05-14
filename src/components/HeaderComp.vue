@@ -11,6 +11,8 @@ const language = ref('')
 
 // functions
 const logout = () => {
+	localStorage.removeItem('access')
+	localStorage.removeItem('refresh')
   store.userAuthorised = false
 }
 

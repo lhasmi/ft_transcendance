@@ -1,6 +1,26 @@
 <script setup>
+import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import HeaderComp from './components/HeaderComp.vue'
+import { store } from './store/store.js'
+import { fetchWithJWT } from './utils/utils.js'
+
+onMounted(async () => {
+	if (localStorage.getItem('access') && localStorage.getItem('refresh')) {
+		console.log('try to login')
+		const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+		if (!response.ok) {
+			console.log('can\'t login with existing JWT')
+			return
+		}
+		const data = await response.json()
+		store.userAuthorised = true
+		store.username = data.user.username
+		store.email = data.user.email
+		store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+		console.log(store.username)
+	}
+})
 </script>
 
 <template>

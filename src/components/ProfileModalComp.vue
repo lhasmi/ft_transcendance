@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import ButtonComp from './ButtonComp.vue'
 import { store } from '../store/store.js'
 import { getText } from '../language/language.js'
-import { refreshAccessToken, fetchWithJWT } from '../utils/utils.js'
+import { fetchWithJWT } from '../utils/utils.js'
 
 // test data
 let data = {

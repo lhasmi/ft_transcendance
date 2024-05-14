@@ -21,8 +21,13 @@ const texts = {
 	},
 	login: {
 		en: 'login',
-		de: 'loggen',
+		de: 'einloggen',
 		ru: 'войти'
+	},
+	loginWith42: {
+		en: 'login with 42',
+		de: 'einloggen mit 42',
+		ru: 'войти через 42'
 	},
 	register: {
 		en: 'register',
@@ -168,7 +173,23 @@ const texts = {
 		en: 'is the winner',
 		de: 'ist gewinner',
 		ru: 'победитель'
-	}
+	},
+	playPong: {
+		en: 'play pong',
+		de: 'pong spielen',
+		ru: 'играть в понг'
+	},
+	chooseMode: {
+		en: 'choose mode',
+		de: 'wählen den modus',
+		ru: 'выбери режим игры'
+	},
+	duel: {
+		en: 'duel',
+		de: 'duel',
+		ru: 'дуэль'
+	},
+
 }
 
 const errors =	 {

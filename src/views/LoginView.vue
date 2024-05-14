@@ -67,7 +67,7 @@ const submit = async (e) => {
     class="container-md flex-grow-1 d-flex flex-column justify-content-center align-items-center"
   >
     <div
-      class="col-8 col-md-6 col-lg-4 col-xl-4 bg-white bg-opacity-10 rounded-4 myshadow d-flex flex-column"
+      class="col-11 col-md-8 col-lg-5 col-xl-4 bg-white bg-opacity-10 rounded-4 myshadow d-flex flex-column"
     >
       <div class="d-flex justify-content-center position-relative">
         <RouterLink to="/">
@@ -88,7 +88,7 @@ const submit = async (e) => {
 					</span>
 				</div>
 				<div
-					class="input-container col-8 mx-auto mt-4 mb-4 d-flex justify-content-around align-items-center"
+					class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
 				>
 					<input v-model="password" type="password" id="password" :placeholder="getText('password', store.lang)" required />
 					<span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
@@ -96,8 +96,10 @@ const submit = async (e) => {
 					</span>
 				</div>
 				<div v-if="errorMsg" class="my-1 fs-6 roboto-bold text-center" style="color: #da4834;">{{ errorMsg }}</div>
-				<ButtonComp @click="submit" class="btn-lg fs-5 col-6 mx-auto mt-4">{{ getText('login', store.lang) }}</ButtonComp>
+				<ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{ getText('login', store.lang) }}</ButtonComp>
 			</form>
+			<p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">or</p>
+			<ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto">{{ getText('loginWith42', store.lang) }}</ButtonComp>
       <div class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">
         {{ getText('dontHaveAcc', store.lang) }}
         <RouterLink class="register-link roboto-bold" to="/register">{{ getText('register', store.lang) }}</RouterLink>

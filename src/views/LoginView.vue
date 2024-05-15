@@ -1,65 +1,71 @@
 <script setup>
-import { ref } from 'vue'
-import { store } from '../store/store.js'
-import { getText, getError } from '../language/language.js'
-import router from '@/router'
-import ButtonComp from '../components/ButtonComp.vue'
-
+import { ref } from "vue";
+import { store } from "../store/store.js";
+import { getText, getError } from "../language/language.js";
+import router from "@/router";
+import ButtonComp from "../components/ButtonComp.vue";
 
 const testData = {
-	username: 'pvznuzda',
-  password: '12345'
-}
+  username: "pvznuzda",
+  password: "12345",
+};
 
 // variables
-const username = ref('')
-const password = ref('')
-const errorMsg = ref('')
+const username = ref("");
+const password = ref("");
+const errorMsg = ref("");
 
 // functions
+const redirectTo42 = () => {
+  window.location.href = "https://profile.intra.42.fr/"; // replace url
+};
+
 const submit = async (e) => {
-	e.preventDefault()
-  if (username.value == testData.username && password.value == testData.password) { // test
-		store.userAuthorised = true
-    router.push('/')
+  e.preventDefault();
+  if (
+    username.value == testData.username &&
+    password.value == testData.password
+  ) {
+    // test
+    store.userAuthorised = true;
+    router.push("/");
   }
 
-	if (!username.value) {
-		errorMsg.value = getError('usernameEmpty', store.lang)
-		return
-	}
-	if (!password.value) {
-		errorMsg.value = getError('passwordEmpty', store.lang)
-		return
-	}
-	errorMsg.value = ''
+  if (!username.value) {
+    errorMsg.value = getError("usernameEmpty", store.lang);
+    return;
+  }
+  if (!password.value) {
+    errorMsg.value = getError("passwordEmpty", store.lang);
+    return;
+  }
+  errorMsg.value = "";
 
-	try {
-		const response = await fetch('http://127.0.0.1:8000/login/', {
-			method: 'POST',
-			headers: {
-					'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-					username: username.value,
-					password: password.value,
-			})
-		})
-		const data = await response.json()
-		console.log(data)
-		if (!response.ok) {
-			errorMsg.value = data.error
-		} else {
-			localStorage.setItem('access', data.access)
-			localStorage.setItem('refresh', data.refresh)
-			store.userAuthorised = true
-			router.push('/')
-		}
-	} catch {
-		errorMsg.value = 'fetch request failed'
-	}
-}
-
+  try {
+    const response = await fetch("http://127.0.0.1:8000/login/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    });
+    const data = await response.json();
+    console.log(data);
+    if (!response.ok) {
+      errorMsg.value = data.error;
+    } else {
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
+      store.userAuthorised = true;
+      router.push("/");
+    }
+  } catch {
+    errorMsg.value = "fetch request failed";
+  }
+};
 </script>
 
 <template>
@@ -71,38 +77,75 @@ const submit = async (e) => {
     >
       <div class="d-flex justify-content-center position-relative">
         <RouterLink to="/">
-          <span class="icon-back material-symbols-outlined" style="font-size: 2.6rem">
+          <span
+            class="icon-back material-symbols-outlined"
+            style="font-size: 2.6rem"
+          >
             keyboard_backspace
           </span>
         </RouterLink>
-        <h2 class="text-center roboto-bold my-2">{{ getText('login', store.lang) }}</h2>
+        <h2 class="text-center roboto-bold my-2">
+          {{ getText("login", store.lang) }}
+        </h2>
       </div>
       <hr class="splitter col-12 mx-auto m-0 mb-2" />
-			<form class="d-flex flex-column">
-				<div
-					class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
-				>
-					<input v-model="username" type="text" id="username" :placeholder="getText('username', store.lang)" required />
-					<span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
-						person
-					</span>
-				</div>
-				<div
-					class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
-				>
-					<input v-model="password" type="password" id="password" :placeholder="getText('password', store.lang)" required />
-					<span class="icon material-symbols-outlined" style="font-size: 24px; color: white">
-						lock
-					</span>
-				</div>
-				<div v-if="errorMsg" class="my-1 fs-6 roboto-bold text-center" style="color: #da4834;">{{ errorMsg }}</div>
-				<ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{ getText('login', store.lang) }}</ButtonComp>
-			</form>
-			<p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">or</p>
-			<ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto">{{ getText('loginWith42', store.lang) }}</ButtonComp>
-      <div class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6">
-        {{ getText('dontHaveAcc', store.lang) }}
-        <RouterLink class="register-link roboto-bold" to="/register">{{ getText('register', store.lang) }}</RouterLink>
+      <form class="d-flex flex-column">
+        <div
+          class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
+        >
+          <input
+            v-model="username"
+            type="text"
+            id="username"
+            :placeholder="getText('username', store.lang)"
+            required
+          />
+          <span
+            class="icon material-symbols-outlined"
+            style="font-size: 24px; color: white"
+          >
+            person
+          </span>
+        </div>
+        <div
+          class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
+        >
+          <input
+            v-model="password"
+            type="password"
+            id="password"
+            :placeholder="getText('password', store.lang)"
+            required
+          />
+          <span
+            class="icon material-symbols-outlined"
+            style="font-size: 24px; color: white"
+          >
+            lock
+          </span>
+        </div>
+        <div
+          v-if="errorMsg"
+          class="my-1 fs-6 roboto-bold text-center"
+          style="color: #da4834"
+        >
+          {{ errorMsg }}
+        </div>
+        <ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{
+          getText("login", store.lang)
+        }}</ButtonComp>
+      </form>
+      <p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">or</p>
+      <ButtonComp @click="redirectTo42" class="btn-lg fs-5 col-7 mx-auto">
+        {{ getText("loginWith42", store.lang) }}
+      </ButtonComp>
+      <div
+        class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
+      >
+        {{ getText("dontHaveAcc", store.lang) }}
+        <RouterLink class="register-link roboto-bold" to="/register">{{
+          getText("register", store.lang)
+        }}</RouterLink>
       </div>
     </div>
   </section>
@@ -147,7 +190,7 @@ input {
 }
 input::placeholder {
   color: white;
-  font-family: 'Roboto';
+  font-family: "Roboto";
 }
 input:focus {
   outline: none;

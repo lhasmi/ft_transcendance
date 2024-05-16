@@ -1,15 +1,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import ButtonComp from '../components/ButtonComp.vue';
+import { store } from '@/store/store';
 
+
+// variables
+const test = ref(false)
 const testMode = ref(false)
-const player1 = ref('pvznuzda')
-const player2 = ref('opponent')
+const player1 = ref('player1')
+const player2 = ref('player2')
 const score = ref({
   player1: 0,
   player2: 0
 })
 
+// functions
 const sendTestData = async () => {
 	
 	const response = await fetch('https://127.0.0.1:8000/game/', {
@@ -241,6 +246,11 @@ onMounted(() => {
   const game = new Game(ctx, player1, player2, ball)
   game.animate()
 
+	if (store.userAuthorised) {
+		player1.value = store.username
+		player2.value = 'opponent'
+	}
+
   // addEventListener('keydown', (e) => {
   //   if (e.key == 'ArrowUp' || e.key == 'w') {
   //     player1.keyPressed = true
@@ -302,7 +312,7 @@ onMounted(() => {
   >
 
 		<!-- TEST -->
-		<ButtonComp @click="testMode = !testMode" class="mb-3">test mode</ButtonComp>
+		<ButtonComp v-if="test" @click="testMode = !testMode" class="mb-3">test mode</ButtonComp>
 		<div v-if="testMode" class="row test-form py-2">
 			<div class="col d-flex">
 				<div class="d-flex flex-column justify-content-center align-items-center">
@@ -317,7 +327,7 @@ onMounted(() => {
 			</div>
 		</div>
 
-    <div class="scoreboard col-6 mx-auto d-flex justify-content-around align-items-center">
+    <div class="scoreboard col-10 col-md-6 mx-auto d-flex justify-content-around align-items-center">
       <p class="text-white fs-4 mb-0 roboto-medium">{{ player1 }}</p>
       <p class="text-white fs-2 mb-0 roboto-bold">{{ score.player1 }} : {{ score.player2 }}</p>
       <p class="text-white fs-4 mb-0 roboto-medium">{{ player2 }}</p>
@@ -327,14 +337,42 @@ onMounted(() => {
     <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
       style="width: 64px; height: 64px"
+			data-bs-toggle="modal"
+			data-bs-target="#helpModal"
     >
       ?
     </button>
+
+		<!-- Modal -->
+		<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="helpModalLabel">Modal title</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						...
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
   </section>
 </template>
 
 <style scoped>
 .canvas {
+	@media screen and (max-width: 600px) {
+		border: 2px solid #f58562;
+		border-left: none;
+		border-right: none;
+	}
+	width: 80%;
   border: 5px solid #f58562;
   border-right: none;
   border-left: none;

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView
+from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, OAuth2LoginAPIView, OAuth2CallbackAPIView
 # from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, AcceptFriendRequestAPIView, UpdateOnlineStatusAPIView, ListOnlineFriendsAPIView, MatchHistoryAPIView, UserStatsAPIView
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
@@ -17,6 +17,8 @@ urlpatterns = [
     path('user-stats/', UserStatsAPIView.as_view(), name='user-stats'),
     path('update-online-status/', UpdateOnlineStatusAPIView.as_view(), name='update-online-status'),
     path('list-friends/', ListFriendsAPIView.as_view(), name='list-friends'),
+	path('oauth/login/', OAuth2LoginAPIView.as_view(), name='oauth2_login'),
+    path('oauth/callback/', OAuth2CallbackAPIView.as_view(), name='oauth2_callback'),
 ]
 # path('send-friend-request/<int:to_player_id>/', FriendRequestAPIView.as_view(), name='send-friend-request'),
 # path('accept-friend-request/<int:request_id>/', AcceptFriendRequestAPIView.as_view(), name='accept-friend-request'),

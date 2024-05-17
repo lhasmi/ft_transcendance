@@ -12,6 +12,9 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.conf import settings
+from django.http import JsonResponse
+from django.shortcuts import redirect
 import re
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
@@ -60,9 +63,6 @@ class UserRegistrationAPIView(APIView):
             user.player.save()
         return Response({"message": "User created successfully", "token": token}, status=status.HTTP_201_CREATED)
 
-
-
-
 class UserLoginAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -79,7 +79,6 @@ class UserLoginAPIView(APIView):
             return Response({'token': token.key}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid Credentials'}, status=status.HTTP_404_NOT_FOUND)
-
 
 def validate_image(image):
     max_size = 2 * 1024 * 1024  # 2MB
@@ -219,3 +218,61 @@ class ListFriendsAPIView(APIView):
         friends = player.friends.all()
         serializer = PlayerSerializer(friends, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class OAuth2LoginAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        auth_url = "https://api.intra.42.fr/oauth/authorize"
+        client_id = settings.OAUTH_CLIENT_ID
+        redirect_uri = settings.OAUTH_REDIRECT_URI
+        scope = "public"
+        response_type = "code"
+        
+        authorization_url = f"{auth_url}?client_id={client_id}&response_type={response_type}&redirect_uri={redirect_uri}&scope={scope}"
+        return redirect(authorization_url)
+    
+class OAuth2CallbackAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+        if code:
+            token_url = 'https://api.intra.42.fr/oauth/token'
+            data = {
+                'grant_type': 'authorization_code',
+                'code': code,
+                'redirect_uri': settings.OAUTH_REDIRECT_URI,
+                'client_id': settings.OAUTH_CLIENT_ID,
+                'client_secret': settings.OAUTH_CLIENT_SECRET,
+            }
+            response = request.post(token_url, data=data)
+            response_data = response.json()
+            access_token = response_data.get('access_token')
+
+            if not access_token:
+                return JsonResponse({'error': 'Failed to obtain access token'}, status=400)
+
+            user_info_url = 'https://api.intra.42.fr/v2/me'
+            headers = {'Authorization': f'Bearer {access_token}'}
+            user_info_response = request.get(user_info_url, headers=headers)
+            user_info = user_info_response.json()
+
+            email = user_info.get('email')
+            login_name = user_info.get('login')
+
+            if not email or not login_name:
+                return JsonResponse({'error': 'Failed to obtain user information'}, status=400)
+
+            try:
+                user = User.objects.get(username=login_name)
+            except User.DoesNotExist:
+
+                user = User.objects.create_user(username=login_name, email=email)
+                user.set_unusable_password()
+                user.save()
+
+            login(request, user)
+            return JsonResponse({'message': 'User logged in successfully', 'token': access_token})
+        
+        return JsonResponse({'error': 'No code provided'}, status=400)

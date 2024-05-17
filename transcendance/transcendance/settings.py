@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 	'rest_framework', 
 	'rest_framework.authtoken',
 	'channels',
+	'oauth2_provider',
 	'myapp',
 	'corsheaders',
 ]
@@ -98,6 +99,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
+AUTHENTICATION_BACKENDS = [
+    'oauth2_provider.backends.OAuth2Backend',
+]
+
 
 TEMPLATES = [
     {
@@ -188,3 +194,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+OAUTH_CLIENT_ID = 'u-s4t2ud-5d66c931fc39d767149776c9efda2aa711a4167224361348d78cad3781c36d69'
+OAUTH_CLIENT_SECRET = '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'
+OAUTH_REDIRECT_URI = 'http://localhost:5173/oauth/callback/'

@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
+from django.db.models import Case, When, Value, BooleanField
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status, permissions, filters
 from rest_framework.exceptions import ValidationError as DRFValidationError
@@ -38,6 +39,9 @@ class MatchViewSet(viewsets.ModelViewSet):
 
 
 def validate_email(email):
+    """
+    Validates the provided email for correct format.
+    """
     if not email:
         raise DjangoValidationError("Email address is required.")
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -45,6 +49,9 @@ def validate_email(email):
         raise DjangoValidationError("Invalid email format.")
 
 def validate_image(image):
+    """
+    Validates the uploaded image for size and format.
+    """
     max_size = 2 * 1024 * 1024  # 2MB
     if image.size > max_size:
         raise DjangoValidationError("The maximum file size that can be uploaded is 2MB")
@@ -52,12 +59,17 @@ def validate_image(image):
         raise DjangoValidationError("Only JPEG and PNG files are allowed.")
 
 class UserRegistrationAPIView(APIView):
+    """
+    API view to register new users.
+    """
     permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
         email = request.data.get('email')
         display_name = request.data.get('display_name')
+
         if not username or not password or not email:
             return Response({"error": "Username, password, and email are required fields."},
                             status=status.HTTP_400_BAD_REQUEST)

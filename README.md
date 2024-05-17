@@ -64,10 +64,6 @@ CREATE DATABASE "djangotrans_db";
 python -m pip install Pillow
 python manage.py migrate
 
-python manage.py createsuperuser
-# call it admin pass admin email admin@example.com, confirm with y
-python manage.py migrate
-python manage.py runserver
 
 
 ### Before you start
@@ -168,5 +164,13 @@ brew services start redis
 # verify redis is running
 redis-cli ping
 
+# call it admin pass admin email admin@example.com, confirm with y
+python manage.py migrate
+python manage.py createsuperuser
+
+# 42auth
+pip install django-oauth-toolkit
+
+python manage.py runserver
 
 

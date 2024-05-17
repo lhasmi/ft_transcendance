@@ -20,13 +20,21 @@ from .serializers import PlayerSerializer, MatchSerializer
 
 
 class PlayerViewSet(viewsets.ModelViewSet):
-    queryset = Player.objects.all().select_related('user') 
+    """
+    ViewSet for viewing and editing player profiles.
+    """
+    queryset = Player.objects.all().select_related('user')
     serializer_class = PlayerSerializer
     filter_backends = (filters.OrderingFilter,)
 
 class MatchViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for viewing and editing match records.
+    """
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
+    ordering_fields = ['played_on']
+    ordering = ['-played_on']
 
 
 def validate_email(email):

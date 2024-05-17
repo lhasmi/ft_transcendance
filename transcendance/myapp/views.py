@@ -1,19 +1,18 @@
-from rest_framework import viewsets, status, permissions, filters
-from .models import Player, Match
-from .serializers import PlayerSerializer, MatchSerializer
+import re
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status, permissions, filters
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ValidationError as DjangoValidationError
-from rest_framework.exceptions import ValidationError as DRFValidationError
-from django.db import transaction, models
-from django.db.models import Case, When, Value, BooleanField, F
-from django.shortcuts import get_object_or_404
-import re
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import Player, Match
+from .serializers import PlayerSerializer, MatchSerializer
 
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
@@ -65,11 +64,13 @@ class UserRegistrationAPIView(APIView):
             return Response({"error": "A user with that email already exists."}, status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.create_user(username=username, email=email, password=password)
         # player = Player.objects.create(user=user, display_name=display_name) # will be created in signals.py
-        token = Token.objects.get_or_create(user=user)[0].key
+        # token = Token.objects.get_or_create(user=user)[0].key
+        token = RefreshToken.for_user(user)
         if display_name:
             user.player.display_name = display_name
             user.player.save()
-        return Response({"message": "User created successfully", "token": token}, status=status.HTTP_201_CREATED)
+        # return Response({"message": "User created successfully", "token": token}, status=status.HTTP_201_CREATED)
+        return Response({"message": "User created successfully", "refresh": str(token), "access": str(token.access_token)}, status=status.HTTP_201_CREATED)
 
 class UserLoginAPIView(APIView):
     permission_classes = [AllowAny]
@@ -83,8 +84,10 @@ class UserLoginAPIView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            # token, created = Token.objects.get_or_create(user=user)
+            token = RefreshToken.for_user(user)
+            # return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'access': str(token.access_token), 'refresh': str(token)}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid Credentials'}, status=status.HTTP_404_NOT_FOUND)
 

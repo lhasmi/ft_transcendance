@@ -16,8 +16,21 @@ const password = ref("");
 const errorMsg = ref("");
 
 // functions
-const redirectTo42 = () => {
-  window.location.href = "https://profile.intra.42.fr/"; // replace url
+const redirectTo42 = async () => {
+	try {
+		const response = await fetch("http://127.0.0.1:8000/oauth/login/")
+		if (!response.ok) {
+			console.log('redirectTo42: bad response')
+		}
+		const data = await response.json()
+	
+		console.log(data)
+		window.location.href = data.link; // replace url
+
+	} catch(error) {
+		console.log(error)
+	}
+
 };
 
 const submit = async (e) => {

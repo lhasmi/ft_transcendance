@@ -230,7 +230,8 @@ class OAuth2LoginAPIView(APIView):
         response_type = "code"
         
         authorization_url = f"{auth_url}?client_id={client_id}&response_type={response_type}&redirect_uri={redirect_uri}&scope={scope}"
-        return redirect(authorization_url)
+        # return redirect(authorization_url)
+        return JsonResponse({'link': authorization_url})
     
 class OAuth2CallbackAPIView(APIView):
     permission_classes = [AllowAny]
@@ -246,7 +247,11 @@ class OAuth2CallbackAPIView(APIView):
                 'client_id': settings.OAUTH_CLIENT_ID,
                 'client_secret': settings.OAUTH_CLIENT_SECRET,
             }
-            response = request.post(token_url, data=data)
+            token_url = f"{token_url}?grant_type=authorization_code&code={code}&redirect_uri={settings.OAUTH_REDIRECT_URI}&client_id={settings.OAUTH_CLIENT_ID}&client_secret={settings.OAUTH_CLIENT_SECRET}"
+            # print(token_url)
+            # return JsonResponse({'url': token_url, 'data': data})
+            response = requests.post(token_url)
+            print("auth2!!!")
             response_data = response.json()
             access_token = response_data.get('access_token')
 
@@ -267,7 +272,7 @@ class OAuth2CallbackAPIView(APIView):
             try:
                 user = User.objects.get(username=login_name)
             except User.DoesNotExist:
-
+                print("auth!!!!")
                 user = User.objects.create_user(username=login_name, email=email)
                 user.set_unusable_password()
                 user.save()

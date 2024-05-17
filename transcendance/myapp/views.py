@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, status, permissions, filters
 from .models import Player, Match
 from .serializers import PlayerSerializer, MatchSerializer
 from django.contrib.auth.models import User
@@ -10,9 +10,11 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
-from django.db import transaction
+from django.db import transaction, models
+from django.db.models import Case, When, Value, BooleanField, F
 from django.shortcuts import get_object_or_404
 import re
+
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
 #    Serializer Class:  linked to their respective serializers.
@@ -21,10 +23,12 @@ import re
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all().select_related('user') 
     serializer_class = PlayerSerializer
+    filter_backends = (filters.OrderingFilter,)
 
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
+
 
 def validate_email(email):
     if not email:
@@ -32,6 +36,13 @@ def validate_email(email):
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     if not re.match(email_regex, email):
         raise DjangoValidationError("Invalid email format.")
+
+def validate_image(image):
+    max_size = 2 * 1024 * 1024  # 2MB
+    if image.size > max_size:
+        raise DjangoValidationError("The maximum file size that can be uploaded is 2MB")
+    if not image.name.endswith(('.png', '.jpg', '.jpeg')):
+        raise DjangoValidationError("Only JPEG and PNG files are allowed.")
 
 class UserRegistrationAPIView(APIView):
     permission_classes = [AllowAny]
@@ -60,9 +71,6 @@ class UserRegistrationAPIView(APIView):
             user.player.save()
         return Response({"message": "User created successfully", "token": token}, status=status.HTTP_201_CREATED)
 
-
-
-
 class UserLoginAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -79,16 +87,6 @@ class UserLoginAPIView(APIView):
             return Response({'token': token.key}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid Credentials'}, status=status.HTTP_404_NOT_FOUND)
-
-
-def validate_image(image):
-    max_size = 2 * 1024 * 1024  # 2MB
-    if image.size > max_size:
-        raise DjangoValidationError("The maximum file size that can be uploaded is 2MB")
-    if not image.name.endswith(('.png', '.jpg', '.jpeg')):
-        raise DjangoValidationError("Only JPEG and PNG files are allowed.")
-    
-
 
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -167,35 +165,21 @@ class FriendRequestAPIView(APIView):
 
         if request.user.player == friend_player:
             return Response({'error': 'You cannot add yourself as a friend'}, status=status.HTTP_400_BAD_REQUEST)
-        
         if request.user.player.friends.filter(id=friend_player.id).exists():
             return Response({'error': 'Already friends'}, status=status.HTTP_409_CONFLICT)
-        
         request.user.player.friends.add(friend_player)
         #friend_player.friends.add(request.user.player) #no need for this line since now symmetrical is true
 
         return Response({'message': 'Friend added successfully'}, status=status.HTTP_200_OK)
 
-
-class MatchHistoryAPIView(APIView):
+class ListFriendsAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         player = request.user.player
-        matches = Match.objects.filter(players=player)
-        data = MatchSerializer(matches, many=True).data
-        return Response(data, status=status.HTTP_200_OK)
-# above : adjusted to filter matches involving the logged-in user's Player profile.  
-
-class UserStatsAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        player = request.user.player
-        wins = Match.objects.filter(winner=player).count()
-        total_games = player.matches.count()
-        data = {'wins': wins, 'losses': total_games - wins}
-        return Response(data, status=status.HTTP_200_OK)
+        friends = player.friends.all()
+        serializer = PlayerSerializer(friends, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class UpdateOnlineStatusAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -211,11 +195,29 @@ class UpdateOnlineStatusAPIView(APIView):
         #player.save()
         return Response({'message': f'Player is now {status}.'})
 
-class ListFriendsAPIView(APIView):
+class UserStatsAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         player = request.user.player
-        friends = player.friends.all()
-        serializer = PlayerSerializer(friends, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        wins = Match.objects.filter(winner=player).count()
+        total_games = player.matches.count()
+        data = {'wins': wins, 'losses': total_games - wins}
+        return Response(data, status=status.HTTP_200_OK)
+
+class MatchHistoryAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        player = request.user.player
+        ordering = request.query_params.get('ordering', '-played_on')
+        matches = Match.objects.filter(players=player).order_by(ordering).annotate(
+            is_winner=Case(
+                When(winner=player, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        )
+        data = MatchSerializer(matches, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
+    # above : adjusted to filter matches involving the logged-in user's Player profile.  
+

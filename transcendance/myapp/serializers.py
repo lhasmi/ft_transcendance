@@ -38,10 +38,13 @@ class PlayerFriendSerializer(serializers.ModelSerializer):#for simplified view o
         fields = ['id', 'user', 'online_status']
 
 class MatchSerializer(serializers.ModelSerializer):
+    ## Show all players in the match
     players = PlayerSerializer(read_only=True, many=True)
+    winner = PlayerSerializer(read_only=True)  # Show the winner's details
+    is_winner = serializers.BooleanField(read_only=True)
     class Meta:
         model = Match
-        fields = ['id', 'players',  'winner', 'played_on', 'details']
+        fields = ['id', 'players',  'winner', 'played_on', 'details', 'is_winner']
 
 #Serializers help convert  Django models (or querysets) into JSON format,
 # which can then be used by APIs to communicate with the frontend.

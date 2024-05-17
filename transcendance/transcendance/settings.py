@@ -33,7 +33,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 # ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1']
+ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost']
 
 CORS_ORIGIN_ALLOW_ALL = False
 

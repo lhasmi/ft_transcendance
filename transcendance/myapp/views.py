@@ -16,6 +16,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import redirect
 import re
+import requests
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
 #    Serializer Class:  linked to their respective serializers.
@@ -260,7 +261,9 @@ class OAuth2CallbackAPIView(APIView):
 
             user_info_url = 'https://api.intra.42.fr/v2/me'
             headers = {'Authorization': f'Bearer {access_token}'}
-            user_info_response = request.get(user_info_url, headers=headers)
+            print("auth3!!!")
+            user_info_response = requests.get(user_info_url, headers=headers)
+            print("auth4!!!")
             user_info = user_info_response.json()
 
             email = user_info.get('email')

@@ -172,7 +172,7 @@ redis-cli ping
 pip install django-otp django-two-factor-auth twilio
 pip install django-cryptography
 pip install twilio
-
+pip install phonenumbers
 # for Frontend :  
 must be  equipped to handle entering the OTP (one time password) sent via email or SMS during the login process.
 

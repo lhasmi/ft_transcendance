@@ -1,6 +1,7 @@
 import re
 import base64
 import time
+
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -281,7 +282,7 @@ class MatchHistoryAPIView(APIView):
         data = MatchSerializer(matches, many=True).data
         return Response(data, status=status.HTTP_200_OK)
     # above : adjusted to filter matches involving the logged-in user's Player profile.
-    def put:
+#    def put:
         #push back   
 
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:

@@ -17,20 +17,18 @@ const errorMsg = ref("");
 
 // functions
 const redirectTo42 = async () => {
-	try {
-		const response = await fetch("http://127.0.0.1:8000/oauth/login/")
-		if (!response.ok) {
-			console.log('redirectTo42: bad response')
-		}
-		const data = await response.json()
-	
-		console.log(data)
-		window.location.href = data.link; // replace url
+  try {
+    const response = await fetch("http://127.0.0.1:8000/oauth/login/");
+    if (!response.ok) {
+      console.log("redirectTo42: bad response");
+    }
+    const data = await response.json();
 
-	} catch(error) {
-		console.log(error)
-	}
-
+    console.log(data);
+    window.location.href = data.link; // replace url
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const submit = async (e) => {

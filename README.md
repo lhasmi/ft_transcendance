@@ -168,5 +168,11 @@ brew services start redis
 # verify redis is running
 redis-cli ping
 
+### For 2F Auth to work:
+pip install django-otp django-two-factor-auth twilio
+pip install django-cryptography
+pip install twilio
 
+# for Frontend :  
+must be  equipped to handle entering the OTP (one time password) sent via email or SMS during the login process.
 

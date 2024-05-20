@@ -14,7 +14,6 @@ class StatusConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
-    
     async def disconnect(self, close_code):# Leaving the group on disconnect
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -41,7 +40,6 @@ class StatusConsumer(AsyncWebsocketConsumer):
             'username': username,
             'online_status': online_status
         }))
-
 
 # class GameConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):

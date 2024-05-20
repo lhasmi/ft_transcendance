@@ -19,6 +19,13 @@ load_dotenv()  # Load environment variables from .env file
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Force all access to the app to be done over HTTPS
+SECURE_SSL_REDIRECT = True
+
+#against man in the middle attacks, forces browsers to use https
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -41,6 +48,7 @@ CORS_ORIGIN_WHITELIST = (
         'http://localhost:5173',
 )
 
+ADMIN_MAIL = os.getenv('ADMIN_MAIL', 'default_admin_email@example.com')
 # Application definition
 
 INSTALLED_APPS = [
@@ -55,6 +63,8 @@ INSTALLED_APPS = [
 	'channels',
 	'myapp',
 	'corsheaders',
+    'django_otp', # One-Time Password, it works for few minutes
+    'two_factor',
 ]
 
 MIDDLEWARE = [
@@ -101,7 +111,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # changed from 5 min to 1 hour
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -229,3 +239,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')

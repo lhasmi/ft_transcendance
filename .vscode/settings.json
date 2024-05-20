@@ -1,7 +1,7 @@
 {
 	"python.linting.pylintArgs": [
 		"--load-plugins=pylint_django",
-		"--django-settings-module=myproject.settings",  // Replace 'myproject.settings' with your actual Django settings module if different
+		"--django-settings-module=transcendance.settings.py",
 		"--init-hook",
 		"import sys; sys.path.append('/Users/lailah/transcendance/ft_transcendance/vtrans/lib/python3.12/site-packages')"
 	],

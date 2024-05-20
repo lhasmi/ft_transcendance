@@ -45,7 +45,7 @@ class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
         fields = ['id', 'players',  'winner', 'played_on', 'details', 'is_winner']
-
+    
 #Serializers help convert  Django models (or querysets) into JSON format,
 # which can then be used by APIs to communicate with the frontend.
 #extend ModelSerializer, which simplifies serialization of model instances:

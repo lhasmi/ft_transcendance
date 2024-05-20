@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, Enable2FAAPIView, Verify2FAAPIView
+from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, Enable2FAAPIView, VerifyOTPAPIView
 from .admin import reset_otp_secret
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
@@ -19,11 +19,5 @@ urlpatterns = [
     path('list-friends/', ListFriendsAPIView.as_view(), name='list-friends'),
     path('admin/reset_otp/<str:username>/', reset_otp_secret, name='manage_otp'),
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
-    path('verify-2fa/', Verify2FAAPIView.as_view(), name='verify-2fa'),
+    path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
 ]
-# path('send-friend-request/<int:to_player_id>/', FriendRequestAPIView.as_view(), name='send-friend-request'),
-# path('accept-friend-request/<int:request_id>/', AcceptFriendRequestAPIView.as_view(), name='accept-friend-request'),
-# path('update-online-status/', UpdateOnlineStatusAPIView.as_view(), name='update-online-status'),
-# path('list-online-friends/', ListOnlineFriendsAPIView.as_view(), name='list-online-friends'),
-# path('match-history/', MatchHistoryAPIView.as_view(), name='match-history'),
-# path('user-stats/', UserStatsAPIView.as_view(), name='user-stats'),

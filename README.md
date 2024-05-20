@@ -171,8 +171,13 @@ redis-cli ping
 ### For 2F Auth to work:
 pip install django-otp django-two-factor-auth twilio
 pip install django-cryptography
-pip install twilio
-pip install phonenumbers
+### For https on developpment server
+pip install django-extensions
+# generate a certificate ( has to be dynamically generated in docker, prob: it is interactive )
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+pip install Werkzeug
+python manage.py runserver_plus --cert-file cert.pem --key-file key.pem
+
 # for Frontend :  
 must be  equipped to handle entering the OTP (one time password) sent via email or SMS during the login process.
 

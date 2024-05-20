@@ -19,9 +19,7 @@ load_dotenv()  # Load environment variables from .env file
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Force all access to the app to be done over HTTPS
-SECURE_SSL_REDIRECT = True
-
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
 #against man in the middle attacks, forces browsers to use https
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -65,6 +63,7 @@ INSTALLED_APPS = [
 	'corsheaders',
     'django_otp', # One-Time Password, it works for few minutes
     'two_factor',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

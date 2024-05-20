@@ -109,9 +109,11 @@ class UserLoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """
+        Handle user login and send OTP via email.
+        """
         username = request.data.get('username')
         password = request.data.get('password')
-        otp = request.data.get('otp')
         if username is None or password is None:
             return Response({'error': 'Please provide both username and password'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -119,26 +121,59 @@ class UserLoginAPIView(APIView):
         if user is not None:
             player = getattr(user, 'player', None)
             if player and player.secret_key: # Check if the player has a secret_key for OTP;
-                totp = TOTP(player.secret_key)  # secret_key is stored in the player model
-                totp.time = time.time()
-                if totp.verify(otp):
-                    login(request, user)
-                    jwt_token = RefreshToken.for_user(user)
-                    return Response({
-                        'access': str(jwt_token.access_token),
-                        'refresh': str(jwt_token)
-                    }, status=status.HTTP_200_OK)
-                else:
-                    return Response({'error': 'Invalid OTP. Please try again or contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED) 
+                totp = TOTP(player.secret_key, step=60, digits=6)  # secret_key is stored in the player model
+                otp_token = totp.token()
+                send_mail(
+                    'Your OTP',
+                    f'Your one-time password is {otp_token}. Please enter it to complete your login.',
+                    'from@example.com',
+                    [user.email],
+                    fail_silently=False,
+                )
+                return Response({'message': 'OTP sent to your email. Please verify to complete login.'}, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'OTP setup not found for user'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
 
+class VerifyOTPAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        """
+        Verify the OTP for completing the login process.
+        """
+        username = request.data.get('username')
+        otp = request.data.get('otp')
+
+        if username is None or otp is None:
+            return Response({'error': 'Please provide both username and OTP'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.get(username=username)
+        player = getattr(user, 'player', None)
+
+        if user is not None and player and player.secret_key:
+            totp = TOTP(player.secret_key, step=60, digits=6)
+            totp.time = time.time()
+            if totp.verify(otp):
+                login(request, user)
+                jwt_token = RefreshToken.for_user(user)
+                return Response({
+                    'access': str(jwt_token.access_token),
+                    'refresh': str(jwt_token)
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': f'Invalid OTP. Please try again or contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'error': 'OTP setup not found for user'}, status=status.HTTP_404_NOT_FOUND)
+
 class Enable2FAAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+        """
+        Enable 2FA for the user by generating and sending an OTP.
+        """
         user = request.user
         player = user.player
         player.generate_secret_key()
@@ -151,23 +186,8 @@ class Enable2FAAPIView(APIView):
             [user.email],
             fail_silently=False,
         )
+        return Response({"message": "OTP sent to your email. Please verify to enable 2FA."}, status=status.HTTP_200_OK)
 
-class Verify2FAAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        user = request.user
-        otp = request.data.get('otp')
-        player = user.player
-        if not player.secret_key:
-            return Response({'error': '2FA is not enabled for this user.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        totp = TOTP(player.secret_key, step=60, digits=6)
-        totp.time = time.time()
-        if totp.verify(otp):
-            return Response({'message': '2FA enabled successfully.'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid OTP. Please try again or contact the admin at {settings.ADMIN_MAIL}.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -246,8 +266,6 @@ class FriendRequestAPIView(APIView):
         if request.user.player.friends.filter(id=friend_player.id).exists():
             return Response({'error': 'Already friends'}, status=status.HTTP_409_CONFLICT)
         request.user.player.friends.add(friend_player)
-        #friend_player.friends.add(request.user.player) #no need for this line since now symmetrical is true
-
         return Response({'message': 'Friend added successfully'}, status=status.HTTP_200_OK)
 
 class ListFriendsAPIView(APIView):
@@ -263,20 +281,24 @@ class UpdateOnlineStatusAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+        """
+        Update the online status of the logged-in user.
+        """
         player = request.user.player
         status = request.data.get('status', 'online')
         if status == 'online':
             player.set.online()
         else:
             player.set.offline()
-        #player.online_status = True
-        #player.save()
         return Response({'message': f'Player is now {status}.'})
 
 class UserStatsAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        """
+        Retrieve the win/loss stats for the logged-in user.
+        """
         player = request.user.player
         wins = Match.objects.filter(winner=player).count()
         total_games = player.matches.count()
@@ -286,6 +308,9 @@ class UserStatsAPIView(APIView):
 class MatchHistoryAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
+        """
+        Retrieve the match history for the logged-in user.
+        """
         player = request.user.player
         ordering = request.query_params.get('ordering', '-played_on')
         matches = Match.objects.filter(players=player).order_by(ordering).annotate(
@@ -297,7 +322,6 @@ class MatchHistoryAPIView(APIView):
         )
         data = MatchSerializer(matches, many=True).data
         return Response(data, status=status.HTTP_200_OK)
-    # above : adjusted to filter matches involving the logged-in user's Player profile.
  
 
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:

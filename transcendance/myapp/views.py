@@ -18,17 +18,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-# from twilio.rest import Client 
 from .models import Player, Match
 from .serializers import PlayerSerializer, MatchSerializer
 
-# twilio_client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-# def send_sms(phone_number, message):
-#     twilio_client.messages.create(
-#         body=message,
-#         from_=settings.TWILIO_PHONE_NUMBER,
-#         to=phone_number
-#     )
 
 def validate_email(email):
     """
@@ -90,18 +82,10 @@ class UserRegistrationAPIView(APIView):
         password = request.data.get('password')
         email = request.data.get('email')
         display_name = request.data.get('display_name')
-        two_fa_method = request.data.get('two_fa_method')  # Get the 2FA method (email or sms)
-        # phone_number = request.data.get('phone_number')  # Get the phone number if SMS is selected
 
-        if not username or not password or not email or not two_fa_method:
-            return Response({"error": "Username, password, email, and 2FA method are required fields."},
+        if not username or not password or not email:
+            return Response({"error": "Username, password and email are required fields."},
                             status=status.HTTP_400_BAD_REQUEST)
-        if two_fa_method not in ['email', 'sms']:
-            return Response({"error": "Invalid 2FA method. Choose 'email' or 'sms'."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        # if two_fa_method == 'sms' and not phone_number:
-        #     return Response({"error": "Phone number is required for SMS 2FA."},
-        #                     status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_email(email)
         except DjangoValidationError as e:
@@ -114,23 +98,6 @@ class UserRegistrationAPIView(APIView):
         if display_name:
             user.player.display_name = display_name
             user.player.save()
-
-        try:
-            totp = TOTP(user.player.secret_key, step=60, digits=6) # Initialize TOTP object
-            otp_token = totp.token()
-            if two_fa_method == 'email':
-                send_mail( # Send token via email or SMS
-                    'Your OTP',
-                    f'Your one-time password is {otp_token}. Please enter it to complete your registration.',
-                    'from@example.com',
-                    [user.email],
-                    fail_silently=False,
-                )
-            elif two_fa_method == 'sms':
-                return Response({"error": "SMS is not supported by our Website"}, status=status.HTTP_400_BAD_REQUEST)
-                # send_sms(phone_number, f'Your OTP is {otp_token}')
-        except DjangoValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         jwt_token = RefreshToken.for_user(user)
         return Response({
             "message": "User created successfully", 
@@ -151,8 +118,7 @@ class UserLoginAPIView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             player = getattr(user, 'player', None)
-            # Check if the player has a secret_key for OTP; assuming it's stored securely in player profile
-            if player and player.secret_key:
+            if player and player.secret_key: # Check if the player has a secret_key for OTP;
                 totp = TOTP(player.secret_key)  # secret_key is stored in the player model
                 totp.time = time.time()
                 if totp.verify(otp):
@@ -168,6 +134,40 @@ class UserLoginAPIView(APIView):
                 return Response({'error': 'OTP setup not found for user'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
+
+class Enable2FAAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        player = user.player
+        player.generate_secret_key()
+        totp = TOTP(player.secret_key, step=60, digits=6)
+        otp_token = totp.token()
+        send_mail(
+            'Your OTP',
+            f'Your one-time password is {otp_token}. Please enter it to enable 2FA.',
+            'from@example.com',
+            [user.email],
+            fail_silently=False,
+        )
+
+class Verify2FAAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        otp = request.data.get('otp')
+        player = user.player
+        if not player.secret_key:
+            return Response({'error': '2FA is not enabled for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        totp = TOTP(player.secret_key, step=60, digits=6)
+        totp.time = time.time()
+        if totp.verify(otp):
+            return Response({'message': '2FA enabled successfully.'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid OTP. Please try again or contact the admin at {settings.ADMIN_MAIL}.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]

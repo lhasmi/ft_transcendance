@@ -169,7 +169,7 @@ brew services start redis
 redis-cli ping
 
 ### For 2F Auth to work:
-pip install django-otp django-two-factor-auth twilio
+
 pip install django-cryptography
 ### For https on developpment server
 pip install django-extensions
@@ -179,7 +179,7 @@ pip install Werkzeug
 python manage.py runserver_plus --cert-file cert.pem --key-file key.pem
 
 # for Frontend :  
-must be  equipped to handle entering the OTP (one time password) sent via email or SMS during the login process.
+ to handle entering the OTP (one time password) sent via email or SMS during the login process.
 
  example of how the frontend can send data about match results
 

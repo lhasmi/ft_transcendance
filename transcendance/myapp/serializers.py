@@ -39,13 +39,51 @@ class PlayerFriendSerializer(serializers.ModelSerializer):#for simplified view o
 
 class MatchSerializer(serializers.ModelSerializer):
     ## Show all players in the match
-    players = PlayerSerializer(read_only=True, many=True)
-    winner = PlayerSerializer(read_only=True)  # Show the winner's details
-    is_winner = serializers.BooleanField(read_only=True)
+    players = serializers.ListField(
+        child=serializers.CharField(),  # Accept usernames as strings
+        write_only=True
+    )
+    winner = serializers.CharField(write_only=True) 
+    players_detail = PlayerSerializer(read_only=True, many=True, source='players')
+    winner_detail = PlayerSerializer(read_only=True, source='winner')
     class Meta:
         model = Match
-        fields = ['id', 'players',  'winner', 'played_on', 'details', 'is_winner']
+        fields = ['id', 'players',  'winner', 'played_on', 'details', 'is_winner', 'players_detail', 'winner_detail']
     
+    def validate_players(self, value):
+        players = []
+        for username in value:
+            try:
+                player = Player.objects.get(user__username=username)
+                players.append(player)
+            except Player.DoesNotExist:
+                raise serializers.ValidationError(f"Player with username '{username}' does not exist.")
+        return players
+    def validate_winner(self, value):
+        try:
+            winner = Player.objects.get(user__username=value)
+        except Player.DoesNotExist:
+            raise serializers.ValidationError(f"Player with username '{value}' does not exist.")
+        return winner
+
+    def create(self, validated_data):
+        players = validated_data.pop('players')
+        winner = validated_data.pop('winner')
+        match = Match.objects.create(winner=winner, **validated_data)
+        match.players.set(players)
+        return match
+
+    def update(self, instance, validated_data):
+        players = validated_data.pop('players', None)
+        winner = validated_data.pop('winner', None)
+        if players is not None:
+            instance.players.set(players)
+        if winner is not None:
+            instance.winner = winner
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 #Serializers help convert  Django models (or querysets) into JSON format,
 # which can then be used by APIs to communicate with the frontend.
 #extend ModelSerializer, which simplifies serialization of model instances:

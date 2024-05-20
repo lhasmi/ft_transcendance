@@ -18,17 +18,17 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from twilio.rest import Client 
+# from twilio.rest import Client 
 from .models import Player, Match
 from .serializers import PlayerSerializer, MatchSerializer
 
-twilio_client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-def send_sms(phone_number, message):
-    twilio_client.messages.create(
-        body=message,
-        from_=settings.TWILIO_PHONE_NUMBER,
-        to=phone_number
-    )
+# twilio_client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+# def send_sms(phone_number, message):
+#     twilio_client.messages.create(
+#         body=message,
+#         from_=settings.TWILIO_PHONE_NUMBER,
+#         to=phone_number
+#     )
 
 def validate_email(email):
     """
@@ -60,12 +60,27 @@ class PlayerViewSet(viewsets.ModelViewSet):
 
 class MatchViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for viewing and editing match records.
+    ViewSet for viewing and updating match history 
     """
     queryset = Match.objects.all()
-    serializer_class = MatchSerializer
     ordering_fields = ['played_on']
     ordering = ['-played_on']
+    serializer_class = MatchSerializer
+
+    def create(self, request, *args, **kwargs):#equivalent to post
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):#equivalent to put
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 class UserRegistrationAPIView(APIView):
     permission_classes = [AllowAny]
@@ -76,7 +91,7 @@ class UserRegistrationAPIView(APIView):
         email = request.data.get('email')
         display_name = request.data.get('display_name')
         two_fa_method = request.data.get('two_fa_method')  # Get the 2FA method (email or sms)
-        phone_number = request.data.get('phone_number')  # Get the phone number if SMS is selected
+        # phone_number = request.data.get('phone_number')  # Get the phone number if SMS is selected
 
         if not username or not password or not email or not two_fa_method:
             return Response({"error": "Username, password, email, and 2FA method are required fields."},
@@ -84,9 +99,9 @@ class UserRegistrationAPIView(APIView):
         if two_fa_method not in ['email', 'sms']:
             return Response({"error": "Invalid 2FA method. Choose 'email' or 'sms'."},
                             status=status.HTTP_400_BAD_REQUEST)
-        if two_fa_method == 'sms' and not phone_number:
-            return Response({"error": "Phone number is required for SMS 2FA."},
-                            status=status.HTTP_400_BAD_REQUEST)
+        # if two_fa_method == 'sms' and not phone_number:
+        #     return Response({"error": "Phone number is required for SMS 2FA."},
+        #                     status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_email(email)
         except DjangoValidationError as e:
@@ -112,7 +127,8 @@ class UserRegistrationAPIView(APIView):
                     fail_silently=False,
                 )
             elif two_fa_method == 'sms':
-                send_sms(phone_number, f'Your OTP is {otp_token}')
+                return Response({"error": "SMS is not supported by our Website"}, status=status.HTTP_400_BAD_REQUEST)
+                # send_sms(phone_number, f'Your OTP is {otp_token}')
         except DjangoValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         jwt_token = RefreshToken.for_user(user)
@@ -282,8 +298,7 @@ class MatchHistoryAPIView(APIView):
         data = MatchSerializer(matches, many=True).data
         return Response(data, status=status.HTTP_200_OK)
     # above : adjusted to filter matches involving the logged-in user's Player profile.
-#    def put:
-        #push back   
+ 
 
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.

@@ -18,7 +18,7 @@ def create_player_profile(sender, instance=None, created=False, **kwargs):
     if created and not Player.objects.filter(user=instance).exists():
         try:
             with transaction.atomic():
-                Player.objects.create(user=instance)
+                player = Player.objects.create(user=instance)
                 player.generate_secret_key()  # Generate and save the secret key upon creation
                 logger.info(f"Player profile and secret key created for user {instance.username}")
         except Exception as e:

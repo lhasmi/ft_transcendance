@@ -176,3 +176,11 @@ pip install phonenumbers
 # for Frontend :  
 must be  equipped to handle entering the OTP (one time password) sent via email or SMS during the login process.
 
+ example of how the frontend can send data about match results
+
+{
+    "players": ["player1", "player2"],
+    "winner": "player1",
+    "played_on": "2023-05-20T14:28:23.382Z",
+    "details": "Match details here."
+}

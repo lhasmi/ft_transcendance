@@ -5,7 +5,7 @@ from .admin import reset_otp_secret
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
 router.register(r'players', PlayerViewSet) #registering viewsets with the router.
-router.register(r'games', MatchViewSet)#to be tested
+router.register(r'games', MatchViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

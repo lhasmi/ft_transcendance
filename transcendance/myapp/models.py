@@ -11,9 +11,10 @@ class Player(models.Model):
     online_status = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', blank=True, symmetrical=True)
     secret_key = models.CharField(max_length=100, blank=True, null=True)  # to store TOTP secret key
+    # two_fa_method = models.CharField(max_length=10, choices=[('email', 'Email'), ('sms', 'SMS')], default='email')
+    # phone_number = models.CharField(max_length=20, blank=True, null=True)  # to store phone number for SMS 2FA
     two_fa_method = models.CharField(max_length=10, choices=[('email', 'Email'), ('sms', 'SMS')], default='email')
-    phone_number = models.CharField(max_length=20, blank=True, null=True)  # to store phone number for SMS 2FA
-    #any reference to username or email can directly use player.user.username and player.user.email.
+
     def __str__(self):
         return f"{self.user.username}'s Player Profile"
     def set_online(self):## For status online tracking

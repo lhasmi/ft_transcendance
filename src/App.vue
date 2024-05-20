@@ -1,43 +1,49 @@
 <script setup>
-import { onMounted } from 'vue'
-import { RouterView } from 'vue-router'
-import HeaderComp from './components/HeaderComp.vue'
-import { store } from './store/store.js'
-import { fetchWithJWT } from './utils/utils.js'
+import { onMounted } from "vue";
+import { RouterView } from "vue-router";
+import HeaderComp from "./components/HeaderComp.vue";
+import { store } from "./store/store.js";
+import { fetchWithJWT } from "./utils/utils.js";
 
 onMounted(async () => {
-	try {
-		const response = await fetch('https://api.intra.42.fr/oauth/token?grant_type=authorization_code&code=814e7d160785257630580087a8627541a333c64a138e1c2a41be41689325ffb9&redirect_uri=http://127.0.0.1:8000/oauth/callback/&client_id=u-s4t2ud-5d66c931fc39d767149776c9efda2aa711a4167224361348d78cad3781c36d69&client_secret=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', {
-			method: 'POST'
-		})
-		if (!response.ok) {
-			console.log(response.error)	
-		}
-		const data = await response.json()
-		console.log(data)
-	} catch(error) {
-		console.log(error)
-	}
+  // try {
+  //   const response = await fetch(
+  //     // "https://api.intra.42.fr/oauth/token?grant_type=authorization_code&code=63858ce2f7b41cef6c055bf5202df26aa32a8422f2dfd62c1ae46491da32962c&redirect_uri=http://127.0.0.1:8000/oauth/callback/&client_id=u-s4t2ud-1303a4f7f8900a6bd31098477269cc5747fab2e7e9f510c47f0e740818e15727&client_secret=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",
+  //     "https://api.intra.42.fr/oauth/token?grant_type=authorization_code&code=69fb743b582870dfabb3e42873293fcd61280bf29e829a9638a14aac10bfff4d&redirect_uri=http://127.0.0.1:8000/oauth/callback/&client_id=u-s4t2ud-1303a4f7f8900a6bd31098477269cc5747fab2e7e9f510c47f0e740818e15727&client_secret=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",
+  //     {
+  //       method: "POST",
+  //     }
+  //   );
+  //   if (!response.ok) {
+  //     console.log(response.error);
+  //   }
+  //   const data = await response.json();
+  //   console.log(data);
+  // } catch (error) {
+  //   console.log(error);
+  // }
 
-	try {
-		if (localStorage.getItem('access') && localStorage.getItem('refresh')) {
-			console.log('try to login')
-			const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
-			if (!response.ok) {
-				console.log('can\'t login with existing JWT')
-				return
-			}
-			const data = await response.json()
-			store.userAuthorised = true
-			store.username = data.user.username
-			store.email = data.user.email
-			store.picture = 'http://127.0.0.1:8000' + data.profile_picture
-			console.log(store.username)
-		}
-	} catch(error) {
-		console.log(error)
-	}
-})
+  try {
+    if (localStorage.getItem("access") && localStorage.getItem("refresh")) {
+      console.log("try to login...");
+      const response = await fetchWithJWT(
+        "http://127.0.0.1:8000/update-profile/"
+      );
+      if (!response.ok) {
+        console.log("can't login with existing JWT");
+        return;
+      }
+      const data = await response.json();
+      store.userAuthorised = true;
+      store.username = data.user.username;
+      store.email = data.user.email;
+      store.picture = "http://127.0.0.1:8000" + data.profile_picture;
+      console.log("logged in as " + store.username);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
 </script>
 
 <template>
@@ -50,7 +56,7 @@ onMounted(async () => {
 
 <style>
 body {
-	background: #3b1a99;
+  background: #3b1a99;
 }
 
 main {

@@ -8,7 +8,7 @@ class Player(models.Model):
     display_name = models.CharField(max_length=255, unique=True, null=True, blank=True)
     profile_picture = models.ImageField(upload_to='media/', default='default.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
-    online_status = models.BooleanField(default=False)
+    online_status = models.IntegerField(default=0) # Changed from BooleanField to IntegerField
     friends = models.ManyToManyField('self', blank=True, symmetrical=True)
     secret_key = models.CharField(max_length=100, blank=True, null=True)  # to store TOTP secret key
     two_fa_method = models.CharField(max_length=10, choices=[('email', 'Email')], default='email')
@@ -16,10 +16,11 @@ class Player(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Player Profile"
     def set_online(self):## For status online tracking
-        self.online_status = True
+        self.online_status += 1  # Increment online status(OS) counter
         self.save()
     def set_offline(self):## For status offline tracking
-        self.online_status = False
+        if self.online_status > 0:
+            self.online_status -= 1  # Decrement OS counter if greater than 0
         self.save()
     def generate_secret_key(self):
         if not self.secret_key:

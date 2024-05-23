@@ -1,15 +1,24 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { store } from '@/store/store'
+
 const props = defineProps({
   isTournament: Boolean,
   player1: String,
   player2: String,
 })
+
 const score = ref({
   player1: 0,
   player2: 0,
 })
+
+const emit = defineEmits(['winner'])
+
+const setWinner = (winner, loser) => {
+	emit('winner', winner, loser)
+}
+
 // GAME
 let canvas
 let ctx
@@ -151,6 +160,15 @@ class Game {
   animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     this.#draw()
+		if (score.value.player1 == 1 || score.value.player2 == 1) {
+			console.log('setWinner')
+			if (props.isTournament == true) {
+				if (score.value.player1 == 1)
+					setWinner(props.player1, props.player2)
+				if (score.value.player2 == 1)
+					setWinner(props.player2, props.player1)
+			}
+		}
     if (this.startGame) {
       this.player1.update()
       this.player2.update()

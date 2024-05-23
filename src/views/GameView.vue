@@ -15,6 +15,11 @@ const score = ref({
 })
 
 // functions
+
+const handleFinishedMatch = (winner, loser) => {
+	// stop the game and show the winner
+}
+
 const sendTestData = async () => {
   const response = await fetch('http://127.0.0.1:8000/games/', {
     method: 'POST',
@@ -36,219 +41,6 @@ const sendTestData = async () => {
     console.log('error: ' + data.error)
   }
 }
-
-// GAME
-
-let canvas
-let ctx
-const playerWidth = 4
-const playerHeight = 100
-const playerSpeed = 3
-const ballSpeed = 2
-
-class Player {
-  constructor(x = 0, y = 0) {
-    this.posX = x
-    this.posY = y
-    // movement velocity
-    this.vy = 0
-    // button released
-    this.upKeyPressed = false
-    this.downKeyPressed = false
-    // color
-    this.color = '#F58562'
-  }
-  draw() {
-    ctx.fillStyle = this.color
-    ctx.fillRect(this.posX, this.posY, playerWidth, playerHeight)
-  }
-  update() {
-    if (this.upKeyPressed && this.downKeyPressed) this.vy = 0
-    else if (this.upKeyPressed) this.vy = -playerSpeed
-    else if (this.downKeyPressed) this.vy = playerSpeed
-    else if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
-
-    // boundaries check
-    if (this.posY <= 0 && this.vy < 0) this.vy = 0
-    if (this.posY >= canvas.height - playerHeight && this.vy > 0) this.vy = 0
-
-    this.posY += this.vy
-    this.draw()
-  }
-}
-
-class Ball {
-  constructor(x = 0, y = 0, player1, player2) {
-    this.posX = x
-    this.posY = y
-    this.player1 = player1
-    this.player2 = player2
-    this.radius = 10
-
-    // direction
-    this.dirX = 1
-    this.dirY = 2
-    // velocity
-    this.v = ballSpeed
-  }
-  draw() {
-    ctx.beginPath()
-    ctx.arc(this.posX, this.posY, this.radius, 0, 2 * Math.PI)
-    ctx.fillStyle = 'white'
-    ctx.fill()
-  }
-  #checkCircleRectCollision(player) {
-    let pointX = this.posX
-    let pointY = this.posY
-
-    if (this.posX < player.posX) pointX = player.posX
-    else if (this.posX > player.posX + playerWidth)
-      pointX = player.posX + playerWidth
-
-    if (this.posY < player.posY) pointY = player.posY
-    else if (this.posY > player.posY + playerHeight)
-      pointY = player.posY + playerHeight
-
-    let distX = this.posX - pointX
-    let distY = this.posY - pointY
-    let distance = Math.sqrt(distX * distX + distY * distY)
-    if (distance <= this.radius) return true
-
-    return false
-  }
-  #checkPlayer1Collision() {
-    if (this.posX - this.radius >= this.player1.posX + playerWidth) return false
-    if (this.#checkCircleRectCollision(this.player1)) return true
-    return false
-  }
-  #checkPlayer2Collision() {
-    if (this.posX + this.radius <= this.player2.posX) return false
-    if (this.#checkCircleRectCollision(this.player2)) return true
-    return false
-  }
-  #checkBoundariesCollision() {
-    if (
-      this.posY - this.radius <= 0 ||
-      this.posY + this.radius >= canvas.height
-    )
-      return true
-    return false
-  }
-  #checkGoal() {
-    if (this.posX - this.radius >= canvas.width + 100) return 1
-    if (this.posX + this.radius <= -100) return 2
-    return 0
-  }
-  update() {
-    // check collisions
-    if (this.#checkPlayer1Collision()) {
-      if (this.posX <= this.player1.posX + playerWidth) {
-        if (this.posY < this.player1.posY + playerHeight / 2) this.dirY = -2
-        else this.dirY = 2
-      } else this.dirX = 1
-    }
-    if (this.#checkPlayer2Collision()) {
-      if (this.posX >= this.player2.posX) {
-        if (this.posY < this.player2.posY + playerHeight / 2) this.dirY = -2
-        else this.dirY = 2
-      } else this.dirX = -1
-    }
-    if (this.#checkBoundariesCollision()) this.dirY *= -1
-    let goalScorer
-    if ((goalScorer = this.#checkGoal())) {
-      goalScorer == 1 ? score.value.player1++ : score.value.player2++
-      this.posX = canvas.width / 2
-      this.posY = canvas.height / 2
-    }
-    // modify position
-    this.posX += this.dirX * this.v
-    this.posY += this.dirY * this.v
-    this.draw()
-  }
-}
-
-class Game {
-  constructor(ctx, player1, player2, ball) {
-    this.ctx = ctx
-    this.player1 = player1
-    this.player2 = player2
-    this.ball = ball
-    this.startGame = false
-  }
-  #draw() {
-    ctx.beginPath()
-    ctx.moveTo(canvas.width / 2, 0)
-    ctx.lineTo(canvas.width / 2, canvas.height)
-    ctx.lineWidth = 2
-    ctx.strokeStyle = '#F58562'
-    ctx.stroke()
-  }
-  animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    this.#draw()
-    if (this.startGame) {
-      this.player1.update()
-      this.player2.update()
-      this.ball.update()
-    } else {
-      this.player1.draw()
-      this.player2.draw()
-      this.ball.draw()
-    }
-
-    requestAnimationFrame(this.animate.bind(this))
-  }
-}
-
-onMounted(() => {
-  canvas = document.getElementById('canvasId')
-  ctx = canvas.getContext('2d')
-  canvas.width = 700
-  canvas.height = 466
-
-  const player1 = new Player(32, canvas.height / 2 - playerHeight / 2)
-  const player2 = new Player(
-    canvas.width - playerWidth - 32,
-    canvas.height / 2 - playerHeight / 2
-  )
-  const ball = new Ball(canvas.width / 2, canvas.height / 2, player1, player2)
-
-  const game = new Game(ctx, player1, player2, ball)
-  game.animate()
-
-  if (store.userAuthorised) {
-    player1.value = store.username
-    player2.value = 'opponent'
-  }
-
-  addEventListener('keydown', (e) => {
-    if (e.key == 'w') {
-      player1.upKeyPressed = true
-    } else if (e.key == 's') {
-      player1.downKeyPressed = true
-    } else if (e.key == 'ArrowUp') {
-      e.preventDefault()
-      player2.upKeyPressed = true
-    } else if (e.key == 'ArrowDown') {
-      e.preventDefault()
-      player2.downKeyPressed = true
-    }
-  })
-
-  addEventListener('keyup', (e) => {
-    if (e.key == 'w') {
-      player1.upKeyPressed = false
-    } else if (e.key == 's') {
-      player1.downKeyPressed = false
-    } else if (e.key == 'ArrowUp') {
-      player2.upKeyPressed = false
-    } else if (e.key == 'ArrowDown') {
-      player2.downKeyPressed = false
-    } else if (e.key == ' ') {
-      game.startGame = !game.startGame
-    }
-  })
-})
 </script>
 
 <template>
@@ -292,7 +84,7 @@ onMounted(() => {
         <ButtonComp @click="sendTestData" class="ms-2">send</ButtonComp>
       </div>
     </div>
-    <GameComp :isTournament="false" player1="player1" player2="player2" />
+    <GameComp @winner="(winner, loser) => handleFinishedMatch" :isTournament="false" player1="player1" player2="player2" />
     <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
       style="width: 64px; height: 64px"

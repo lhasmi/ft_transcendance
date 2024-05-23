@@ -1,127 +1,135 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import ButtonComp from "./ButtonComp.vue";
-import { store } from "../store/store.js";
-import { getText } from "../language/language.js";
-import { fetchWithJWT } from "../utils/utils.js";
+import { ref, onMounted } from 'vue'
+import ButtonComp from './ButtonComp.vue'
+import { store } from '../store/store.js'
+import { getText } from '../language/language.js'
+import { fetchWithJWT } from '../utils/utils.js'
 
 // test data
 let data = {
-  username: "pvznuzdaTest",
-  email: "pashavznuzdajev@gmail.com",
-  // password: '12345',
-  picture: "",
+  username: '',
+  email: '',
+  picture: '',
   gamesHistory: [
-    {
-      id: 8,
-      player1: "pvznuzda",
-      player2: "test1",
-      score1: 6,
-      score2: 7,
-      date: "11.04.2024 14:35",
-    },
-    {
-      id: 7,
-      player1: "pvznuzda",
-      player2: "test2",
-      score1: 7,
-      score2: 5,
-      date: "11.04.2024 14:35",
-    },
-    {
-      id: 6,
-      player1: "pvznuzda",
-      player2: "test3",
-      score1: 7,
-      score2: 2,
-      date: "11.04.2024 14:35",
-    },
-    {
-      id: 5,
-      player1: "pvznuzda",
-      player2: "test1",
-      score1: 4,
-      score2: 7,
-      date: "11.04.2024 14:35",
-    },
-    {
-      id: 4,
-      player1: "pvznuzda",
-      player2: "test1",
-      score1: 7,
-      score2: 2,
-      date: "11.04.2024 14:35",
-    },
-    {
-      id: 3,
-      player1: "pvznuzda",
-      player2: "test3",
-      score1: 2,
-      score2: 7,
-      date: "11.04.2024 14:35",
-    },
-    {
-      id: 2,
-      player1: "pvznuzda",
-      player2: "test2",
-      score1: 6,
-      score2: 5,
-      date: "11.04.2024 14:35",
-    },
-    {
-      id: 1,
-      player1: "pvznuzda",
-      player2: "test2",
-      score1: 7,
-      score2: 5,
-      date: "11.04.2024 14:35",
-    },
+    // {
+    //   id: 8,
+    //   player1: 'pvznuzda',
+    //   player2: 'test1',
+    //   score1: 6,
+    //   score2: 7,
+    //   date: '11.04.2024 14:35',
+    // },
+    // {
+    //   id: 7,
+    //   player1: 'pvznuzda',
+    //   player2: 'test2',
+    //   score1: 7,
+    //   score2: 5,
+    //   date: '11.04.2024 14:35',
+    // },
+    // {
+    //   id: 6,
+    //   player1: 'pvznuzda',
+    //   player2: 'test3',
+    //   score1: 7,
+    //   score2: 2,
+    //   date: '11.04.2024 14:35',
+    // },
+    // {
+    //   id: 5,
+    //   player1: 'pvznuzda',
+    //   player2: 'test1',
+    //   score1: 4,
+    //   score2: 7,
+    //   date: '11.04.2024 14:35',
+    // },
+    // {
+    //   id: 4,
+    //   player1: 'pvznuzda',
+    //   player2: 'test1',
+    //   score1: 7,
+    //   score2: 2,
+    //   date: '11.04.2024 14:35',
+    // },
+    // {
+    //   id: 3,
+    //   player1: 'pvznuzda',
+    //   player2: 'test3',
+    //   score1: 2,
+    //   score2: 7,
+    //   date: '11.04.2024 14:35',
+    // },
+    // {
+    //   id: 2,
+    //   player1: 'pvznuzda',
+    //   player2: 'test2',
+    //   score1: 6,
+    //   score2: 5,
+    //   date: '11.04.2024 14:35',
+    // },
+    // {
+    //   id: 1,
+    //   player1: 'pvznuzda',
+    //   player2: 'test2',
+    //   score1: 7,
+    //   score2: 5,
+    //   date: '11.04.2024 14:35',
+    // },
   ],
-};
+}
 
 // variables
-const editProfile = ref(false);
-const gamesHistory = ref(false);
-const title = ref("profile");
-const loader = ref(true);
-const newUsername = ref("");
-const newEmail = ref("");
-const newPicture = ref(null);
-const newPassword = ref("");
-const newPassword2 = ref("");
-const errorMsg = ref("");
+const editProfile = ref(false)
+const gamesHistory = ref(false)
+const title = ref('profile')
+const loader = ref(true)
+const newUsername = ref('')
+const newEmail = ref('')
+const newPicture = ref(null)
+const newPassword = ref('')
+const newPassword2 = ref('')
+const errorMsg = ref('')
 
 // functions
 const loadData = async () => {
-  loader.value = true;
+  loader.value = true
   try {
-    console.log("fetch profile");
-    const response = await fetchWithJWT(
-      "http://127.0.0.1:8000/update-profile/"
-    );
-    const newData = await response.json();
-    console.log(newData);
+    console.log('fetch profile')
+    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const newData = await response.json()
+    console.log(newData)
     if (!response.ok) {
-      errorMsg.value = newData.error;
+      errorMsg.value = newData.error
     } else {
-      data.username = newData.user.username;
-      data.email = newData.user.email;
-      data.picture = "http://127.0.0.1:8000" + newData.profile_picture;
+      data.username = newData.user.username
+      data.email = newData.user.email
+      data.picture = 'http://127.0.0.1:8000' + newData.profile_picture
     }
   } catch {
-    console.log("fetch error");
-    errorMsg.value = "fetch request failed";
+    console.log('fetch error')
+    errorMsg.value = 'fetch request failed'
   }
-  loader.value = false;
-
-  // setTimeout(() => { // test
-  // 	loader.value = false
-  // }, 1000);
-};
+  // fetch games history
+  try {
+    console.log('fetch games history')
+    const response = await fetchWithJWT('http://127.0.0.1:8000/match-history/')
+    const newData = await response.json()
+    console.log(newData)
+    if (!response.ok) {
+      errorMsg.value = newData.error
+    } else {
+      data.gamesHistory = newData
+    }
+  } catch {
+    console.log('fetch error')
+    errorMsg.value = 'fetch request failed'
+  }
+  loader.value = false
+}
 
 const saveChanges = async (e) => {
-  e.preventDefault();
-  const formData = new FormData();
+  e.preventDefault()
+  const formData = new FormData()
 
   if (
     !newUsername.value &&
@@ -129,119 +137,119 @@ const saveChanges = async (e) => {
     !newPassword.value &&
     !newPicture.value
   ) {
-    errorMsg.value = "no changes";
-    return;
+    errorMsg.value = 'no changes'
+    return
   }
 
   if (newUsername.value && newUsername.value === data.username) {
-    errorMsg.value = "new username is same as old";
-    return;
+    errorMsg.value = 'new username is same as old'
+    return
   }
   if (newEmail.value && newEmail.value === data.email) {
-    errorMsg.value = "new email is same as old";
-    return;
+    errorMsg.value = 'new email is same as old'
+    return
   }
   if (newPassword.value && newPassword.value !== newPassword2.value) {
-    errorMsg.value = "passwords don't match";
-    return;
+    errorMsg.value = "passwords don't match"
+    return
   }
 
-  if (newUsername.value) formData.append("username", newUsername.value);
-  if (newEmail.value) formData.append("email", newEmail.value);
-  if (newPassword.value) formData.append("password", newPassword.value);
+  if (newUsername.value) formData.append('username', newUsername.value)
+  if (newEmail.value) formData.append('email', newEmail.value)
+  if (newPassword.value) formData.append('password', newPassword.value)
   if (newPicture.value)
-    formData.append("profile_picture", newPicture.value, newPicture.value.name);
+    formData.append('profile_picture', newPicture.value, newPicture.value.name)
 
-  errorMsg.value = "";
+  errorMsg.value = ''
 
   try {
     const response = await fetchWithJWT(
-      "http://127.0.0.1:8000/update-profile/",
-      "PUT",
+      'http://127.0.0.1:8000/update-profile/',
+      'PUT',
       formData
-    );
-    const newData = await response.json();
-    console.log(newData);
+    )
+    const newData = await response.json()
+    console.log(newData)
     if (!response.ok) {
-      errorMsg.value = newData.error;
-      console.log(newData.error + "!!!");
-      return;
+      errorMsg.value = newData.error
+      console.log(newData.error + '!!!')
+      return
     } else {
-      console.log("profile updated");
+      console.log('profile updated')
     }
   } catch {
-    console.log("fetch request failed");
-    errorMsg.value = "fetch request failed";
+    console.log('fetch request failed')
+    errorMsg.value = 'fetch request failed'
   }
-  loadData();
-  backProfileModal();
-};
+  loadData()
+  backProfileModal()
+}
 
 const resetInput = () => {
-  newUsername.value = "";
-  newEmail.value = "";
-  newPassword.value = "";
-  newPassword2.value = "";
-  newPicture.value = null;
-  errorMsg.value = null;
-};
+  newUsername.value = ''
+  newEmail.value = ''
+  newPassword.value = ''
+  newPassword2.value = ''
+  newPicture.value = null
+  errorMsg.value = null
+}
 
 const toEditProfile = () => {
-  editProfile.value = true;
-  title.value = "editProfile";
-};
+  editProfile.value = true
+  title.value = 'editProfile'
+}
 
 const toGamesHistory = () => {
-  gamesHistory.value = true;
-  title.value = "gamesHistory";
-};
+  gamesHistory.value = true
+  title.value = 'gamesHistory'
+}
 
 const backProfileModal = () => {
-  title.value = "profile";
-  editProfile.value = false;
-  gamesHistory.value = false;
-  resetInput();
-};
+  title.value = 'profile'
+  editProfile.value = false
+  gamesHistory.value = false
+  resetInput()
+}
 
 const shortEmail = (email) => {
-  const atSignPos = email.search("@");
-  let first;
+  const atSignPos = email.search('@')
+  let first
   if (atSignPos >= 10) {
-    first = email.substring(0, 8) + "...";
+    first = email.substring(0, 8) + '...'
   } else {
-    return email;
+    return email
   }
-  return first + email.substring(atSignPos);
-};
+  return first + email.substring(atSignPos)
+}
 
 const getCircleColor = (index) => {
   if (index >= data.gamesHistory.length)
-    return "background: rgba(255, 255, 255, 0.1)";
+    return 'background: rgba(255, 255, 255, 0.1)'
   return data.gamesHistory[index].score1 > data.gamesHistory[index].score2
-    ? "background: #66bf6a"
-    : "background: #da4834";
-};
+    ? 'background: #66bf6a'
+    : 'background: #da4834'
+}
 
 const changePicture = (e) => {
-  console.log(e.target.files[0]);
-  console.log(URL.createObjectURL(e.target.files[0]));
-  document.getElementById("profile_img").src = URL.createObjectURL(
+  console.log(e.target.files[0])
+  console.log(URL.createObjectURL(e.target.files[0]))
+  document.getElementById('profile_img').src = URL.createObjectURL(
     e.target.files[0]
-  );
-  newPicture.value = e.target.files[0];
-};
+  )
+  newPicture.value = e.target.files[0]
+}
 
 onMounted(() => {
-  const profileModal = document.getElementById("profileModal");
-  profileModal.addEventListener("show.bs.modal", (e) => {
-    loadData();
-  });
-  profileModal.addEventListener("hidden.bs.modal", (e) => {
-    loader.value = true;
-    backProfileModal();
+  const profileModal = document.getElementById('profileModal')
+  profileModal.addEventListener('show.bs.modal', (e) => {
+    loadData()
+  })
+  profileModal.addEventListener('hidden.bs.modal', (e) => {
+    loader.value = true
+    backProfileModal()
     // abort fetch if its still ongoing
-  });
-});
+  })
+})
 </script>
 
 <template>
@@ -319,7 +327,7 @@ onMounted(() => {
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
             >
               <label for="picture" class="roboto-bold text-white fs-6"
-                >{{ getText("picture", store.lang) }}:</label
+                >{{ getText('picture', store.lang) }}:</label
               >
               <input
                 @change="changePicture"
@@ -333,7 +341,7 @@ onMounted(() => {
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
             >
               <label for="username" class="roboto-bold text-white fs-6"
-                >{{ getText("username", store.lang) }}:</label
+                >{{ getText('username', store.lang) }}:</label
               >
               <input
                 v-model="newUsername"
@@ -347,7 +355,7 @@ onMounted(() => {
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
             >
               <label for="email" class="roboto-bold text-white fs-6"
-                >{{ getText("email", store.lang) }}:</label
+                >{{ getText('email', store.lang) }}:</label
               >
               <input
                 v-model="newEmail"
@@ -361,7 +369,7 @@ onMounted(() => {
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
             >
               <label for="password" class="roboto-bold text-white fs-6"
-                >{{ getText("password", store.lang) }}:</label
+                >{{ getText('password', store.lang) }}:</label
               >
               <input
                 v-model="newPassword"
@@ -374,7 +382,7 @@ onMounted(() => {
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-3 mb-md-4"
             >
               <label for="passwordRepeat" class="roboto-bold text-white fs-6"
-                >{{ getText("password", store.lang) }}:</label
+                >{{ getText('password', store.lang) }}:</label
               >
               <input
                 v-model="newPassword2"
@@ -394,7 +402,7 @@ onMounted(() => {
               class="d-flex col-9 col-md-7 mx-auto justify-content-around my-4"
             >
               <ButtonComp @click="saveChanges" class="save-btn fs-6">{{
-                getText("saveChanges", store.lang)
+                getText('saveChanges', store.lang)
               }}</ButtonComp>
               <!-- <ButtonComp @click="backProfileModal" class="cancel-btn fs-6">{{ getText('cancel', store.lang) }}</ButtonComp> -->
             </div>
@@ -458,24 +466,24 @@ onMounted(() => {
           <p
             class="col-9 col-md-7 mx-auto roboto-bold mb-2 mb-md-3 text-white fs-6"
           >
-            {{ getText("username", store.lang) }}:
+            {{ getText('username', store.lang) }}:
             <span class="fs-6 ms-1">{{ data.username }}</span>
           </p>
           <p
             class="col-9 col-md-7 mx-auto roboto-bold mb-2 mb-md-3 text-white fs-6"
           >
-            {{ getText("email", store.lang) }}:
+            {{ getText('email', store.lang) }}:
             <span class="fs-6 ms-1">{{ shortEmail(data.email) }}</span>
           </p>
           <ButtonComp
             @click="toEditProfile"
             class="fs-6 col-9 col-md-7 mx-auto mb-4"
           >
-            {{ getText("editProfile", store.lang) }}
+            {{ getText('editProfile', store.lang) }}
           </ButtonComp>
           <hr class="splitter col-12 mx-auto m-0" />
           <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">
-            {{ getText("lastGames", store.lang) }}
+            {{ getText('lastGames', store.lang) }}
           </h2>
           <div
             class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3"
@@ -490,7 +498,7 @@ onMounted(() => {
             @click="toGamesHistory"
             class="fs-6 col-9 col-md-7 mx-auto mb-4"
           >
-            {{ getText("gamesHistory", store.lang) }}
+            {{ getText('gamesHistory', store.lang) }}
           </ButtonComp>
         </div>
       </div>
@@ -596,7 +604,7 @@ input {
 }
 input::placeholder {
   color: white;
-  font-family: "Roboto";
+  font-family: 'Roboto';
 }
 input:focus {
   outline: none;

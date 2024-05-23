@@ -52,9 +52,13 @@ class MatchSerializer(serializers.ModelSerializer):
     winner = serializers.CharField(write_only=True) 
     players_detail = PublicPlayerSerializer(read_only=True, many=True, source='players')
     winner_detail = PublicPlayerSerializer(read_only=True, source='winner')
+    # Change details to user_score and opponent_score
+    user_score = serializers.IntegerField()  
+    opponent_score = serializers.IntegerField()
+
     class Meta:
         model = Match
-        fields = ['id', 'players',  'winner', 'played_on', 'details', 'is_winner', 'players_detail', 'winner_detail']
+        fields = ['id', 'players',  'winner', 'played_on', 'user_score', 'opponent_score', 'is_winner', 'players_detail', 'winner_detail']
     
     def validate_players(self, value):
         players = []

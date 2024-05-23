@@ -30,7 +30,8 @@ class Match(models.Model):
     players = models.ManyToManyField(Player, related_name="matches")
     winner = models.ForeignKey(Player, related_name="won_matches", on_delete=models.SET_NULL, null=True)
     played_on = models.DateTimeField(auto_now_add=True)
-    details = models.TextField()
+    user_score = models.IntegerField()
+    opponent_score = models.IntegerField()
 
 # Foreign Key Relations: using related_name for backwards navigation in relations.
 

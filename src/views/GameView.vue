@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import ButtonComp from '../components/ButtonComp.vue';
-import { store } from '@/store/store';
-
+import ButtonComp from '../components/ButtonComp.vue'
+import { store } from '@/store/store'
+import GameComp from '../components/GameComp.vue'
 
 // variables
 const test = ref(false)
@@ -11,29 +11,30 @@ const player1 = ref('player1')
 const player2 = ref('player2')
 const score = ref({
   player1: 0,
-  player2: 0
+  player2: 0,
 })
 
 // functions
 const sendTestData = async () => {
-	
-	const response = await fetch('https://127.0.0.1:8000/game/', {
-		method: "POST",
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Token ${localStorage.getItem('token')}`,
-		},
-		body: JSON.stringify({
-			player1: player1.value,
-			player2: player2.value,
-			score: [score.value.player1, score.value.player2],
-		})
-	})
+  const response = await fetch('http://127.0.0.1:8000/games/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('access')}`,
+    },
+    body: JSON.stringify({
+      players: ['vpaul', 'admin'],
+      winner: 'vpaul',
+      played_on: '2023-05-20T14:28:23.382Z',
+      details: 'Match details here.',
+    }),
+  })
 
-	const data = await response.json()
-	if (!response.ok) {
-		console.log('error: ' + data.error)
-	}
+  const data = await response.json()
+  console.log(data)
+  if (!response.ok) {
+    console.log('error: ' + data.error)
+  }
 }
 
 // GAME
@@ -56,47 +57,12 @@ class Player {
     this.downKeyPressed = false
     // color
     this.color = '#F58562'
-
-    //
-    // addEventListener('keydown', (e) => {
-    //   // DYNAMIC SPEED
-    //   // if (e.key == 'ArrowUp' || e.key == 'w') {
-    //   //   this.keyPressed = true
-    //   //   if (this.vy > -2) this.vy -= 0.1
-    //   // } else if (e.key == 'ArrowDown' || e.key == 's') {
-    //   //   this.keyPressed = true
-    //   //   if (this.vy < 2) this.vy += 0.1
-    //   // }
-    //   // STATIC SPEED
-    //   if (e.key == 'ArrowUp' || e.key == 'w') {
-    //     this.keyPressed = true
-    //     if (this.vy > -2) this.vy = -1.5
-    //   } else if (e.key == 'ArrowDown' || e.key == 's') {
-    //     this.keyPressed = true
-    //     if (this.vy < 2) this.vy = 1.5
-    //   }
-    // })
-
-    // addEventListener('keyup', (e) => {
-    //   if (e.key == 'ArrowUp' || e.key == 'w') {
-    //     this.keyPressed = false
-    //   } else if (e.key == 'ArrowDown' || e.key == 's') {
-    //     this.keyPressed = false
-    //   }
-    // })
   }
   draw() {
     ctx.fillStyle = this.color
     ctx.fillRect(this.posX, this.posY, playerWidth, playerHeight)
   }
   update() {
-    // movement key is not pressed
-    // DYNAMIC SPEED
-    // if (this.vy >= -0.02 && this.vy <= 0.02 && !this.keyPressed) this.vy = 0
-    // if (this.vy < -0.02 && !this.keyPressed) this.vy += 0.02
-    // if (this.vy > 0.02 && !this.keyPressed) this.vy -= 0.02
-    // STATIC SPEED
-    // if (!this.upKeyPressed && !this.downKeyPressed) this.vy = 0
     if (this.upKeyPressed && this.downKeyPressed) this.vy = 0
     else if (this.upKeyPressed) this.vy = -playerSpeed
     else if (this.downKeyPressed) this.vy = playerSpeed
@@ -136,10 +102,12 @@ class Ball {
     let pointY = this.posY
 
     if (this.posX < player.posX) pointX = player.posX
-    else if (this.posX > player.posX + playerWidth) pointX = player.posX + playerWidth
+    else if (this.posX > player.posX + playerWidth)
+      pointX = player.posX + playerWidth
 
     if (this.posY < player.posY) pointY = player.posY
-    else if (this.posY > player.posY + playerHeight) pointY = player.posY + playerHeight
+    else if (this.posY > player.posY + playerHeight)
+      pointY = player.posY + playerHeight
 
     let distX = this.posX - pointX
     let distY = this.posY - pointY
@@ -159,7 +127,11 @@ class Ball {
     return false
   }
   #checkBoundariesCollision() {
-    if (this.posY - this.radius <= 0 || this.posY + this.radius >= canvas.height) return true
+    if (
+      this.posY - this.radius <= 0 ||
+      this.posY + this.radius >= canvas.height
+    )
+      return true
     return false
   }
   #checkGoal() {
@@ -202,11 +174,6 @@ class Game {
     this.player2 = player2
     this.ball = ball
     this.startGame = false
-
-    // time delta
-    // this.lastTime = 0
-    // this.interval = 1000 / 60
-    // this.timer = 0
   }
   #draw() {
     ctx.beginPath()
@@ -240,52 +207,30 @@ onMounted(() => {
   canvas.height = 466
 
   const player1 = new Player(32, canvas.height / 2 - playerHeight / 2)
-  const player2 = new Player(canvas.width - playerWidth - 32, canvas.height / 2 - playerHeight / 2)
+  const player2 = new Player(
+    canvas.width - playerWidth - 32,
+    canvas.height / 2 - playerHeight / 2
+  )
   const ball = new Ball(canvas.width / 2, canvas.height / 2, player1, player2)
 
   const game = new Game(ctx, player1, player2, ball)
   game.animate()
 
-	if (store.userAuthorised) {
-		player1.value = store.username
-		player2.value = 'opponent'
-	}
-
-  // addEventListener('keydown', (e) => {
-  //   if (e.key == 'ArrowUp' || e.key == 'w') {
-  //     player1.keyPressed = true
-  //     if (player1.vy > -2) player1.vy -= 0.05
-  //   } else if (e.key == 'ArrowDown' || e.key == 's') {
-  //     player1.keyPressed = true
-  //     if (player1.vy < 2) player1.vy += 0.05
-  //   }
-  // })
-
-  // addEventListener('keyup', (e) => {
-  //   if (e.key == 'ArrowUp' || e.key == 'w') {
-  //     player1.keyPressed = false
-  //   } else if (e.key == 'ArrowDown' || e.key == 's') {
-  //     player1.keyPressed = false
-  //   }
-  // })
+  if (store.userAuthorised) {
+    player1.value = store.username
+    player2.value = 'opponent'
+  }
 
   addEventListener('keydown', (e) => {
-    // DYNAMIC SPEED
-    // if (e.key == 'ArrowUp' || e.key == 'w') {
-    //   this.keyPressed = true
-    //   if (this.vy > -2) this.vy -= 0.1
-    // } else if (e.key == 'ArrowDown' || e.key == 's') {
-    //   this.keyPressed = true
-    //   if (this.vy < 2) this.vy += 0.1
-    // }
-    // STATIC SPEED
     if (e.key == 'w') {
       player1.upKeyPressed = true
     } else if (e.key == 's') {
       player1.downKeyPressed = true
     } else if (e.key == 'ArrowUp') {
+      e.preventDefault()
       player2.upKeyPressed = true
     } else if (e.key == 'ArrowDown') {
+      e.preventDefault()
       player2.downKeyPressed = true
     }
   })
@@ -310,69 +255,97 @@ onMounted(() => {
   <section
     class="container flex-grow-1 d-flex flex-column justify-content-center align-items-center"
   >
-
-		<!-- TEST -->
-		<ButtonComp v-if="test" @click="testMode = !testMode" class="mb-3">test mode</ButtonComp>
-		<div v-if="testMode" class="row test-form py-2">
-			<div class="col d-flex">
-				<div class="d-flex flex-column justify-content-center align-items-center">
-					<label class="text-white roboto-regular fs-6" for="player1">{{ player1 }}</label>
-					<input v-model="score.player1" class="text-center" type="text" id="player1" :placeholder="player1">
-				</div>
-				<div class="d-flex flex-column justify-content-center align-items-center">
-					<label class="text-white roboto-regular fs-6" for="player2">{{ player2 }}</label>
-					<input v-model="score.player2" class="ms-2 text-center" type="text" id="player2" :placeholder="player2">
-				</div>
-				<ButtonComp @click="sendTestData" class="ms-2">send</ButtonComp>
-			</div>
-		</div>
-
-    <div class="scoreboard col-10 col-md-6 mx-auto d-flex justify-content-around align-items-center">
-      <p class="text-white fs-4 mb-0 roboto-medium">{{ player1 }}</p>
-      <p class="text-white fs-2 mb-0 roboto-bold">{{ score.player1 }} : {{ score.player2 }}</p>
-      <p class="text-white fs-4 mb-0 roboto-medium">{{ player2 }}</p>
+    <!-- TEST -->
+    <ButtonComp v-if="test" @click="testMode = !testMode" class="mb-3"
+      >test mode</ButtonComp
+    >
+    <div v-if="testMode" class="row test-form py-2">
+      <div class="col d-flex">
+        <div
+          class="d-flex flex-column justify-content-center align-items-center"
+        >
+          <label class="text-white roboto-regular fs-6" for="player1">{{
+            player1
+          }}</label>
+          <input
+            v-model="score.player1"
+            class="text-center"
+            type="text"
+            id="player1"
+            :placeholder="player1"
+          />
+        </div>
+        <div
+          class="d-flex flex-column justify-content-center align-items-center"
+        >
+          <label class="text-white roboto-regular fs-6" for="player2">{{
+            player2
+          }}</label>
+          <input
+            v-model="score.player2"
+            class="ms-2 text-center"
+            type="text"
+            id="player2"
+            :placeholder="player2"
+          />
+        </div>
+        <ButtonComp @click="sendTestData" class="ms-2">send</ButtonComp>
+      </div>
     </div>
-
-    <canvas class="canvas" id="canvasId"></canvas>
+    <GameComp :isTournament="false" player1="player1" player2="player2" />
     <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
       style="width: 64px; height: 64px"
-			data-bs-toggle="modal"
-			data-bs-target="#helpModal"
+      data-bs-toggle="modal"
+      data-bs-target="#helpModal"
     >
       ?
     </button>
 
-		<!-- Modal -->
-		<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="helpModalLabel">Modal title</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						...
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="helpModal"
+      tabindex="-1"
+      aria-labelledby="helpModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="helpModalLabel">Modal title</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">...</div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <style scoped>
 .canvas {
-	@media screen and (max-width: 600px) {
-		border: 2px solid #f58562;
-		border-left: none;
-		border-right: none;
-	}
-	width: 80%;
+  @media screen and (max-width: 600px) {
+    border: 2px solid #f58562;
+    border-left: none;
+    border-right: none;
+  }
+  width: 80%;
   border: 5px solid #f58562;
   border-right: none;
   border-left: none;
@@ -411,8 +384,7 @@ onMounted(() => {
 
 /* test */
 .test-form {
-	border-bottom: 1px solid #f58562;
-	border-top: 1px solid #f58562;
+  border-bottom: 1px solid #f58562;
+  border-top: 1px solid #f58562;
 }
-
 </style>

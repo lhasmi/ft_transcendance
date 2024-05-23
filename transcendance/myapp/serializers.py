@@ -41,7 +41,7 @@ class PlayerFriendSerializer(serializers.ModelSerializer):#for simplified view o
 
     class Meta:
         model = Player
-        fields = ['id', 'user', 'online_status']
+        fields = ['id', 'user', 'online_status']  # to allow users to see the status of their friends
 
 class MatchSerializer(serializers.ModelSerializer):
     ## Show all players in the match

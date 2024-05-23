@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { store } from "../store/store.js";
 import { getText, getError } from "../language/language.js";
 import router from "@/router";
 import ButtonComp from "../components/ButtonComp.vue";
+import { fetchWithJWT } from "@/utils/utils";
 
 const testData = {
   username: "pvznuzda",
@@ -20,6 +21,7 @@ const redirectTo42 = async () => {
   try {
     const response = await fetch("http://127.0.0.1:8000/oauth/login/");
     if (!response.ok) {
+			console.log(response)
       console.log("redirectTo42: bad response");
     }
     const data = await response.json();
@@ -77,6 +79,41 @@ const submit = async (e) => {
     errorMsg.value = "fetch request failed";
   }
 };
+
+onMounted(async () => {
+	const query = window.location.search
+	console.log("query:" + query)
+	if (query) {
+		try {
+			const response = await fetch(`http://127.0.0.1:8000/oauth/callback/${query}`)
+			const data = await response.json()
+			console.log(data)
+			localStorage.setItem("access", data.access)
+			localStorage.setItem("refresh", data.refresh)
+			store.userAuthorised = true
+			router.push('/')
+		} catch(error) {
+			console.log("catch: " + error)
+		}
+		try {
+			const response = await fetchWithJWT(
+        "http://127.0.0.1:8000/update-profile/"
+      );
+      if (!response.ok) {
+        console.log("can't login with existing JWT");
+        return;
+      }
+      const data = await response.json();
+      store.userAuthorised = true;
+      store.username = data.user.username;
+      store.email = data.user.email;
+      store.picture = "http://127.0.0.1:8000" + data.profile_picture;
+      console.log("logged in as " + store.username);
+		} catch(error) {
+			console.log("catch: " + error)
+		}
+	}
+})
 </script>
 
 <template>

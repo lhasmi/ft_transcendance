@@ -123,7 +123,7 @@ const validateInput = () => {
 		<!-- TOURNAMENT GAME -->
 		<div v-else-if="tournamentState === states.game">
 			<!-- <TournamentTestComp @winner="(winner, loser) => handleFinishedMatch(winner, loser)" :match="upcomingMatches[0]"/> -->
-			<GameComp @winner="(winner, loser) => handleFinishedMatch(winner, loser)" :player1="upcomingMatches[0][0]" :player2="upcomingMatches[0][1]"/>
+			<GameComp :is-tournament="true" @winner="(winner, loser) => handleFinishedMatch(winner, loser)" :player1="upcomingMatches[0][0]" :player2="upcomingMatches[0][1]"/>
 		</div>
 
 		<div v-else-if="tournamentState === states.end" class="myshadow bg-white bg-opacity-10 col-11 col-sm-8 col-md-6 col-lg-4 rounded-4">

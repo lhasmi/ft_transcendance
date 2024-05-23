@@ -309,9 +309,15 @@ class MatchHistoryAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         """
-        Retrieve the match history for the logged-in user.
+        Retrieve the match history for for any user, if authenticated.
         """
-        player = request.user.player
+        #If a username is provided, it fetches the Player object for that user. 
+        username = request.query_params.get('username', None)
+        if username:
+            user = get_object_or_404(User, username=username)
+            player = user.player
+        else:# Otherwise, it uses the logged-in user's Player.
+            player = request.user.player
         ordering = request.query_params.get('ordering', '-played_on')
         matches = Match.objects.filter(players=player).order_by(ordering).annotate(
             is_winner=Case(
@@ -321,6 +327,7 @@ class MatchHistoryAPIView(APIView):
             )
         )
         data = MatchSerializer(matches, many=True).data
+        player_data = {'display_name': player.display_name, 'matches': data}
         return Response(data, status=status.HTTP_200_OK)
  
 

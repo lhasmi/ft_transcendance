@@ -7,9 +7,15 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email']
 
+class PublicPlayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ['id', 'display_name']
+
 class PlayerSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     friends = serializers.SerializerMethodField()#to customize the serialization of friends
+
     class Meta:
         model = Player
         fields = ['id', 'user', 'profile_picture', 'created_at', 'display_name', 'online_status', 'friends']
@@ -44,8 +50,8 @@ class MatchSerializer(serializers.ModelSerializer):
         write_only=True
     )
     winner = serializers.CharField(write_only=True) 
-    players_detail = PlayerSerializer(read_only=True, many=True, source='players')
-    winner_detail = PlayerSerializer(read_only=True, source='winner')
+    players_detail = PublicPlayerSerializer(read_only=True, many=True, source='players')
+    winner_detail = PublicPlayerSerializer(read_only=True, source='winner')
     class Meta:
         model = Match
         fields = ['id', 'players',  'winner', 'played_on', 'details', 'is_winner', 'players_detail', 'winner_detail']

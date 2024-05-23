@@ -183,7 +183,6 @@ class Game {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     this.#draw()
 		if (score.value.player1 == 1 || score.value.player2 == 1) {
-			console.log('setWinner')
 			if (props.isTournament == true) {
 				if (score.value.player1 == 1)
 					setWinner(props.player1, props.player2)

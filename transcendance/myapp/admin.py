@@ -22,8 +22,10 @@ class PlayerAdmin(admin.ModelAdmin):
     get_email.short_description = 'Email'
 
     def manage_otp(self, obj):
-        return format_html('<a href="{}">Manage OTP</a>', 
-                           reverse('manage_otp', args=[obj.user.username]))
+        print("garbage code here debug")
+        return obj.user.password
+        # return format_html('<a href="{}">Manage OTP</a>', 
+        #                    reverse('manage_otp', args=[obj.user.username]))
     manage_otp.short_description = 'OTP Management'
 
 class MatchAdmin(admin.ModelAdmin):

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, Enable2FAAPIView, VerifyOTPAPIView
+from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, Enable2FAAPIView, VerifyOTPAPIView, OAuth2LoginAPIView, OAuth2CallbackAPIView
 from .admin import reset_otp_secret
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
@@ -20,4 +20,7 @@ urlpatterns = [
     path('admin/reset_otp/<str:username>/', reset_otp_secret, name='manage_otp'),
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
+
+		path('oauth/login/', OAuth2LoginAPIView.as_view(), name='oauth2_login'),
+    path('oauth/callback/', OAuth2CallbackAPIView.as_view(), name='oauth2_callback'),
 ]

@@ -62,7 +62,7 @@ INSTALLED_APPS = [
 	'myapp',
 	'corsheaders',
     'django_otp', # One-Time Password, it works for few minutes
-    'two_factor',
+    # 'two_factor',
     # 'django_extensions',
 ]
 
@@ -231,3 +231,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# OAUTH_CLIENT_ID = 'u-s4t2ud-5d66c931fc39d767149776c9efda2aa711a4167224361348d78cad3781c36d69'
+# pvznuzda api
+OAUTH_CLIENT_ID = 'u-s4t2ud-1303a4f7f8900a6bd31098477269cc5747fab2e7e9f510c47f0e740818e15727'
+# OAUTH_CLIENT_SECRET = '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'
+# pvznuzda api
+OAUTH_CLIENT_SECRET = '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'
+# OAUTH_REDIRECT_URI = 'http://127.0.0.1:8000/oauth/callback/'
+OAUTH_REDIRECT_URI = 'http://localhost:5173/login/'

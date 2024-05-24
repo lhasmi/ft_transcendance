@@ -27,7 +27,7 @@ class PlayerAdmin(admin.ModelAdmin):
     manage_otp.short_description = 'OTP Management'
 
 class MatchAdmin(admin.ModelAdmin):
-    list_display = ('id', 'display_players', 'winner', 'played_on', 'details')
+    list_display = ('id', 'display_players', 'winner', 'played_on',  'user_score', 'opponent_score')
     search_fields = ('players__user__username', 'winner__user__username')
     list_filter = ('played_on',)
     

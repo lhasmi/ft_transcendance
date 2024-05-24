@@ -112,12 +112,16 @@ const loadData = async () => {
   // fetch games history
   try {
     console.log('fetch games history')
-    const response = await fetchWithJWT('http://127.0.0.1:8000/match-history/')
+    const response = await fetchWithJWT(
+      'http://127.0.0.1:8000/my-matches-history/'
+    )
     const newData = await response.json()
-    console.log(newData)
+    console.log(newData + ' games history')
     if (!response.ok) {
+      console.log('fetch games history error: ' + newData.error)
       errorMsg.value = newData.error
     } else {
+      console.log(newData)
       data.gamesHistory = newData
     }
   } catch {
@@ -237,6 +241,31 @@ const changePicture = (e) => {
     e.target.files[0]
   )
   newPicture.value = e.target.files[0]
+}
+
+// 2024-05-24T23:48:49.479760
+const formatDateTime = (dateTime) => {
+  let date = dateTime.slice(0, dateTime.indexOf('T'))
+  let time = dateTime.slice(dateTime.indexOf('T') + 1, dateTime.indexOf('.'))
+  return `${date} | ${time}`
+}
+
+const getWonAmount = () => {
+  if (data.gamesHistory.length == 0) return 0
+  let counter = 0
+  for (let i in data.gamesHistory) {
+    if (data.gamesHistory[i].winner == data.username) counter++
+  }
+  return counter
+}
+
+const getLostAmount = () => {
+  if (data.gamesHistory.length == 0) return 0
+  let counter = 0
+  for (let i in data.gamesHistory) {
+    if (data.gamesHistory[i].winner != data.username) counter++
+  }
+  return counter
 }
 
 onMounted(() => {
@@ -416,12 +445,18 @@ onMounted(() => {
           style="height: 396px"
         >
           <div
+            v-if="data.gamesHistory.length == 0"
+            class="text-center text-white roboto-regular mt-4"
+          >
+            games history is empty...
+          </div>
+          <div
             class="col-9 col-md-7 mx-auto mb-1"
-            v-for="item in data.gamesHistory"
-            :key="item.id"
+            v-for="item in data.gamesHistory.slice().reverse()"
+            :key="item.played_on"
           >
             <p class="game-date text-center text-white roboto-regular mb-1">
-              {{ item.date }}
+              {{ formatDateTime(item.played_on) }}
             </p>
             <div class="d-flex justify-content-center position-relative">
               <p class="player-left text-white roboto-regular fs-5">
@@ -482,10 +517,29 @@ onMounted(() => {
             {{ getText('editProfile', store.lang) }}
           </ButtonComp>
           <hr class="splitter col-12 mx-auto m-0" />
-          <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">
-            {{ getText('lastGames', store.lang) }}
-          </h2>
           <div
+            class="col-9 col-md-7 d-flex justify-content-around my-3 mx-auto roboto-bold mb-2 mb-md-3 text-white"
+          >
+            <div class="fs-4 roboto-bold" style="color: #f58562">
+              won
+              <p class="text-center text-white m-0">{{ getWonAmount() }}</p>
+            </div>
+            <div
+              style="
+                border-right: 1px solid #f58562;
+                border-left: 2px solid #f58562;
+              "
+            ></div>
+            <div class="fs-4 roboto-bold" style="color: #f58562">
+              lost
+              <p class="text-center text-white m-0">{{ getLostAmount() }}</p>
+            </div>
+          </div>
+
+          <!-- <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">
+            {{ getText('lastGames', store.lang) }}
+          </h2> -->
+          <!-- <div
             class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3"
           >
             <div class="circle" :style="getCircleColor(4)"></div>
@@ -493,7 +547,7 @@ onMounted(() => {
             <div class="circle" :style="getCircleColor(2)"></div>
             <div class="circle" :style="getCircleColor(1)"></div>
             <div class="circle" :style="getCircleColor(0)"></div>
-          </div>
+          </div> -->
           <ButtonComp
             @click="toGamesHistory"
             class="fs-6 col-9 col-md-7 mx-auto mb-4"

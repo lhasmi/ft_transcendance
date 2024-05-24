@@ -13,33 +13,39 @@ const score = ref({
   player2: 0,
 })
 
-const emit = defineEmits(['winner'])
+const gameFinished = ref(false)
+
+const emit = defineEmits(['winner', 'results'])
+
+const emitResults = (player1, player2, score1, score2) => {
+  emit('results', player1, player2, score1, score2)
+}
 
 const setWinner = (winner, loser) => {
-	emit('winner', winner, loser)
+  emit('winner', winner, loser)
 }
 
-const sendGameResult = async () => {
-  const response = await fetch('http://127.0.0.1:8000/games/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access')}`,
-    },
-    body: JSON.stringify({
-      players: ['vpaul', 'admin'],
-      winner: 'vpaul',
-      played_on: '2023-05-20T14:28:23.382Z',
-      details: 'Match details here.',
-    }),
-  })
+// const sendGameResult = async () => {
+//   const response = await fetch('http://127.0.0.1:8000/games/', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       Authorization: `Bearer ${localStorage.getItem('access')}`,
+//     },
+//     body: JSON.stringify({
+//       players: ['vpaul', 'admin'],
+//       winner: 'vpaul',
+//       played_on: '2023-05-20T14:28:23.382Z',
+//       details: 'Match details here.',
+//     }),
+//   })
 
-  const data = await response.json()
-  console.log(data)
-  if (!response.ok) {
-    console.log('error: ' + data.error)
-  }
-}
+//   const data = await response.json()
+//   console.log(data)
+//   if (!response.ok) {
+//     console.log('error: ' + data.error)
+//   }
+// }
 
 // GAME
 let canvas
@@ -180,18 +186,24 @@ class Game {
     ctx.stroke()
   }
   animate() {
+    if (gameFinished.value) return
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     this.#draw()
-		if (score.value.player1 == 1 || score.value.player2 == 1) {
-			if (props.isTournament == true) {
-				if (score.value.player1 == 1)
-					setWinner(props.player1, props.player2)
-				if (score.value.player2 == 1)
-					setWinner(props.player2, props.player1)
-			} else { // 1 vs 1 game => send results to backend
-				
-			}
-		}
+    if (score.value.player1 == 1 || score.value.player2 == 1) {
+      gameFinished.value = true
+      if (props.isTournament == true) {
+        if (score.value.player1 == 1) setWinner(props.player1, props.player2)
+        if (score.value.player2 == 1) setWinner(props.player2, props.player1)
+      } else {
+        // 1 vs 1 game => send results to backend
+        emitResults(
+          props.player1,
+          props.player2,
+          score.value.player1,
+          score.value.player2
+        )
+      }
+    }
     if (this.startGame) {
       this.player1.update()
       this.player2.update()

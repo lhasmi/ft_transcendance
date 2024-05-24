@@ -16,22 +16,34 @@ const score = ref({
 
 // functions
 
-const handleFinishedMatch = (winner, loser) => {
-	// stop the game and show the winner
+const handleFinishedMatch = async (player1, player2, score1, score2) => {
+  // stop the game and show the winner
+  console.log('GAME FINISHED')
+  console.log(`p1: ${player1}, p2: ${player2}, s1: ${score1}, s2: ${score2}`)
+  // send results
+  if (store.userAuthorised) await sendTestData(player1, player2, score1, score2)
 }
 
-const sendTestData = async () => {
-  const response = await fetch('http://127.0.0.1:8000/games/', {
+const sendTestData = async (player1, player2, score1, score2) => {
+  const response = await fetch('http://127.0.0.1:8000/my-games/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${localStorage.getItem('access')}`,
     },
     body: JSON.stringify({
-      players: ['vpaul', 'admin'],
-      winner: 'vpaul',
-      played_on: '2023-05-20T14:28:23.382Z',
-      details: 'Match details here.',
+      // players: [player1, player2],
+      // winner: score1 > score2 ? player1 : player2,
+      // // played_on: '2023-05-20T14:28:23.382Z',
+      // // details: 'Match details here.',
+      // user_score: score1,
+      // opponent_score: score2,
+      //
+      player1: player1,
+      player2: player2,
+      score1: score1,
+      score2: score2,
+      winner: score1 > score2 ? player1 : player2,
     }),
   })
 
@@ -84,7 +96,15 @@ const sendTestData = async () => {
         <ButtonComp @click="sendTestData" class="ms-2">send</ButtonComp>
       </div>
     </div>
-    <GameComp @winner="(winner, loser) => handleFinishedMatch" :isTournament="false" player1="player1" player2="player2" />
+    <GameComp
+      @results="
+        (player1, player2, score1, score2) =>
+          handleFinishedMatch(player1, player2, score1, score2)
+      "
+      :isTournament="false"
+      :player1="store.userAuthorised ? store.username : 'player1'"
+      player2="player2"
+    />
     <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
       style="width: 64px; height: 64px"

@@ -1,118 +1,135 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { store } from "../store/store.js";
-import { getText, getError } from "../language/language.js";
-import router from "@/router";
-import ButtonComp from "../components/ButtonComp.vue";
-import { fetchWithJWT } from "@/utils/utils";
+import { ref, onMounted } from 'vue'
+import { store } from '../store/store.js'
+import { getText, getError } from '../language/language.js'
+import router from '@/router'
+import ButtonComp from '../components/ButtonComp.vue'
+import { fetchWithJWT } from '@/utils/utils'
 
 const testData = {
-  username: "pvznuzda",
-  password: "12345",
-};
+  username: 'pvznuzda',
+  password: '12345',
+}
 
 // variables
-const username = ref("");
-const password = ref("");
-const errorMsg = ref("");
+const username = ref('')
+const password = ref('')
+const errorMsg = ref('')
 
 // functions
 const redirectTo42 = async () => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/oauth/login/");
+    const response = await fetch('http://127.0.0.1:8000/oauth/login/')
     if (!response.ok) {
-			console.log(response)
-      console.log("redirectTo42: bad response");
+      console.log(response)
+      console.log('redirectTo42: bad response')
     }
-    const data = await response.json();
+    const data = await response.json()
 
-    console.log(data);
-    window.location.href = data.link; // replace url
+    console.log(data)
+    window.location.href = data.link // replace url
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}
 
 const submit = async (e) => {
-  e.preventDefault();
+  e.preventDefault()
   if (
     username.value == testData.username &&
     password.value == testData.password
   ) {
     // test
-    store.userAuthorised = true;
-    router.push("/");
+    store.userAuthorised = true
+    router.push('/')
   }
 
   if (!username.value) {
-    errorMsg.value = getError("usernameEmpty", store.lang);
-    return;
+    errorMsg.value = getError('usernameEmpty', store.lang)
+    return
   }
   if (!password.value) {
-    errorMsg.value = getError("passwordEmpty", store.lang);
-    return;
+    errorMsg.value = getError('passwordEmpty', store.lang)
+    return
   }
-  errorMsg.value = "";
+  errorMsg.value = ''
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/login/", {
-      method: "POST",
+    const response = await fetch('http://127.0.0.1:8000/login/', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         username: username.value,
         password: password.value,
       }),
-    });
-    const data = await response.json();
-    console.log(data);
+    })
+    const data = await response.json()
+    console.log(data)
     if (!response.ok) {
-      errorMsg.value = data.error;
+      errorMsg.value = data.error
     } else {
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
-      store.userAuthorised = true;
-      router.push("/");
+      localStorage.setItem('access', data.access)
+      localStorage.setItem('refresh', data.refresh)
+      store.userAuthorised = true
+      router.push('/')
     }
   } catch {
-    errorMsg.value = "fetch request failed";
+    errorMsg.value = 'fetch request failed'
   }
-};
+  try {
+    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    if (!response.ok) {
+      console.log("can't login with existing JWT")
+      return
+    }
+    const data = await response.json()
+    store.userAuthorised = true
+    store.username = data.user.username
+    store.email = data.user.email
+    store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+    console.log('logged in as ' + store.username)
+  } catch (error) {
+    console.log('catch: ' + error)
+  }
+}
 
 onMounted(async () => {
-	const query = window.location.search
-	console.log("query:" + query)
-	if (query) {
-		try {
-			const response = await fetch(`http://127.0.0.1:8000/oauth/callback/${query}`)
-			const data = await response.json()
-			console.log(data)
-			localStorage.setItem("access", data.access)
-			localStorage.setItem("refresh", data.refresh)
-			store.userAuthorised = true
-			router.push('/')
-		} catch(error) {
-			console.log("catch: " + error)
-		}
-		try {
-			const response = await fetchWithJWT(
-        "http://127.0.0.1:8000/update-profile/"
-      );
+  const query = window.location.search
+  console.log('query:' + query)
+  if (query) {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/oauth/callback/${query}`
+      )
+      const data = await response.json()
+      console.log(data)
+      localStorage.setItem('access', data.access)
+      localStorage.setItem('refresh', data.refresh)
+      store.userAuthorised = true
+      router.push('/')
+    } catch (error) {
+      console.log('catch: ' + error)
+    }
+    try {
+      const response = await fetchWithJWT(
+        'http://127.0.0.1:8000/update-profile/'
+      )
       if (!response.ok) {
-        console.log("can't login with existing JWT");
-        return;
+        console.log("can't login with existing JWT")
+        return
       }
-      const data = await response.json();
-      store.userAuthorised = true;
-      store.username = data.user.username;
-      store.email = data.user.email;
-      store.picture = "http://127.0.0.1:8000" + data.profile_picture;
-      console.log("logged in as " + store.username);
-		} catch(error) {
-			console.log("catch: " + error)
-		}
-	}
+      const data = await response.json()
+      store.userAuthorised = true
+      store.username = data.user.username
+      store.email = data.user.email
+      store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+      console.log('logged in as ' + store.username)
+    } catch (error) {
+      console.log('catch: ' + error)
+    }
+  }
 })
 </script>
 
@@ -133,7 +150,7 @@ onMounted(async () => {
           </span>
         </RouterLink>
         <h2 class="text-center roboto-bold my-2">
-          {{ getText("login", store.lang) }}
+          {{ getText('login', store.lang) }}
         </h2>
       </div>
       <hr class="splitter col-12 mx-auto m-0 mb-2" />
@@ -180,19 +197,19 @@ onMounted(async () => {
           {{ errorMsg }}
         </div>
         <ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{
-          getText("login", store.lang)
+          getText('login', store.lang)
         }}</ButtonComp>
       </form>
       <p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">or</p>
       <ButtonComp @click="redirectTo42" class="btn-lg fs-5 col-7 mx-auto">
-        {{ getText("loginWith42", store.lang) }}
+        {{ getText('loginWith42', store.lang) }}
       </ButtonComp>
       <div
         class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
       >
-        {{ getText("dontHaveAcc", store.lang) }}
+        {{ getText('dontHaveAcc', store.lang) }}
         <RouterLink class="register-link roboto-bold" to="/register">{{
-          getText("register", store.lang)
+          getText('register', store.lang)
         }}</RouterLink>
       </div>
     </div>
@@ -238,7 +255,7 @@ input {
 }
 input::placeholder {
   color: white;
-  font-family: "Roboto";
+  font-family: 'Roboto';
 }
 input:focus {
   outline: none;

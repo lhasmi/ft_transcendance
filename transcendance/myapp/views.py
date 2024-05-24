@@ -328,7 +328,8 @@ class MatchHistoryAPIView(APIView):
         )
         data = MatchSerializer(matches, many=True).data
         player_data = {'display_name': player.display_name, 'matches': data}
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(player_data, status=status.HTTP_200_OK)# Modified to return player display name and match data
+
  
 
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:

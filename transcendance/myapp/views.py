@@ -1,7 +1,10 @@
 import re
 import base64
 import time
+import os
 
+from django.views import View
+from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -341,6 +344,19 @@ class MatchHistoryAPIView(APIView):
         return Response(player_data, status=status.HTTP_200_OK)# Modified to return player display name and match data
 
  
+class TestEmailView(View):
+    def get(self, request):
+        try:
+            send_mail(
+                'Test Email',  # Subject
+                'This is a test email sent from Django.', 
+                os.getenv('EMAIL_HOST_USER'),  # From email of the dev
+                [os.getenv('TEST_RECIPIENT_EMAIL')],  # To email of a test user
+                fail_silently=False,
+            )
+            return JsonResponse({'message': 'Email sent successfully!'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
 #    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.

@@ -83,6 +83,10 @@ python3 manage.py runserver
 myapp.Player.profile_picture: (fields.E210) Cannot use ImageField because Pillow is not installed.
         HINT: Get Pillow at https://pypi.org/project/Pillow/ or run command "python3 -m pip install Pillow".
 
+#### ###############################
+## !!!!!!! LOOK HERE BELLOW !!!!!!!:
+#### ##############################
+
 #### ################################################################################################# 
 ### Dependencies to incorporate real-time functionality and WebSocket integration with Django Channels,
 ### and 2 F auth ( otp) and jwt
@@ -104,6 +108,25 @@ pip3 install django-cryptography
 pip3 install django_otp
 pip3 install djangorestframework-simplejwt
 
+# on macOS, you need to install the certificates using the Install Certificates.command that comes with Python:
+    Find the Install Certificates.command File:
+
+    Here's how you can find it:
+        Open Finder.
+        Go to the Applications folder.
+        Look for the Python folder (e.g., Python 3.8 if you have Python 3.8 installed).
+        Inside the Python folder, you should find the Install Certificates.command file.
+
+    Run the Install Certificates.command File:
+        Double-click the Install Certificates.command file.
+        A terminal window should open, and the command will run automatically to install the necessary SSL certificates.
+# Install OpenSSL using Homebrew: first verify if you have it by "openssl --version"
+brew install openssl
+
+# Link the installed OpenSSL:
+brew link openssl --force
+
+there is a space at the end of the email password in .env ! be aware of it!
 ### For https on developpment server
 pip3 install django-extensions
 # generate a certificate ( has to be dynamically generated in docker, prob: it is interactive )

@@ -4,7 +4,7 @@ from .views import (
     PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, 
     UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, 
     UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, 
-    Enable2FAAPIView, VerifyOTPAPIView
+    Enable2FAAPIView, VerifyOTPAPIView, TestEmailView 
 )
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
@@ -25,4 +25,5 @@ urlpatterns = [
     # It allows the user to activate 2FA on their account.
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
+    path('test-email/', TestEmailView.as_view(), name='test-email'),  # TEST debug
 ]

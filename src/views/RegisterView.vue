@@ -72,6 +72,7 @@ const submit = async (e) => {
   } catch {
     errorMsg.value = 'fetch request failed'
   }
+  if (errorMsg.value != '') return
   try {
     const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
     if (!response.ok) {

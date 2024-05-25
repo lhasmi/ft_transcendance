@@ -2,4 +2,5 @@ transcendance/.env
 ft_transcendance_hasmi_backend1404.pdf
 transcendance/myapp/tests.py
 *.pem
-vtrans
+vtrans/
+transcendance/myapp/__pycache__/

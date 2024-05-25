@@ -10,72 +10,7 @@ let data = {
   username: '',
   email: '',
   picture: '',
-  gamesHistory: [
-    // {
-    //   id: 8,
-    //   player1: 'pvznuzda',
-    //   player2: 'test1',
-    //   score1: 6,
-    //   score2: 7,
-    //   date: '11.04.2024 14:35',
-    // },
-    // {
-    //   id: 7,
-    //   player1: 'pvznuzda',
-    //   player2: 'test2',
-    //   score1: 7,
-    //   score2: 5,
-    //   date: '11.04.2024 14:35',
-    // },
-    // {
-    //   id: 6,
-    //   player1: 'pvznuzda',
-    //   player2: 'test3',
-    //   score1: 7,
-    //   score2: 2,
-    //   date: '11.04.2024 14:35',
-    // },
-    // {
-    //   id: 5,
-    //   player1: 'pvznuzda',
-    //   player2: 'test1',
-    //   score1: 4,
-    //   score2: 7,
-    //   date: '11.04.2024 14:35',
-    // },
-    // {
-    //   id: 4,
-    //   player1: 'pvznuzda',
-    //   player2: 'test1',
-    //   score1: 7,
-    //   score2: 2,
-    //   date: '11.04.2024 14:35',
-    // },
-    // {
-    //   id: 3,
-    //   player1: 'pvznuzda',
-    //   player2: 'test3',
-    //   score1: 2,
-    //   score2: 7,
-    //   date: '11.04.2024 14:35',
-    // },
-    // {
-    //   id: 2,
-    //   player1: 'pvznuzda',
-    //   player2: 'test2',
-    //   score1: 6,
-    //   score2: 5,
-    //   date: '11.04.2024 14:35',
-    // },
-    // {
-    //   id: 1,
-    //   player1: 'pvznuzda',
-    //   player2: 'test2',
-    //   score1: 7,
-    //   score2: 5,
-    //   date: '11.04.2024 14:35',
-    // },
-  ],
+  gamesHistory: [],
 }
 
 // variables
@@ -99,7 +34,7 @@ const loadData = async () => {
     const newData = await response.json()
     console.log(newData)
     if (!response.ok) {
-      errorMsg.value = newData.error
+      errorMsg.value = `${response.status}: ${response.statusText}`
     } else {
       data.username = newData.user.username
       data.email = newData.user.email
@@ -110,13 +45,23 @@ const loadData = async () => {
     errorMsg.value = 'fetch request failed'
   }
   // fetch games history
+  if (errorMsg.value != '') {
+    loader.value = false
+    store.userAuthorised = false
+    store.username = ''
+    store.email = ''
+    store.picture = ''
+    store.lang = 'en'
+    localStorage.removeItem('access')
+    localStorage.removeItem('refresh')
+    return
+  }
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(
       'http://127.0.0.1:8000/my-matches-history/'
     )
     const newData = await response.json()
-    console.log(newData + ' games history')
     if (!response.ok) {
       console.log('fetch games history error: ' + newData.error)
       errorMsg.value = newData.error
@@ -554,6 +499,13 @@ onMounted(() => {
           >
             {{ getText('gamesHistory', store.lang) }}
           </ButtonComp>
+          <div
+            v-if="errorMsg"
+            class="mt-1 mb-3 fs-6 roboto-bold text-center"
+            style="color: #da4834"
+          >
+            {{ errorMsg }}
+          </div>
         </div>
       </div>
     </div>

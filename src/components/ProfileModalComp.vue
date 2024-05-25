@@ -45,17 +45,17 @@ const loadData = async () => {
     errorMsg.value = 'fetch request failed'
   }
   // fetch games history
-  if (errorMsg.value != '') {
-    loader.value = false
-    store.userAuthorised = false
-    store.username = ''
-    store.email = ''
-    store.picture = ''
-    store.lang = 'en'
-    localStorage.removeItem('access')
-    localStorage.removeItem('refresh')
-    return
-  }
+  // if (errorMsg.value != '') {
+  //   loader.value = false
+  //   store.userAuthorised = false
+  //   store.username = ''
+  //   store.email = ''
+  //   store.picture = ''
+  //   store.lang = 'en'
+  //   localStorage.removeItem('access')
+  //   localStorage.removeItem('refresh')
+  //   return
+  // }
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(

@@ -19,6 +19,7 @@ let data = {
 
 let friendsData
 let friendData
+let friendGamesHistory
 
 // variables
 const loader = ref(true)
@@ -45,26 +46,6 @@ const loadFriends = async () => {
   }
   loader.value = false
 }
-
-// const loadFriend = async (id) => {
-//   loader.value = true;
-//   // try {
-//   // 	const response = await fetch(`127.0.0.1:8000/friend/${id}`)
-//   // 	const data = await response.json()
-//   // 	console.log(data)
-//   // 	if (!response.ok) {
-//   // 		errorMsg.value = data.error
-//   // 	}
-//   // } catch {
-//   // 	errorMsg.value = 'fetch request failed'
-//   // }
-//   // loader.value = false
-
-//   setTimeout(() => {
-//     // test
-//     loader.value = false;
-//   }, 1000);
-// };
 
 const addFriend = async () => {
   if (friendToAdd.value === '') {
@@ -99,8 +80,30 @@ const getStatusColor = (status) => {
   else return 'background: rgba(255, 255, 255, 0.1)'
 }
 
-const toFriendProfile = (friendItem) => {
+const fetchFriendsGames = async (username) => {
+  try {
+    console.log('fetch games history')
+    const response = await fetchWithJWT(
+      `http://127.0.0.1:8000/my-matches-history/?target=${username}`
+    )
+    const newData = await response.json()
+    if (!response.ok) {
+      console.log('fetch games history error: ' + newData.error)
+      errorMsg.value = newData.error
+    } else {
+      console.log(newData)
+      friendGamesHistory = newData
+    }
+  } catch {
+    console.log('fetch error')
+    errorMsg.value = 'fetch request failed'
+  }
+}
+
+const toFriendProfile = async (friendItem) => {
   // loadFriend(friendItem.id);
+  // fetch friends game history
+  await fetchFriendsGames(friendItem.user.username)
   title.value = friendItem.user.username
   friendData = friendItem
   friendProfile.value = true
@@ -184,7 +187,11 @@ onMounted(() => {
         </div>
 
         <!-- FRIEND PROFILE -->
-        <FriendProfileComp v-else-if="friendProfile" :data="friendData" />
+        <FriendProfileComp
+          v-else-if="friendProfile"
+          :data="friendData"
+          :games="friendGamesHistory"
+        />
 
         <!-- FRIENDS -->
         <div

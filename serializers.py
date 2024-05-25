@@ -76,9 +76,9 @@ class MatchSerializer(serializers.ModelSerializer):
             players.append(player)
         except Player.DoesNotExist:
             raise serializers.ValidationError(f"Player with username '{value[0]}' does not exist.")
-            
         # players.append(value[1])
         return players
+
     def validate_winner(self, value):
         # try:
         #     winner = Player.objects.get(user__username=value)

@@ -15,7 +15,6 @@ urlpatterns = [
     path('login/', UserLoginAPIView.as_view(), name='login'),
     path('update-profile/', UserProfileUpdateAPIView.as_view(), name='update-profile'),
     path('add-friend/', FriendRequestAPIView.as_view(), name='add-friend'),
-    path('match-history/', MatchHistoryAPIView.as_view(), name='match-history'),
     path('user-stats/', UserStatsAPIView.as_view(), name='user-stats'),
     path('update-online-status/', UpdateOnlineStatusAPIView.as_view(), name='update-online-status'),
     path('list-friends/', ListFriendsAPIView.as_view(), name='list-friends'),
@@ -23,6 +22,7 @@ urlpatterns = [
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
 		
+    path('match-history/', MatchHistoryAPIView.as_view(), name='match-history'),
     # COPY my-matches-history
     path('my-matches-history/', MyMatchHistoryAPIView.as_view(), name='my-match-history')
 ]

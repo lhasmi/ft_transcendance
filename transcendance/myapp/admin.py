@@ -1,19 +1,21 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
-from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404
 from .models import Player, Match
 
+# Defines how player entries are displayed and managed in the Django admin interface.
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('get_username', 'get_email', 'display_name', 'profile_picture', 'created_at', 'online_status', 'manage_otp')
+    # List display for the fields to display in the list view.
+    list_display = ('get_username', 'get_email', 'display_name', 'profile_picture', 'created_at', 'online_status', 'otp_enabled')
     readonly_fields = ('profile_picture', 'created_at')
     search_fields = ('user__username', 'user__email', 'display_name')
-    list_filter = ('online_status',)
+    list_filter = ('online_status', 'otp_enabled')  # Add filter for OTP enabled/disabled
+    actions = ['reset_otp']
 
     def get_username(self, obj):
         return obj.user.username
-    get_username.admin_order_field  = 'user__username'  # Allows column order sorting
+    get_username.admin_order_field = 'user__username'  # Allows column order sorting
     get_username.short_description = 'Username'  # Renames column head
 
     def get_email(self, obj):
@@ -21,10 +23,18 @@ class PlayerAdmin(admin.ModelAdmin):
     get_email.admin_order_field = 'user__email'
     get_email.short_description = 'Email'
 
-    def manage_otp(self, obj):
-        return format_html('<a href="{}">Manage OTP</a>', 
-                           reverse('manage_otp', args=[obj.user.username]))
-    manage_otp.short_description = 'OTP Management'
+    def otp_enabled(self, obj):
+        return bool(obj.otp_enabled)  # Check the otp_enabled field
+    otp_enabled.boolean = True
+    otp_enabled.short_description = 'OTP Enabled'
+
+    # Operates directly from the Django admin interface, on multiple selected players
+    def reset_otp(self, request, queryset):  # Calls generate_secret_key on each player to reset their OTP secret key.
+        for player in queryset:
+            player.generate_secret_key()
+            player.save()
+        self.message_user(request, "OTP reset for selected players.")
+    reset_otp.short_description = 'Reset OTP for selected players'
 
 class MatchAdmin(admin.ModelAdmin):
     list_display = ('id', 'display_players', 'winner', 'played_on',  'user_score', 'opponent_score')
@@ -35,14 +45,17 @@ class MatchAdmin(admin.ModelAdmin):
         return ", ".join([player.user.username for player in obj.players.all()])
     display_players.short_description = 'Players'
 
-
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Match, MatchAdmin)
 
-@staff_member_required
-def reset_otp_secret(request, player_id):
-    user = get_object_or_404(User, username=username)
-    player = get_object_or_404(Player, user=user)
-    player.generate_secret_key()
-    player.save()
-    return HttpResponseRedirect('/admin/app/player/')
+# handles resetting the OTP secret for a single player when accessed via a specific URL.
+# the function returns to Django admin interface
+# @staff_member_required 
+# def reset_otp_secret(request, username):
+#     user = get_object_or_404(User, username=username)
+#     player = get_object_or_404(Player, user=user)
+#     player.generate_secret_key()
+#     player.save()
+#     return HttpResponseRedirect(reverse('admin:myapp_player_changelist'))
+# for that to work the line bellow has to be added to the urls.py 
+# path('admin/reset_otp/<str:username>/', reset_otp_secret, name='reset_otp'), # only if we decide to uncomment the standalone function in admin.py

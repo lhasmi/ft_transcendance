@@ -62,7 +62,6 @@ INSTALLED_APPS = [
 	'myapp',
 	'corsheaders',
     'django_otp', # One-Time Password, it works for few minutes
-    'two_factor',
     # 'django_extensions',
 ]
 

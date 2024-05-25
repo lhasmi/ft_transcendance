@@ -120,7 +120,7 @@ class UserLoginAPIView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             player = getattr(user, 'player', None)
-            if player and player.secret_key: # Check if the player has a secret_key for OTP;
+            if player and player.otp_enabled:  # Check if the player has a set 2Fauth using OTP;
                 totp = TOTP(player.secret_key, step=60, digits=6)  # secret_key is stored in the player model
                 otp_token = totp.token()
                 send_mail(
@@ -131,8 +131,13 @@ class UserLoginAPIView(APIView):
                     fail_silently=False,
                 )
                 return Response({'message': 'OTP sent to your email. Please verify to complete login.'}, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'OTP setup not found for user'}, status=status.HTTP_404_NOT_FOUND)
+            else: # Directly log in the user if OTP is not enabled
+                login(request, user)
+                jwt_token = RefreshToken.for_user(user)
+                return Response({
+                    'access': str(jwt_token.access_token),
+                    'refresh': str(jwt_token)
+                }, status=status.HTTP_200_OK)        
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -152,7 +157,7 @@ class VerifyOTPAPIView(APIView):
         user = User.objects.get(username=username)
         player = getattr(user, 'player', None)
 
-        if user is not None and player and player.secret_key:
+        if user is not None and player and player.otp_enabled:
             totp = TOTP(player.secret_key, step=60, digits=6)
             totp.time = time.time()
             if totp.verify(otp):
@@ -176,7 +181,7 @@ class Enable2FAAPIView(APIView):
         """
         user = request.user
         player = user.player
-        player.generate_secret_key()
+        player.generate_secret_key() # This will also set otp_enabled to True
         totp = TOTP(player.secret_key, step=60, digits=6)
         otp_token = totp.token()
         send_mail(
@@ -187,7 +192,6 @@ class Enable2FAAPIView(APIView):
             fail_silently=False,
         )
         return Response({"message": "OTP sent to your email. Please verify to enable 2FA."}, status=status.HTTP_200_OK)
-
 
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -309,9 +313,15 @@ class MatchHistoryAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         """
-        Retrieve the match history for the logged-in user.
+        Retrieve the match history for for any user, if authenticated.
         """
-        player = request.user.player
+        #If a username is provided, it fetches the Player object for that user. 
+        username = request.query_params.get('username', None)
+        if username:
+            user = get_object_or_404(User, username=username)
+            player = user.player
+        else:# Otherwise, it uses the logged-in user's Player.
+            player = request.user.player
         ordering = request.query_params.get('ordering', '-played_on')
         matches = Match.objects.filter(players=player).order_by(ordering).annotate(
             is_winner=Case(
@@ -321,7 +331,9 @@ class MatchHistoryAPIView(APIView):
             )
         )
         data = MatchSerializer(matches, many=True).data
-        return Response(data, status=status.HTTP_200_OK)
+        player_data = {'display_name': player.display_name, 'matches': data}
+        return Response(player_data, status=status.HTTP_200_OK)# Modified to return player display name and match data
+
  
 
 # using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:

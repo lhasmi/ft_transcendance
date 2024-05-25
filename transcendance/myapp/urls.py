@@ -1,7 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, Enable2FAAPIView, VerifyOTPAPIView
-from .admin import reset_otp_secret
+from .views import (
+    PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, 
+    UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, 
+    UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, 
+    Enable2FAAPIView, VerifyOTPAPIView
+)
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
 router.register(r'players', PlayerViewSet) #registering viewsets with the router.
@@ -17,7 +21,8 @@ urlpatterns = [
     path('user-stats/', UserStatsAPIView.as_view(), name='user-stats'),
     path('update-online-status/', UpdateOnlineStatusAPIView.as_view(), name='update-online-status'),
     path('list-friends/', ListFriendsAPIView.as_view(), name='list-friends'),
-    path('admin/reset_otp/<str:username>/', reset_otp_secret, name='manage_otp'),
+    # bellow path MUST stay: is used to enable 2FA for a user by generating a secret key and sending an OTP via email. 
+    # It allows the user to activate 2FA on their account.
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
 ]

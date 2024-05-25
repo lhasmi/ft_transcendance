@@ -35,14 +35,6 @@ const redirectTo42 = async () => {
 
 const submit = async (e) => {
   e.preventDefault()
-  if (
-    username.value == testData.username &&
-    password.value == testData.password
-  ) {
-    // test
-    store.userAuthorised = true
-    router.push('/')
-  }
 
   if (!username.value) {
     errorMsg.value = getError('usernameEmpty', store.lang)
@@ -78,6 +70,7 @@ const submit = async (e) => {
   } catch {
     errorMsg.value = 'fetch request failed'
   }
+  if (errorMsg.value !== '') return
   try {
     const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
     if (!response.ok) {
@@ -90,6 +83,14 @@ const submit = async (e) => {
     store.email = data.user.email
     store.picture = 'http://127.0.0.1:8000' + data.profile_picture
     console.log('logged in as ' + store.username)
+
+    // socket connection to track online status
+    const socket = new WebSocket('ws://localhost:8000/ws/status/')
+    socket.onopen = () => {
+      console.log(
+        'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
+      )
+    }
   } catch (error) {
     console.log('catch: ' + error)
   }

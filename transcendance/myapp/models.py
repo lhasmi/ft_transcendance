@@ -29,8 +29,6 @@ class Player(models.Model):
             self.otp_enabled = True  # Enable OTP when a secret key is generated
             self.save()
 
-
-
 class Match(models.Model):
     players = models.ManyToManyField(Player, related_name="matches")
     winner = models.ForeignKey(Player, related_name="won_matches", on_delete=models.SET_NULL, null=True)

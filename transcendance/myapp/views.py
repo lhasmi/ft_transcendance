@@ -99,6 +99,8 @@ class UserRegistrationAPIView(APIView):
             user.player.display_name = display_name
             user.player.save()
         jwt_token = RefreshToken.for_user(user)
+        player = getattr(user, 'player', None) #debug
+        print(f"!!!!!!!!Is otp_enabled in register  1 ? !!!!!!!!!!!: {player.otp_enabled}") #debug
         return Response({
             "message": "User created successfully", 
             "refresh": str(jwt_token), 
@@ -120,8 +122,12 @@ class UserLoginAPIView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             player = getattr(user, 'player', None)
+            print(f"!!!!!!!!Is otp_enabled ? !!!!!!!!!!!: {player.otp_enabled}") #debug
             if player and player.otp_enabled:  # Check if the player has a set 2Fauth using OTP;
-                totp = TOTP(player.secret_key, step=60, digits=6)  # secret_key is stored in the player model
+                print(f"!!!!!!!! YES but WHY?? !!!!!!!!!!!: {player.otp_enabled}") #debug
+                secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
+                totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
+                print(f"Type of totp : {type(totp)}")
                 otp_token = totp.token()
                 send_mail(
                     'Your OTP',

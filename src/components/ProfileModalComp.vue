@@ -56,6 +56,7 @@ const loadData = async () => {
   //   localStorage.removeItem('refresh')
   //   return
   // }
+
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(

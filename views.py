@@ -197,3 +197,178 @@ class Enable2FAAPIView(APIView):
         return Response({"message": "OTP sent to your email. Please verify to enable 2FA."}, status=status.HTTP_200_OK)
 
 
+class UserProfileUpdateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser,)  # file upload
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            player = user.player
+            serializer = PlayerSerializer(player)
+            return Response(serializer.data)
+        except Player.DoesNotExist:
+            return Response({"error": "Player profile does not exist"}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            player = user.player  # Accessing the Player model of this User
+        except Player.DoesNotExist:
+            return Response({"error": "Player profile does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        profile_picture = request.FILES.get('profile_picture')  # Get uploaded image
+        display_name = request.data.get('display_name')
+
+        try:
+            with transaction.atomic(): # changes to DB are rolled back if any part fails
+                if username and username != user.username:
+                    if User.objects.filter(username=username).exists():
+                        return Response({"error": "This username is already taken."}, status=status.HTTP_400_BAD_REQUEST)
+                    user.username = username
+                if email and email != user.email:
+                    try:
+                        validate_email(email)  # Validate email format
+                    except DjangoValidationError as ve:
+                        return Response({"error": str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+                    if User.objects.exclude(id=user.id).filter(email=email).exists():  # Check if any other user has this email
+                        return Response({"error": "This email is already in use by another user."}, status=status.HTTP_400_BAD_REQUEST)
+                    user.email = email
+                if password:
+                    user.set_password(password)
+                    user.save()
+                    logout(request)  # Log out from all sessions after password change
+                if profile_picture:
+                    try:
+                        validate_image(profile_picture)
+                    except DjangoValidationError as ve:
+                        raise DRFValidationError({'profile_picture': [str(ve)]})
+                    player.profile_picture = profile_picture
+                if display_name:
+                    if Player.objects.filter(display_name=display_name).exclude(user=user).exists():
+                        return Response({"error": "This display name is already taken."}, status=status.HTTP_400_BAD_REQUEST)
+                    player.display_name = display_name
+                user.save()
+                player.save()
+            return Response({'message': 'User profile updated successfully'}, status=status.HTTP_200_OK)
+        except DjangoValidationError as ve:
+            return Response({'error': str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': 'Failed to update profile due to an unexpected error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class FriendRequestAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        friend_username = request.data.get('username')
+        if not friend_username:
+            return Response({'error': 'Username is required to add a friend'}, status=status.HTTP_400_BAD_REQUEST)
+
+        friend_user = get_object_or_404(User, username=friend_username)
+        friend_player = get_object_or_404(Player, user=friend_user)
+
+        if request.user.player == friend_player:
+            return Response({'error': 'You cannot add yourself as a friend'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.player.friends.filter(id=friend_player.id).exists():
+            return Response({'error': 'Already friends'}, status=status.HTTP_409_CONFLICT)
+        request.user.player.friends.add(friend_player)
+        return Response({'message': 'Friend added successfully'}, status=status.HTTP_200_OK)
+
+class ListFriendsAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        player = request.user.player
+        friends = player.friends.all()
+        serializer = PlayerSerializer(friends, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UpdateOnlineStatusAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        """
+        Update the online status of the logged-in user.
+        """
+        player = request.user.player
+        status = request.data.get('status', 'online')
+        if status == 'online':
+            player.set.online()
+        else:
+            player.set.offline()
+        return Response({'message': f'Player is now {status}.'})
+
+class UserStatsAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        """
+        Retrieve the win/loss stats for the logged-in user.
+        """
+        player = request.user.player
+        wins = Match.objects.filter(winner=player).count()
+        total_games = player.matches.count()
+        data = {'wins': wins, 'losses': total_games - wins}
+        return Response(data, status=status.HTTP_200_OK)
+
+class MatchHistoryAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        """
+        Retrieve the match history for for any user, if authenticated.
+        """
+        #If a username is provided, it fetches the Player object for that user. 
+        username = request.query_params.get('username', None)
+        if username:
+            user = get_object_or_404(User, username=username)
+            player = user.player
+        else:# Otherwise, it uses the logged-in user's Player.
+            player = request.user.player
+        ordering = request.query_params.get('ordering', '-played_on')
+        matches = Match.objects.filter(players=player).order_by(ordering).annotate(
+            is_winner=Case(
+                When(winner=player, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        )
+        data = MatchSerializer(matches, many=True).data
+        player_data = {'username': player.user.username, 'matches': data}
+        return Response(player_data, status=status.HTTP_200_OK)# Modified to return player display name and match data
+
+ 
+
+# using ModelViewSet, provides a full set of read and write operations without needing to specify explicit methods for basic behavior:
+#    QuerySet Configuration: Directly tying to the model’s all objects queryset, which is fine for development.
+#    Serializer Class:  linked to their respective serializers.
+
+# API View for sending friend requests
+# to do : preventing duplicate friend requests, handling non-existent user IDs 
+#securing endpoints against unauthorized access.
+
+# COPY MyMatchViewSet
+class MyMatchViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    queryset = MyMatch.objects.all()
+    ordering_fields = ['played_on']
+    ordering = ['-played_on']
+    serializer_class = MyMatchSerializer
+
+# COPY MyMatchHistoryAPIView
+class MyMatchHistoryAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        target = request.query_params.get('target', None)
+        if target:
+            username = target
+        else:
+            username = request.user.username
+        myMatches = MyMatch.objects.filter(Q(player1=username) | Q(player2=username))
+        data = MyMatchSerializer(myMatches, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
+
+
+    

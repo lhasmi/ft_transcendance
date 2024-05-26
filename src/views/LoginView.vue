@@ -85,7 +85,9 @@ const submit = async (e) => {
     console.log('logged in as ' + store.username)
 
     // socket connection to track online status
-    const socket = new WebSocket('ws://localhost:8000/ws/status/')
+    const socket = new WebSocket(
+      `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
+    )
     socket.onopen = () => {
       console.log(
         'CONNECTED TO STATUS CONSUMER (my online status should be online now)'

@@ -265,14 +265,18 @@ onMounted(() => {
 
 <template>
   <section>
-    <div
-      class="scoreboard col-10 col-md-6 mx-auto d-flex justify-content-around align-items-center"
-    >
-      <p class="text-white fs-4 mb-0 roboto-medium">{{ props.player1 }}</p>
-      <p class="text-white fs-2 mb-0 roboto-bold">
-        {{ score.player1 }} : {{ score.player2 }}
-      </p>
-      <p class="text-white fs-4 mb-0 roboto-medium">{{ props.player2 }}</p>
+    <div class="scoreboard col-10 col-md-6 mx-auto">
+      <div class="row d-flex align-items-center">
+        <p class="text-white text-center fs-4 mb-0 roboto-medium col-4">
+          {{ props.player1 }}
+        </p>
+        <p class="text-white text-center fs-2 mb-0 roboto-bold col-4">
+          {{ score.player1 }} : {{ score.player2 }}
+        </p>
+        <p class="text-white text-center fs-4 mb-0 roboto-medium col-4">
+          {{ props.player2 }}
+        </p>
+      </div>
     </div>
     <canvas class="canvas mx-auto" id="canvasId"></canvas>
   </section>

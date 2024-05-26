@@ -39,23 +39,25 @@ const loadData = async () => {
       data.username = newData.user.username
       data.email = newData.user.email
       data.picture = 'http://127.0.0.1:8000' + newData.profile_picture
+      errorMsg.value = ''
     }
   } catch {
     console.log('fetch error')
     errorMsg.value = 'fetch request failed'
   }
   // fetch games history
-  // if (errorMsg.value != '') {
-  //   loader.value = false
-  //   store.userAuthorised = false
-  //   store.username = ''
-  //   store.email = ''
-  //   store.picture = ''
-  //   store.lang = 'en'
-  //   localStorage.removeItem('access')
-  //   localStorage.removeItem('refresh')
-  //   return
-  // }
+  if (errorMsg.value != '') {
+    console.log('CLEAR')
+    loader.value = false
+    store.userAuthorised = false
+    store.username = ''
+    store.email = ''
+    store.picture = ''
+    store.lang = 'en'
+    localStorage.removeItem('access')
+    localStorage.removeItem('refresh')
+    return
+  }
 
   try {
     console.log('fetch games history')
@@ -212,6 +214,23 @@ const getLostAmount = () => {
     if (data.gamesHistory[i].winner != data.username) counter++
   }
   return counter
+}
+
+const enable2FA = async () => {
+  console.log('enable2FA')
+  try {
+    const response = await fetch('http://127.0.0.1:8000/test-email/')
+    if (!response.ok) {
+      console.log('enable 2FA error: ')
+      console.log(response)
+    } else {
+      const data = await response.json()
+      console.log('enable 2FA success: ')
+      console.log(data)
+    }
+  } catch (error) {
+    console.log('enable 2FA fetch error: ' + error)
+  }
 }
 
 onMounted(() => {
@@ -458,9 +477,15 @@ onMounted(() => {
           </p>
           <ButtonComp
             @click="toEditProfile"
-            class="fs-6 col-9 col-md-7 mx-auto mb-4"
+            class="fs-6 col-9 col-md-7 mx-auto mb-3"
           >
             {{ getText('editProfile', store.lang) }}
+          </ButtonComp>
+          <ButtonComp
+            @click="enable2FA"
+            class="fs-6 col-9 col-md-7 mx-auto mb-4"
+          >
+            enable 2FA
           </ButtonComp>
           <hr class="splitter col-12 mx-auto m-0" />
           <div

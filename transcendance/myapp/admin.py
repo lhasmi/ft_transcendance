@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from .models import Player, Match
+from .models import Player, Match, MyMatch
 
 # Defines how player entries are displayed and managed in the Django admin interface.
 class PlayerAdmin(admin.ModelAdmin):
@@ -45,8 +45,12 @@ class MatchAdmin(admin.ModelAdmin):
         return ", ".join([player.user.username for player in obj.players.all()])
     display_players.short_description = 'Players'
 
+class MyMatchAdmin(admin.ModelAdmin):
+    list_display = ('player1', 'player2', 'score1', 'score2', 'played_on')
+
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Match, MatchAdmin)
+admin.site.register(MyMatch, MyNatchAdmin)
 
 # handles resetting the OTP secret for a single player when accessed via a specific URL.
 # the function returns to Django admin interface

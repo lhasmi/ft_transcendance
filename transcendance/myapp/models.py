@@ -43,3 +43,12 @@ class Match(models.Model):
 # fields like profile_picture. This design inherits and extends the base User model capabilities
 # by association rather than by modifying the existing User model. It is called a One-to-One relationship
 # For status online/offline tracking
+
+
+class MyMatch(models.Model):
+    player1 = models.CharField(null=True)
+    player2 = models.CharField(null=True)
+    winner = models.CharField(null=True)
+    score1 = models.IntegerField(default=0)
+    score2 = models.IntegerField(default=0)
+    played_on = models.DateTimeField(auto_now_add=True)

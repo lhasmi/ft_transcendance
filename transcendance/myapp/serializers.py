@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Player, Match
+from .models import Player, Match, MyMatch
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -99,3 +99,8 @@ class MatchSerializer(serializers.ModelSerializer):
 #extend ModelSerializer, which simplifies serialization of model instances:
 #  Fields Specification: enumerating fields that should be serialized/deserialized. 
 #   Meta Class Usage: Standard practice for DRF serializers.
+
+class MyMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyMatch
+        fields = ['player1', 'player2', 'winner', 'score1', 'score2', 'played_on']

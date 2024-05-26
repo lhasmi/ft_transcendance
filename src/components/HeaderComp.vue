@@ -4,21 +4,24 @@ import ProfileModalComp from './ProfileModalComp.vue'
 import FriendsModalComp from './FriendsModalComp.vue'
 import ButtonComp from './ButtonComp.vue'
 import { store } from '../store/store.js'
+import { logout } from '../utils/utils.js'
 import { getText } from '../language/language.js'
 
 // variables
 const language = ref('')
 
 // functions
-const logout = () => {
-  localStorage.removeItem('access')
-  localStorage.removeItem('refresh')
-  localStorage.removeItem('lang')
-  store.userAuthorised = false
-  store.username = ''
-  store.email = ''
-  store.picture = ''
-}
+// const logout = () => {
+//   localStorage.removeItem('access')
+//   localStorage.removeItem('refresh')
+//   localStorage.removeItem('lang')
+//   store.userAuthorised = false
+//   store.username = ''
+//   store.email = ''
+//   store.picture = ''
+//   store.socket.close()
+//   store.socket = null
+// }
 
 const toggleLanguage = () => {
   const languages = ['en', 'de', 'ru']

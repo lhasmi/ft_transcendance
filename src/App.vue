@@ -22,6 +22,15 @@ onMounted(async () => {
       store.email = data.user.email
       store.picture = 'http://127.0.0.1:8000' + data.profile_picture
       console.log('logged in as ' + store.username)
+      // socket connection to track online status
+      store.socket = new WebSocket(
+        `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
+      )
+      store.socket.onopen = () => {
+        console.log(
+          'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
+        )
+      }
     }
   } catch (error) {
     console.log(error)

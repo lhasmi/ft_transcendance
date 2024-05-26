@@ -1,3 +1,5 @@
+import { store } from '../store/store.js'
+
 const refreshAccessToken = async () => {
   const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
     method: 'POST',
@@ -74,4 +76,17 @@ export const fetchWithJWTJson = async (url, method = 'GET', data = null) => {
     })
   }
   return response
+}
+
+export const logout = () => {
+  console.log('LOGOUT')
+  localStorage.removeItem('access')
+  localStorage.removeItem('refresh')
+  localStorage.removeItem('lang')
+  store.userAuthorised = false
+  store.username = ''
+  store.email = ''
+  store.picture = ''
+  store.socket.close()
+  store.socket = null
 }

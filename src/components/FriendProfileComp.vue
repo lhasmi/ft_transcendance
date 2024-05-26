@@ -124,7 +124,7 @@ onMounted(() => {
     </div>
     <div
       class="col-9 col-md-7 mx-auto mb-1"
-      v-for="item in props.games"
+      v-for="item in props.games.slice().reverse()"
       :key="item.played_on"
     >
       <p class="game-date text-center text-white roboto-regular mb-1">

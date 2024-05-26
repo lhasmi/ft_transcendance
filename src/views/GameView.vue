@@ -105,17 +105,17 @@ const sendTestData = async (player1, player2, score1, score2) => {
       :player1="store.userAuthorised ? store.username : 'player1'"
       player2="player2"
     />
-    <button
+    <!-- <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
       style="width: 64px; height: 64px"
       data-bs-toggle="modal"
       data-bs-target="#helpModal"
     >
       ?
-    </button>
+    </button> -->
 
     <!-- Modal -->
-    <div
+    <!-- <div
       class="modal fade"
       id="helpModal"
       tabindex="-1"
@@ -146,7 +146,7 @@ const sendTestData = async (player1, player2, score1, score2) => {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </section>
 </template>
 
@@ -163,7 +163,7 @@ const sendTestData = async (player1, player2, score1, score2) => {
   border-left: none;
 }
 
-.btn-primary {
+/* .btn-primary {
   --bs-btn-active-color: #f58562;
   --bs-btn-active-bg: rgba(255, 255, 255, 0.1);
   background-color: var(--bs-btn-active-bg);
@@ -192,7 +192,7 @@ const sendTestData = async (player1, player2, score1, score2) => {
 .btn-primary:hover:disabled {
   transform: none;
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
-}
+} */
 
 /* test */
 .test-form {

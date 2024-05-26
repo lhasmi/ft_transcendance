@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { store } from '@/store/store'
+import HelpModalComp from './HelpModalComp.vue'
 
 const props = defineProps({
   isTournament: Boolean,
@@ -264,7 +265,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section>
+  <section class="">
     <div class="scoreboard col-10 col-md-6 mx-auto">
       <div class="row d-flex align-items-center">
         <p class="text-white text-center fs-4 mb-0 roboto-medium col-4">
@@ -279,6 +280,17 @@ onMounted(() => {
       </div>
     </div>
     <canvas class="canvas mx-auto" id="canvasId"></canvas>
+
+    <button
+      class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1 mx-auto"
+      style="width: 64px; height: 64px"
+      data-bs-toggle="modal"
+      data-bs-target="#helpModal"
+    >
+      ?
+    </button>
+
+    <HelpModalComp />
   </section>
 </template>
 
@@ -293,5 +305,36 @@ onMounted(() => {
   border: 5px solid #f58562;
   border-right: none;
   border-left: none;
+}
+
+.btn-primary {
+  --bs-btn-active-color: #f58562;
+  --bs-btn-active-bg: rgba(255, 255, 255, 0.1);
+  background-color: var(--bs-btn-active-bg);
+  border: none;
+  box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.2s ease;
+}
+.btn-primary:hover,
+.btn-primary:active {
+  color: #f58562;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translate(2px, -2px);
+  box-shadow: -8px 8px 8px 0px rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary:disabled {
+  --bs-btn-active-color: rgba(255, 255, 255, 0.5);
+  --bs-btn-active-bg: rgba(255, 255, 255, 0.07);
+  position: relative;
+  color: var(--bs-btn-active-color);
+  background-color: var(--bs-btn-active-bg);
+  pointer-events: all;
+}
+.btn-primary:hover:disabled {
+  transform: none;
+  box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
 }
 </style>

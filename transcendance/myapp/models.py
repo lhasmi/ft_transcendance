@@ -36,6 +36,13 @@ class Match(models.Model):
     user_score = models.IntegerField(default=0)
     opponent_score = models.IntegerField(default=0)
 
+class MyMatch(models.Model):
+    player1 = models.CharField(null=True)
+    player2 = models.CharField(null=True)
+    winner = models.CharField(null=True)
+    score1 = models.IntegerField(default=0)
+    score2 = models.IntegerField(default=0)
+    played_on = models.DateTimeField(auto_now_add=True)
 # Foreign Key Relations: using related_name for backwards navigation in relations.
 
 

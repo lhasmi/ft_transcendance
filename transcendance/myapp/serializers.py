@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Player, Match
+from .models import Player, Match, MyMatch
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -10,7 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
 class PublicPlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['id', 'display_name']
+        # fields = ['id', 'display_name']
+        fields = ['id', 'user']
 
 class PlayerSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -51,29 +52,36 @@ class MatchSerializer(serializers.ModelSerializer):
     )
     winner = serializers.CharField(write_only=True) 
     players_detail = PublicPlayerSerializer(read_only=True, many=True, source='players')
-    winner_detail = PublicPlayerSerializer(read_only=True, source='winner')
-    # Change details to user_score and opponent_score
+    # winner_detail = PublicPlayerSerializer(read_only=True, source='winner')
     user_score = serializers.IntegerField()  
     opponent_score = serializers.IntegerField()
 
     class Meta:
         model = Match
-        fields = ['id', 'players',  'winner', 'played_on', 'user_score', 'opponent_score', 'is_winner', 'players_detail', 'winner_detail']
-    
+        # fields = ['id', 'players',  'winner', 'played_on', 'user_score', 'opponent_score', 'players_detail', 'winner_detail', 'is_winner']
+        fields = ['id', 'players',  'winner', 'played_on', 'user_score', 'opponent_score', 'players_detail', 'winner_detail']
+
     def validate_players(self, value):
         players = []
-        for username in value:
-            try:
-                player = Player.objects.get(user__username=username)
-                players.append(player)
-            except Player.DoesNotExist:
-                raise serializers.ValidationError(f"Player with username '{username}' does not exist.")
-        return players
-    def validate_winner(self, value):
+        # for username in value: # removed because we need to validate only the logged in user, the other user is a guest
+        #     try:
+        #         player = Player.objects.get(user__username=username)
+        #         players.append(player)
+        #     except Player.DoesNotExist:
+        #         raise serializers.ValidationError(f"Player with username '{username}' does not exist.")
         try:
-            winner = Player.objects.get(user__username=value)
+            player = Player.objects.get(user__username=value[0])
+            players.append(player)
         except Player.DoesNotExist:
-            raise serializers.ValidationError(f"Player with username '{value}' does not exist.")
+            raise serializers.ValidationError(f"Player with username '{value[0]}' does not exist.")
+        return players
+
+    def validate_winner(self, value):
+        # try:
+        #     winner = Player.objects.get(user__username=value)
+        # except Player.DoesNotExist:
+        #     raise serializers.ValidationError(f"Player with username '{value}' does not exist.")
+        winner = value
         return winner
 
     def create(self, validated_data):
@@ -94,6 +102,11 @@ class MatchSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+class MyMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyMatch
+        fields = ['player1', 'player2', 'winner', 'score1', 'score2', 'played_on']
 #Serializers help convert  Django models (or querysets) into JSON format,
 # which can then be used by APIs to communicate with the frontend.
 #extend ModelSerializer, which simplifies serialization of model instances:

@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
 from django.db import transaction
-from django.db.models import Case, When, Value, BooleanField
+from django.db.models import Case, When, Value, BooleanField, Q
 from django.shortcuts import get_object_or_404
 from django_otp.oath import TOTP
 from rest_framework import viewsets, status, permissions, filters
@@ -21,8 +21,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Player, Match
-from .serializers import PlayerSerializer, MatchSerializer
+from .models import Player, Match, MyMatch
+from .serializers import PlayerSerializer, MatchSerializer, MyMatchSerializer
 
 
 def validate_email(email):
@@ -76,6 +76,14 @@ class MatchViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+
+class MyMatchViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    queryset = MyMatch.objects.all()
+    ordering_fields = ['played_on']
+    ordering = ['-played_on']
+    serializer_class = MyMatchSerializer
 
 class UserRegistrationAPIView(APIView):
     permission_classes = [AllowAny]
@@ -343,7 +351,19 @@ class MatchHistoryAPIView(APIView):
         player_data = {'display_name': player.display_name, 'matches': data}
         return Response(player_data, status=status.HTTP_200_OK)# Modified to return player display name and match data
 
- 
+
+class MyMatchHistoryAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        target = request.query_params.get('target', None)
+        if target:
+            username = target
+        else:
+            username = request.user.username
+        myMatches = MyMatch.objects.filter(Q(player1=username) | Q(player2=username))
+        data = MyMatchSerializer(myMatches, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
+
 class TestEmailView(View):
     def get(self, request):
         try:

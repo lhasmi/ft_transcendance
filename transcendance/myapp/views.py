@@ -21,8 +21,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Player, Match
-from .serializers import PlayerSerializer, MatchSerializer
+from .models import Player, Match, MyMatch
+from .serializers import PlayerSerializer, MatchSerializer, MyMatchSerializer
+from django.db.models import Q
 
 
 def validate_email(email):
@@ -365,3 +366,24 @@ class TestEmailView(View):
 # API View for sending friend requests
 # to do : preventing duplicate friend requests, handling non-existent user IDs 
 #securing endpoints against unauthorized access.
+
+
+class MyMatchViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    queryset = MyMatch.objects.all()
+    ordering_fields = ['played_on']
+    ordering = ['-played_on']
+    serializer_class = MyMatchSerializer
+
+class MyMatchHistoryAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        target = request.query_params.get('target', None)
+        if target:
+            username = target
+        else:
+            username = request.user.username
+        myMatches = MyMatch.objects.filter(Q(player1=username) | Q(player2=username))
+        data = MyMatchSerializer(myMatches, many=True).data
+        return Response(data, status=status.HTTP_200_OK)

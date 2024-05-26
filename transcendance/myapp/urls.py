@@ -6,10 +6,12 @@ from .views import (
     UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, 
     Enable2FAAPIView, VerifyOTPAPIView, TestEmailView 
 )
+from .views import MyMatchViewSet, MyMatchHistoryAPIView
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
 router.register(r'players', PlayerViewSet) #registering viewsets with the router.
 router.register(r'games', MatchViewSet)
+router.register(r'my-games', MyMatchViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -26,4 +28,6 @@ urlpatterns = [
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
     path('test-email/', TestEmailView.as_view(), name='test-email'),  # TEST debug
+		
+    path('my-matches-history/', MyMatchHistoryAPIView.as_view(), name='my-match-history')
 ]

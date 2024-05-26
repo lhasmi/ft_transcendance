@@ -1,0 +1,7 @@
+these are stuff to be fixed in frontend:
+
+- make a human friendly signla for end of game
+- add a signal for who won the game
+- if the player just finished the game and wants to start a new game, ake a buton for that, because now he needs to clik on ft_transcendence
+and chose duel
+- I didnt try tournament yet

@@ -184,14 +184,16 @@ class VerifyOTPAPIView(APIView):
         print(f"!!!!!!!!Is otp_enabled ? !!!!!!!!!!!: {player.otp_enabled}") #debug
         if player and player.otp_enabled:
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
-            print(f"Type of totp verify: {type(totp)}")
+            print(f"Type of totp verify: {totp}")
             totp.time = time.time()
-            if totp.verify(otp):
+            print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
+            if totp.verify(int(otp)):
                 login(request, user)
                 jwt_token = RefreshToken.for_user(user)
+                print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug
                 return Response({
                     'access': str(jwt_token.access_token),
-                    'refresh': str(jwt_token)
+                    'refresh': str(jwt_token),
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({'error': f'Invalid OTP. Please try again or contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)

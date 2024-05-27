@@ -32,8 +32,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'optional-default-value')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # pvznuzda api
-OAUTH_CLIENT_ID = os.getenv('u-s4t2ud-1303a4f7f8900a6bd31098477269cc5747fab2e7e9f510c47f0e740818e15727')
-OAUTH_CLIENT_SECRET = os.getenv('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')
+OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
+OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
 
 OAUTH_REDIRECT_URI = 'http://localhost:5173/login/'
 # ALLOWED_HOSTS = []

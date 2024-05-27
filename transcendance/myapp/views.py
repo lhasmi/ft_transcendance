@@ -2,7 +2,7 @@ import re
 import base64
 import time
 import os
-
+import requests
 from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
@@ -79,7 +79,6 @@ class MatchViewSet(viewsets.ModelViewSet):
 
 class MyMatchViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-
     queryset = MyMatch.objects.all()
     ordering_fields = ['played_on']
     ordering = ['-played_on']
@@ -87,14 +86,12 @@ class MyMatchViewSet(viewsets.ModelViewSet):
 
 class OAuth2LoginAPIView(APIView):
     permission_classes = [AllowAny]
-
     def get(self, request):
         auth_url = "https://api.intra.42.fr/oauth/authorize"
         client_id = settings.OAUTH_CLIENT_ID
         redirect_uri = settings.OAUTH_REDIRECT_URI
         scope = "public"
         response_type = "code"
-        
         authorization_url = f"{auth_url}?client_id={client_id}&response_type={response_type}&redirect_uri={redirect_uri}&scope={scope}"
         print(authorization_url)
         return JsonResponse({'link': authorization_url})
@@ -140,11 +137,10 @@ class OAuth2CallbackAPIView(APIView):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                print("auth!!!!")# Debug
+                print("auth!!  User.objects.create_user   !!")# Debug
                 user = User.objects.create_user(username=login_name, email=email, password="")
                 # user.set_unusable_password()
                 user.save()
-
             login(request, user)
             # return JsonResponse({'message': 'User logged in successfully', 'token': access_token})
             jwt_token = RefreshToken.for_user(user)
@@ -153,7 +149,6 @@ class OAuth2CallbackAPIView(APIView):
                 "refresh": str(jwt_token), 
                 "access": str(jwt_token.access_token)
             }, status=status.HTTP_201_CREATED)
-        
         return JsonResponse({'error': 'No code provided'}, status=400)
 
 class UserRegistrationAPIView(APIView):
@@ -252,10 +247,9 @@ class VerifyOTPAPIView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
-        print(f"!!!!!!!!Is otp_enabled ? !!!!!!!!!!!: {player.otp_enabled}") #debug
+        print(f"!!!!!!!!Is otp_enabled verify? !!!!!!!!!!!: {player.otp_enabled}") #debug
         if player and player.otp_enabled:
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
-            print(f"Type of totp verify: {totp}")
             totp.time = time.time()
             print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
             if totp.verify(int(otp)):

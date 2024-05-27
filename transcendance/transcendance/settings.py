@@ -18,28 +18,28 @@ from dotenv import load_dotenv
 from datetime import timedelta
 load_dotenv()  # Load environment variables from .env file
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
-#against man in the middle attacks, forces browsers to use https
-# SECURE_HSTS_SECONDS = 31536000  # 1 year
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in .env!
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# SECURITY WARNING: 
 SECRET_KEY = os.getenv('SECRET_KEY', 'optional-default-value')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# split the ALLOWED_HOSTS string from the .env file into a Python list. 
-# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+# pvznuzda api
+OAUTH_CLIENT_ID = os.getenv('u-s4t2ud-1303a4f7f8900a6bd31098477269cc5747fab2e7e9f510c47f0e740818e15727')
+OAUTH_CLIENT_SECRET = os.getenv('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')
+
+OAUTH_REDIRECT_URI = 'http://localhost:5173/login/'
 # ALLOWED_HOSTS = []
 
+# split the ALLOWED_HOSTS string from the .env file into a Python list. 
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost']
 
 CORS_ORIGIN_ALLOW_ALL = False
@@ -49,7 +49,6 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 ADMIN_MAIL = os.getenv('ADMIN_MAIL', 'default_admin_email@example.com')
-# Application definition
 
 INSTALLED_APPS = [
     'daphne',
@@ -103,7 +102,6 @@ CHANNEL_LAYERS = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework.authentication.TokenAuthentication',
 		'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (

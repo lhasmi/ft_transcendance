@@ -85,6 +85,77 @@ class MyMatchViewSet(viewsets.ModelViewSet):
     ordering = ['-played_on']
     serializer_class = MyMatchSerializer
 
+class OAuth2LoginAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        auth_url = "https://api.intra.42.fr/oauth/authorize"
+        client_id = settings.OAUTH_CLIENT_ID
+        redirect_uri = settings.OAUTH_REDIRECT_URI
+        scope = "public"
+        response_type = "code"
+        
+        authorization_url = f"{auth_url}?client_id={client_id}&response_type={response_type}&redirect_uri={redirect_uri}&scope={scope}"
+        print(authorization_url)
+        return JsonResponse({'link': authorization_url})
+
+class OAuth2CallbackAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+        if code:
+            token_url = 'https://api.intra.42.fr/oauth/token'
+            data = {
+                'grant_type': 'authorization_code',
+                'code': code,
+                'redirect_uri': settings.OAUTH_REDIRECT_URI,
+                'client_id': settings.OAUTH_CLIENT_ID,
+                'client_secret': settings.OAUTH_CLIENT_SECRET,
+            }
+            token_url = f"{token_url}?grant_type=authorization_code&code={code}&redirect_uri={settings.OAUTH_REDIRECT_URI}&client_id={settings.OAUTH_CLIENT_ID}&client_secret={settings.OAUTH_CLIENT_SECRET}"
+            # print(token_url)
+            # return JsonResponse({'url': token_url, 'data': data})
+            response = requests.post(token_url)
+            print("auth2!!!")# Debug
+            response_data = response.json()
+            access_token = response_data.get('access_token')
+
+            if not access_token:
+                return JsonResponse({'error': 'Failed to obtain access token'}, status=400)
+
+            user_info_url = 'https://api.intra.42.fr/v2/me'
+            headers = {'Authorization': f'Bearer {access_token}'}
+            print("auth3!!!")# Debug
+            user_info_response = requests.get(user_info_url, headers=headers)
+            print("auth4!!!")# Debug
+            user_info = user_info_response.json()
+
+            email = user_info.get('email')
+            login_name = user_info.get('login')
+
+            if not email or not login_name:
+                return JsonResponse({'error': 'Failed to obtain user information'}, status=400)
+
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                print("auth!!!!")# Debug
+                user = User.objects.create_user(username=login_name, email=email, password="")
+                # user.set_unusable_password()
+                user.save()
+
+            login(request, user)
+            # return JsonResponse({'message': 'User logged in successfully', 'token': access_token})
+            jwt_token = RefreshToken.for_user(user)
+            return Response({
+                "message": "User created successfully", 
+                "refresh": str(jwt_token), 
+                "access": str(jwt_token.access_token)
+            }, status=status.HTTP_201_CREATED)
+        
+        return JsonResponse({'error': 'No code provided'}, status=400)
+
 class UserRegistrationAPIView(APIView):
     permission_classes = [AllowAny]
 

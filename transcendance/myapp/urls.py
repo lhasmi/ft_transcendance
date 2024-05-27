@@ -5,7 +5,7 @@ from .views import (
     UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, 
     UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, 
     Enable2FAAPIView, VerifyOTPAPIView, TestEmailView, MyMatchHistoryAPIView,
-    MyMatchViewSet
+    MyMatchViewSet, OAuth2LoginAPIView, OAuth2CallbackAPIView
 )
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
@@ -29,4 +29,7 @@ urlpatterns = [
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
     path('test-email/', TestEmailView.as_view(), name='test-email'),  # TEST debug
+    
+    path('oauth/login/', OAuth2LoginAPIView.as_view(), name='oauth2_login'),
+    path('oauth/callback/', OAuth2CallbackAPIView.as_view(), name='oauth2_callback'),
 ]

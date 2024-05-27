@@ -4,7 +4,7 @@ import { store } from '../store/store.js'
 import { getText, getError } from '../language/language.js'
 import router from '@/router'
 import ButtonComp from '../components/ButtonComp.vue'
-import { fetchWithJWT } from '@/utils/utils.js'
+import { fetchWithJWT, connectWithSocket } from '@/utils/utils.js'
 
 // variables
 const username = ref('')
@@ -85,15 +85,16 @@ const submit = async (e) => {
     store.email = data.user.email
     store.picture = 'http://127.0.0.1:8000' + data.profile_picture
     console.log('logged in as ' + store.username)
+		connectWithSocket()
     // socket connection to track online status
-    store.socket = new WebSocket(
-      `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
-    )
-    store.socket.onopen = () => {
-      console.log(
-        'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
-      )
-    }
+    // store.socket = new WebSocket(
+    //   `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
+    // )
+    // store.socket.onopen = () => {
+    //   console.log(
+    //     'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
+    //   )
+    // }
   } catch (error) {
     console.log('catch: ' + error)
   }

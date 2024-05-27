@@ -87,6 +87,21 @@ export const logout = () => {
   store.username = ''
   store.email = ''
   store.picture = ''
-  store.socket.close()
+  // store.socket.close()
   store.socket = null
+}
+
+export const connectWithSocket = () => {
+	// socket connection to track online status
+	let protocol = window.location.protocol
+	let wsProtocol = protocol == 'https' ? 'wss' : 'ws'
+
+	store.socket = new WebSocket(
+		`${wsProtocol}://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
+	)
+	store.socket.onopen = () => {
+		console.log(
+			'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
+		)
+	}
 }

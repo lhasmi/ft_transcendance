@@ -4,12 +4,7 @@ import { store } from '../store/store.js'
 import { getText, getError } from '../language/language.js'
 import router from '@/router'
 import ButtonComp from '../components/ButtonComp.vue'
-import { fetchWithJWT } from '@/utils/utils'
-
-const testData = {
-  username: 'pvznuzda',
-  password: '12345',
-}
+import { fetchWithJWT, connectWithSocket } from '@/utils/utils'
 
 // variables
 const username = ref('')
@@ -57,11 +52,17 @@ const submit = async (e) => {
         password: password.value,
       }),
     })
-    const data = await response.json()
-    console.log(data)
     if (!response.ok) {
+			console.log("/login/ response not ok: " + response.status)
       errorMsg.value = data.error
     } else {
+			const data = await response.json()
+			console.log(data)
+			if (data.message == 'OTP sent to your email. Please verify to complete login.') {
+				// display an input field for OTP
+				// send request to verify OTP => on success receive the jwt and login the user
+				//                            => on failure display prompt again with button to resend the email
+			}
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
       store.userAuthorised = true
@@ -83,16 +84,17 @@ const submit = async (e) => {
     store.email = data.user.email
     store.picture = 'http://127.0.0.1:8000' + data.profile_picture
     console.log('logged in as ' + store.username)
-
-    // socket connection to track online status
-    store.socket = new WebSocket(
-      `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
-    )
-    store.socket.onopen = () => {
-      console.log(
-        'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
-      )
-    }
+		
+		 connectWithSocket()
+    // // socket connection to track online status
+    // store.socket = new WebSocket(
+    //   `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
+    // )
+    // store.socket.onopen = () => {
+    //   console.log(
+    //     'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
+    //   )
+    // }
   } catch (error) {
     console.log('catch: ' + error)
   }
@@ -100,18 +102,22 @@ const submit = async (e) => {
 
 onMounted(async () => {
   const query = window.location.search
-  console.log('query:' + query)
-  if (query) {
+  query ? console.log('query:' + query) : null
+  if (query) { // check if query starts with '?code=' ???
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/oauth/callback/${query}`
       )
-      const data = await response.json()
-      console.log(data)
-      localStorage.setItem('access', data.access)
-      localStorage.setItem('refresh', data.refresh)
-      store.userAuthorised = true
-      router.push('/')
+			if (!response.ok) {
+				console.log('/oauth/callback/ response not ok: ' + response.status)
+			} else {
+				const data = await response.json()
+				console.log(data)
+				localStorage.setItem('access', data.access)
+				localStorage.setItem('refresh', data.refresh)
+				store.userAuthorised = true
+				router.push('/')
+			}
     } catch (error) {
       console.log('catch: ' + error)
     }

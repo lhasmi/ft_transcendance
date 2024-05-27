@@ -219,7 +219,7 @@ class Enable2FAAPIView(APIView):
             [user.email],
             fail_silently=False,
         )
-        return Response({"message": "OTP sent to your email. Please verify to enable 2FA."}, status=status.HTTP_200_OK)
+        return Response({"message": "OTP sent to your email. If you provided a real eamil, you will see it !. Please verify to enable 2FA."}, status=status.HTTP_200_OK)
 
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]

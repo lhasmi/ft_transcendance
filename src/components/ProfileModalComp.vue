@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import ButtonComp from './ButtonComp.vue'
 import { store } from '../store/store.js'
 import { getText } from '../language/language.js'
-import { fetchWithJWT } from '../utils/utils.js'
+import { fetchWithJWT, fetchWithJWTJson } from '../utils/utils.js'
 
 // test data
 let data = {
@@ -24,6 +24,7 @@ const newPicture = ref(null)
 const newPassword = ref('')
 const newPassword2 = ref('')
 const errorMsg = ref('')
+const otpCode = ref('')
 
 // functions
 const loadData = async () => {
@@ -46,18 +47,18 @@ const loadData = async () => {
     errorMsg.value = 'fetch request failed'
   }
   // fetch games history
-  if (errorMsg.value != '') {
-    console.log('CLEAR')
-    loader.value = false
-    store.userAuthorised = false
-    store.username = ''
-    store.email = ''
-    store.picture = ''
-    store.lang = 'en'
-    localStorage.removeItem('access')
-    localStorage.removeItem('refresh')
-    return
-  }
+  // if (errorMsg.value != '') {
+  //   console.log('CLEAR')
+  //   loader.value = false
+  //   store.userAuthorised = false
+  //   store.username = ''
+  //   store.email = ''
+  //   store.picture = ''
+  //   store.lang = 'en'
+  //   localStorage.removeItem('access')
+  //   localStorage.removeItem('refresh')
+  //   return
+  // }
 
   try {
     console.log('fetch games history')
@@ -174,7 +175,7 @@ const shortEmail = (email) => {
   return first + email.substring(atSignPos)
 }
 
-const getCircleColor = (index) => {
+const getCircleColor = (index) => { // TO BE REMOVED?
   if (index >= data.gamesHistory.length)
     return 'background: rgba(255, 255, 255, 0.1)'
   return data.gamesHistory[index].score1 > data.gamesHistory[index].score2
@@ -219,7 +220,7 @@ const getLostAmount = () => {
 const enable2FA = async () => {
   console.log('enable2FA')
   try {
-    const response = await fetch('http://127.0.0.1:8000/test-email/')
+    const response = await fetchWithJWT('http://127.0.0.1:8000/enable-2fa/', 'POST')
     if (!response.ok) {
       console.log('enable 2FA error: ')
       console.log(response)
@@ -230,6 +231,28 @@ const enable2FA = async () => {
     }
   } catch (error) {
     console.log('enable 2FA fetch error: ' + error)
+  }
+}
+
+const verifyOTP = async () => {
+  console.log('verify-otp')
+	console.log("username: " + store.username)
+	console.log("otp code: " + otpCode.value)
+  try {
+    const response = await fetchWithJWTJson('http://127.0.0.1:8000/verify-otp/', 'POST', {
+			username: store.username,
+			otp: otpCode.value
+		})
+    if (!response.ok) {
+      console.log('verify-otp error: ')
+      console.log(response)
+    } else {
+      const data = await response.json()
+      console.log('verify-otp success: ')
+      console.log(data)
+    }
+  } catch (error) {
+    console.log('verify-otp fetch error: ' + error)
   }
 }
 
@@ -483,10 +506,26 @@ onMounted(() => {
           </ButtonComp>
           <ButtonComp
             @click="enable2FA"
-            class="fs-6 col-9 col-md-7 mx-auto mb-4"
+            class="fs-6 col-9 col-md-7 mx-auto mb-3"
           >
             enable 2FA
           </ButtonComp>
+					<div class="col-9 col-md-7 mx-auto d-flex mb-3">
+						<input
+									v-model="otpCode"
+									class="text-input text-white text-center roboto-regular fs-6 me-3"
+									type="text"
+									id="otpCode"
+									placeholder="otp code"
+								/>
+						<ButtonComp
+							@click="verifyOTP"
+							class="fs-6 col-9 col-md-7 mx-auto"
+							style="width: 120px;"
+						>
+							send OTP
+						</ButtonComp>
+					</div>
           <hr class="splitter col-12 mx-auto m-0" />
           <div
             class="col-9 col-md-7 d-flex justify-content-around my-3 mx-auto roboto-bold mb-2 mb-md-3 text-white"

@@ -143,7 +143,7 @@ class UserLoginAPIView(APIView):
                 send_mail(
                     'Your OTP',
                     f'Your one-time password is {otp_token}. Please enter it to complete your login.',
-                    'from@example.com',
+                    os.getenv('EMAIL_HOST_USER'), 
                     [user.email],
                     fail_silently=False,
                 )
@@ -158,6 +158,11 @@ class UserLoginAPIView(APIView):
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
 
+# For users with 2FA enabled, the initial login does not complete 
+# authentication process.
+# JWT tokens are not issued in the initial login because the OTP verification 
+# step is pending. Once the OTP is verified, user’s identity is fully confirmed.
+# JWT tokens are issued here because this marks the completion of the authentication process.
 class VerifyOTPAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -168,14 +173,16 @@ class VerifyOTPAPIView(APIView):
         username = request.data.get('username')
         otp = request.data.get('otp')
 
-        if username is None or otp is None:
+        if not username or not otp:
             return Response({'error': 'Please provide both username and OTP'},
                             status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.get(username=username)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
-
-        if user is not None and player and player.otp_enabled:
-            print(f"Type of totp verify: {type(totp)}")
+        print(f"!!!!!!!!Is otp_enabled ? !!!!!!!!!!!: {player.otp_enabled}") #debug
+        if player and player.otp_enabled:
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
             print(f"Type of totp verify: {type(totp)}")
             totp.time = time.time()
@@ -200,13 +207,15 @@ class Enable2FAAPIView(APIView):
         """
         user = request.user
         player = user.player
-        player.generate_secret_key() # This will also set otp_enabled to True
+        if not player.secret_key:
+            player.generate_secret_key() # This will also set otp_enabled to True
+            player.save()
         totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
         otp_token = totp.token()
         send_mail(
             'Your OTP',
             f'Your one-time password is {otp_token}. Please enter it to enable 2FA.',
-            'from@example.com',
+            os.getenv('EMAIL_HOST_USER'),
             [user.email],
             fail_silently=False,
         )

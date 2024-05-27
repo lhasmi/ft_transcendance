@@ -138,7 +138,7 @@ class UserLoginAPIView(APIView):
                 print(f"!!!!!!!! YES but WHY?? !!!!!!!!!!!: {player.otp_enabled}") #debug
                 secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
                 totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
-                print(f"Type of totp : {type(totp)}")
+                print(f"Type of totp login: {type(totp)}")
                 otp_token = totp.token()
                 send_mail(
                     'Your OTP',
@@ -175,7 +175,9 @@ class VerifyOTPAPIView(APIView):
         player = getattr(user, 'player', None)
 
         if user is not None and player and player.otp_enabled:
-            totp = TOTP(player.secret_key, step=60, digits=6)
+            print(f"Type of totp verify: {type(totp)}")
+            totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
+            print(f"Type of totp verify: {type(totp)}")
             totp.time = time.time()
             if totp.verify(otp):
                 login(request, user)
@@ -199,7 +201,7 @@ class Enable2FAAPIView(APIView):
         user = request.user
         player = user.player
         player.generate_secret_key() # This will also set otp_enabled to True
-        totp = TOTP(player.secret_key, step=60, digits=6)
+        totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
         otp_token = totp.token()
         send_mail(
             'Your OTP',

@@ -50,7 +50,7 @@ class MyMatchAdmin(admin.ModelAdmin):
 
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Match, MatchAdmin)
-admin.site.register(MyMatch, MyNatchAdmin)
+admin.site.register(MyMatch, MyMatchAdmin)
 
 # handles resetting the OTP secret for a single player when accessed via a specific URL.
 # the function returns to Django admin interface

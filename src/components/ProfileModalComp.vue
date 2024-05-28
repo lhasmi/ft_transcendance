@@ -25,6 +25,8 @@ const newPassword = ref('')
 const newPassword2 = ref('')
 const errorMsg = ref('')
 const otpCode = ref('')
+const requested2FA = ref(false)
+const activated2FA = ref(false)
 
 // functions
 const loadData = async () => {
@@ -40,25 +42,15 @@ const loadData = async () => {
       data.username = newData.user.username
       data.email = newData.user.email
       data.picture = 'http://127.0.0.1:8000' + newData.profile_picture
+			data.two_fa_activated = newData.two_fa_activated
+			data.two_fa_requested = newData.two_fa_requested
       errorMsg.value = ''
     }
   } catch {
     console.log('fetch error')
     errorMsg.value = 'fetch request failed'
   }
-  // fetch games history
-  // if (errorMsg.value != '') {
-  //   console.log('CLEAR')
-  //   loader.value = false
-  //   store.userAuthorised = false
-  //   store.username = ''
-  //   store.email = ''
-  //   store.picture = ''
-  //   store.lang = 'en'
-  //   localStorage.removeItem('access')
-  //   localStorage.removeItem('refresh')
-  //   return
-  // }
+  // PROTECT FETCH WITH JWT IF TOKEN WAS INVALID
 
   try {
     console.log('fetch games history')
@@ -77,6 +69,8 @@ const loadData = async () => {
     console.log('fetch error')
     errorMsg.value = 'fetch request failed'
   }
+  // PROTECT FETCH WITH JWT IF TOKEN WAS INVALID
+
   loader.value = false
 }
 
@@ -228,10 +222,23 @@ const enable2FA = async () => {
       const data = await response.json()
       console.log('enable 2FA success: ')
       console.log(data)
+			requested2FA.value = true
     }
   } catch (error) {
     console.log('enable 2FA fetch error: ' + error)
   }
+}
+
+const disable2FA = async () => {
+	const response = await fetchWithJWT('http://127.0.0.1:8000/disable-2fa/', 'POST')
+	const data = await response.json()
+	if (!response.ok) {
+		console.log('/disable-2fa/ response not ok: ' + response.status)
+	} else {
+		console.log(data)
+		activated2FA.value = false
+		requested2FA.value = false
+	}
 }
 
 const verifyOTP = async () => {
@@ -250,6 +257,8 @@ const verifyOTP = async () => {
       const data = await response.json()
       console.log('verify-otp success: ')
       console.log(data)
+			requested2FA.value = false
+			activated2FA.value = true
     }
   } catch (error) {
     console.log('verify-otp fetch error: ' + error)
@@ -504,13 +513,30 @@ onMounted(() => {
           >
             {{ getText('editProfile', store.lang) }}
           </ButtonComp>
+					
+					<hr class="splitter col-12 mx-auto m-0" />
+					<p
+              class="fs-5 my-2 mx-auto roboto-bold"
+              style="color: #f58562"
+              id="profileModalLabel"
+          >
+              2FA
+          </p>
+					<ButtonComp
+						v-if="data.two_fa_activated || activated2FA"
+            @click="disable2FA"
+            class="fs-6 col-9 col-md-7 mx-auto mb-3"
+          >
+            disable
+          </ButtonComp>
           <ButtonComp
+						v-else
             @click="enable2FA"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
           >
-            enable 2FA
+             {{ data.two_fa_requested || requested2FA ? 'resend code' : 'enable' }}
           </ButtonComp>
-					<div class="col-9 col-md-7 mx-auto d-flex mb-3">
+					<div v-if="(data.two_fa_requested && !data.two_fa_activated) || requested2FA" class="col-9 col-md-7 mx-auto d-flex mb-3">
 						<input
 									v-model="otpCode"
 									class="text-input text-white text-center roboto-regular fs-6 me-3"
@@ -523,7 +549,7 @@ onMounted(() => {
 							class="fs-6 col-9 col-md-7 mx-auto"
 							style="width: 120px;"
 						>
-							send OTP
+							verify OTP
 						</ButtonComp>
 					</div>
           <hr class="splitter col-12 mx-auto m-0" />

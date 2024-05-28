@@ -145,7 +145,7 @@ const sendOTP = async () => {
 			store.email = data.user.email
 			store.picture = 'http://127.0.0.1:8000' + data.profile_picture
 			console.log('logged in as ' + store.username)
-			router.push('/')	
+			router.push('/')
 			connectWithSocket()
 		}
   } catch (error) {
@@ -163,17 +163,27 @@ onMounted(async () => {
       )
 			if (!response.ok) {
 				console.log('/oauth/callback/ response not ok: ' + response.status)
+				const data = response.json()
+				console.log(data)
+				errorMsg.value = data.error // ???
 			} else {
 				const data = await response.json()
+				console.log("callback")
 				console.log(data)
-				localStorage.setItem('access', data.access)
-				localStorage.setItem('refresh', data.refresh)
-				store.userAuthorised = true
-				router.push('/')
+				if (data.message == 'OTP sent to your email. Please verify to complete login.') {
+					// NEED TO GET USERNAME IN CALLBACK RESPONSE
+					renderOtpPrompt.value = true
+					console.log("NEED TO PROMPT OTP CODE")
+				} else {
+					localStorage.setItem('access', data.access)
+					localStorage.setItem('refresh', data.refresh)
+					canFetchProfile.value = true
+				}
 			}
     } catch (error) {
       console.log('catch: ' + error)
     }
+		if (!canFetchProfile.value) return
     try {
       const response = await fetchWithJWT(
         'http://127.0.0.1:8000/update-profile/'
@@ -188,6 +198,7 @@ onMounted(async () => {
       store.email = data.user.email
       store.picture = 'http://127.0.0.1:8000' + data.profile_picture
       console.log('logged in as ' + store.username)
+			router.push('/')
 			connectWithSocket()
     } catch (error) {
       console.log('catch: ' + error)

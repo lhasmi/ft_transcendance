@@ -87,7 +87,7 @@ export const logout = () => {
   store.username = ''
   store.email = ''
   store.picture = ''
-  // store.socket.close()
+  store.socket.close()
   store.socket = null
 }
 

@@ -99,6 +99,60 @@ const submit = async (e) => {
   }
 }
 
+const sendOTP = async () => {
+  console.log('verify-otp')
+	console.log("username: " + username.value)
+	console.log("otp code: " + otpCode.value)
+
+	canFetchProfile.value = false
+  try {
+    const response = await fetch('http://127.0.0.1:8000/verify-otp/', {
+			method: 'POST',
+			headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.value,
+        otp: otpCode.value,
+      }),
+		})
+    if (!response.ok) {
+      console.log('verify-otp error: ')
+      console.log(response)
+			const data = await response.json()
+			console.log(data)
+			errorMsg.value = data.error
+    } else {
+      const data = await response.json()
+      console.log('verify-otp success: ')
+      console.log(data)
+			localStorage.setItem('access', data.access)
+			localStorage.setItem('refresh', data.refresh)
+			canFetchProfile.value = true
+    }
+  } catch (error) {
+    console.log('verify-otp fetch error: ' + error)
+  }
+	if (!canFetchProfile.value) return
+  try {
+    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    if (!response.ok) {
+      console.log("can't login with existing JWT")
+    } else {
+			const data = await response.json()
+			store.userAuthorised = true
+			store.username = data.user.username
+			store.email = data.user.email
+			store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+			console.log('logged in as ' + store.username)
+			router.push('/')	
+			connectWithSocket()
+		}
+  } catch (error) {
+    console.log('catch: ' + error)
+  }
+}
+
 onMounted(async () => {
   const query = window.location.search
   query ? console.log('query:' + query) : null
@@ -175,6 +229,13 @@ onMounted(async () => {
 						id="otpCode"
 						placeholder="otp code"
 					/>
+				</div>
+				<div
+					v-if="errorMsg"
+					class="my-1 fs-6 roboto-bold text-center"
+					style="color: #da4834"
+				>
+					{{ errorMsg }}
 				</div>
 				<ButtonComp
 					@click="sendOTP"

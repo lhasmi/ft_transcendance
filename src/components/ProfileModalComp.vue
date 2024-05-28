@@ -546,18 +546,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">
-            {{ getText('lastGames', store.lang) }}
-          </h2> -->
-          <!-- <div
-            class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3"
-          >
-            <div class="circle" :style="getCircleColor(4)"></div>
-            <div class="circle" :style="getCircleColor(3)"></div>
-            <div class="circle" :style="getCircleColor(2)"></div>
-            <div class="circle" :style="getCircleColor(1)"></div>
-            <div class="circle" :style="getCircleColor(0)"></div>
-          </div> -->
           <ButtonComp
             @click="toGamesHistory"
             class="fs-6 col-9 col-md-7 mx-auto mb-4"

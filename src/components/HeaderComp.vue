@@ -134,6 +134,10 @@ onMounted(() => {
   text-decoration: underline;
   text-decoration-color: #f58562;
 }
+.navbar-nav .nav-link:focus {
+  text-decoration: underline;
+  text-decoration-color: #f58562;
+}
 
 .myshadow {
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);

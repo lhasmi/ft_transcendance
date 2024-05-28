@@ -199,10 +199,8 @@ class UserLoginAPIView(APIView):
             player = getattr(user, 'player', None)
             print(f"!!!!!!!!Is two_fa_activated ? !!!!!!!!!!!: {player.two_fa_activated}") #debug
             if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
-                print(f"!!!!!!!! YES but WHY?? !!!!!!!!!!!: {player.two_fa_activated}") #debug
                 secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
                 totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
-                print(f"Type of totp login: {type(totp)}")
                 otp_token = totp.token()
                 send_mail(
                     'Your OTP',
@@ -211,7 +209,16 @@ class UserLoginAPIView(APIView):
                     [user.email],
                     fail_silently=False,
                 )
-                return Response({'message': 'OTP sent to your email. Please verify to complete login.'}, status=status.HTTP_200_OK)
+                if totp.verify(int(otp)):
+                    login(request, user)
+                    jwt_token = RefreshToken.for_user(user)
+                    print(f" !!!! YEAH !!!!! STOP loggin VERIFICATION NOW !!!!!")  # Debug
+                    return Response({
+                        'access': str(jwt_token.access_token),
+                        'refresh': str(jwt_token)
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({'error': f'Invalid OTP. Please contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)
             else: # Directly log in the user if 2FA is not activated
                 login(request, user)
                 jwt_token = RefreshToken.for_user(user)
@@ -228,10 +235,10 @@ class UserLoginAPIView(APIView):
 # step is pending. Once the OTP is verified, user’s identity is fully confirmed.
 # JWT tokens are issued here because this marks the completion of the authentication process.
 class VerifyOTPAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.IsAuthenticated]  # only an authenticated person can activate 2FA
     def post(self, request):
         """
-        Verify the OTP for completing the login process.
+        Verify the OTP for completing the 2 FA activation process.
         """
         username = request.data.get('username')
         otp = request.data.get('otp')
@@ -245,20 +252,15 @@ class VerifyOTPAPIView(APIView):
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
         print(f"!!!!!!!!Is two_fa_activated verify? !!!!!!!!!!!: {player.two_fa_activated}") #debug
-        if player and player.two_fa_activated:
+        if player and player.two_fa_requested :
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
             totp.time = time.time()
             print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
             if totp.verify(int(otp)):
                 player.two_fa_activated = True  # Set the 2FA activated flag
                 player.save()
-                login(request, user)
-                jwt_token = RefreshToken.for_user(user)
                 print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug
-                return Response({
-                    'access': str(jwt_token.access_token),
-                    'refresh': str(jwt_token),
-                }, status=status.HTTP_200_OK)
+                return Response({"message": "you have activated 2FA !"}, status=status.HTTP_200_OK)
             else:
                 return Response({'error': f'Invalid OTP. Please contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)
         else:

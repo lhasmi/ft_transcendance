@@ -230,8 +230,7 @@ class UserLoginAPIView(APIView):
 # step is pending. Once the OTP is verified, user’s identity is fully confirmed.
 # JWT tokens are issued here because this marks the completion of the authentication process.
 class VerifyOTPAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
+    permission_classes = [AllowAny]
     def post(self, request):
         """
         Verify the OTP for completing the login process.

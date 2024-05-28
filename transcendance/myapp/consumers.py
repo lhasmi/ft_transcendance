@@ -60,4 +60,5 @@ class StatusConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def set_offline_status(self):
         # Decrement the user's online status count
+        self.user = User.objects.get(id=self.user.id)
         self.user.player.set_offline()

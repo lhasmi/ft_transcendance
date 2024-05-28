@@ -10,6 +10,9 @@ import { fetchWithJWT, connectWithSocket } from '@/utils/utils'
 const username = ref('')
 const password = ref('')
 const errorMsg = ref('')
+const renderOtpPrompt = ref(false) // should be false
+const otpCode = ref('')
+const canFetchProfile = ref(false)
 
 // functions
 const redirectTo42 = async () => {
@@ -30,6 +33,7 @@ const redirectTo42 = async () => {
 
 const submit = async (e) => {
   e.preventDefault()
+	canFetchProfile.value = false
 
   if (!username.value) {
     errorMsg.value = getError('usernameEmpty', store.lang)
@@ -54,6 +58,7 @@ const submit = async (e) => {
     })
     if (!response.ok) {
 			console.log("/login/ response not ok: " + response.status)
+			const data = await response.json()
       errorMsg.value = data.error
     } else {
 			const data = await response.json()
@@ -62,39 +67,33 @@ const submit = async (e) => {
 				// display an input field for OTP
 				// send request to verify OTP => on success receive the jwt and login the user
 				//                            => on failure display prompt again with button to resend the email
+				renderOtpPrompt.value = true
+				console.log("NEED TO PROMPT OTP CODE")
+			} else {
+				localStorage.setItem('access', data.access)
+				localStorage.setItem('refresh', data.refresh)
+				canFetchProfile.value = true
 			}
-      localStorage.setItem('access', data.access)
-      localStorage.setItem('refresh', data.refresh)
-      store.userAuthorised = true
-      router.push('/')
     }
   } catch {
     errorMsg.value = 'fetch request failed'
   }
-  if (errorMsg.value !== '') return
+  if (renderOtpPrompt.value) return
+	if (!canFetchProfile.value) return
   try {
     const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
     if (!response.ok) {
       console.log("can't login with existing JWT")
-      return
-    }
-    const data = await response.json()
-    store.userAuthorised = true
-    store.username = data.user.username
-    store.email = data.user.email
-    store.picture = 'http://127.0.0.1:8000' + data.profile_picture
-    console.log('logged in as ' + store.username)
-		
-		 connectWithSocket()
-    // // socket connection to track online status
-    // store.socket = new WebSocket(
-    //   `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
-    // )
-    // store.socket.onopen = () => {
-    //   console.log(
-    //     'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
-    //   )
-    // }
+    } else {
+			const data = await response.json()
+			store.userAuthorised = true
+			store.username = data.user.username
+			store.email = data.user.email
+			store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+			console.log('logged in as ' + store.username)
+			router.push('/')	
+			connectWithSocket()
+		}
   } catch (error) {
     console.log('catch: ' + error)
   }
@@ -135,6 +134,7 @@ onMounted(async () => {
       store.email = data.user.email
       store.picture = 'http://127.0.0.1:8000' + data.profile_picture
       console.log('logged in as ' + store.username)
+			connectWithSocket()
     } catch (error) {
       console.log('catch: ' + error)
     }
@@ -150,77 +150,101 @@ onMounted(async () => {
       class="col-11 col-md-8 col-lg-5 col-xl-4 bg-white bg-opacity-10 rounded-4 myshadow d-flex flex-column"
     >
       <div class="d-flex justify-content-center position-relative">
-        <RouterLink to="/">
-          <span
-            class="icon-back material-symbols-outlined"
-            style="font-size: 2.6rem"
-          >
-            keyboard_backspace
-          </span>
-        </RouterLink>
+				<RouterLink to="/" aria-label="back button" class="router-link">
+					<span
+						class="icon-back material-symbols-outlined"
+						style="font-size: 2.6rem"
+						aria-label="back button"
+					>
+						keyboard_backspace
+					</span>
+				</RouterLink>
+					
         <h2 class="text-center roboto-bold my-2">
           {{ getText('login', store.lang) }}
         </h2>
       </div>
       <hr class="splitter col-12 mx-auto m-0 mb-2" />
-      <form class="d-flex flex-column">
-        <div
-          class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
-        >
-          <input
-            v-model="username"
-            type="text"
-            id="username"
-            :placeholder="getText('username', store.lang)"
-            required
-          />
-          <span
-            class="icon material-symbols-outlined"
-            style="font-size: 24px; color: white"
-          >
-            person
-          </span>
-        </div>
-        <div
-          class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
-        >
-          <input
-            v-model="password"
-            type="password"
-            id="password"
-            :placeholder="getText('password', store.lang)"
-            required
-          />
-          <span
-            class="icon material-symbols-outlined"
-            style="font-size: 24px; color: white"
-          >
-            lock
-          </span>
-        </div>
-        <div
-          v-if="errorMsg"
-          class="my-1 fs-6 roboto-bold text-center"
-          style="color: #da4834"
-        >
-          {{ errorMsg }}
-        </div>
-        <ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{
-          getText('login', store.lang)
-        }}</ButtonComp>
-      </form>
-      <p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">or</p>
-      <ButtonComp @click="redirectTo42" class="btn-lg fs-5 col-7 mx-auto">
-        {{ getText('loginWith42', store.lang) }}
-      </ButtonComp>
-      <div
-        class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
-      >
-        {{ getText('dontHaveAcc', store.lang) }}
-        <RouterLink class="register-link roboto-bold" to="/register">{{
-          getText('register', store.lang)
-        }}</RouterLink>
-      </div>
+			<div v-if="renderOtpPrompt" class="col-11 col-md-8 mx-auto d-flex flex-column">
+				<p class="m-0 mx-auto mb-3 text-center text-white roboto-regular fs-5">otp code has been sent to your email</p>
+				<div class="col-9 mx-auto mb-3">
+					<input
+						v-model="otpCode"
+						class=" text-input text-white text-center roboto-regular fs-6"
+						type="text"
+						id="otpCode"
+						placeholder="otp code"
+					/>
+				</div>
+				<ButtonComp
+					@click="sendOTP"
+					class="fs-6 col-9 col-md-7 mx-auto mb-4"
+					style="width: 120px;"
+				>
+					send OTP
+				</ButtonComp>
+			</div>
+			<div v-else class="d-flex flex-column">
+				<form class="d-flex flex-column">
+					<div
+						class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
+					>
+						<input
+							v-model="username"
+							type="text"
+							id="username"
+							:placeholder="getText('username', store.lang)"
+							required
+						/>
+						<span
+							class="icon material-symbols-outlined"
+							style="font-size: 24px; color: white"
+						>
+							person
+						</span>
+					</div>
+					<div
+						class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
+					>
+						<input
+							v-model="password"
+							type="password"
+							id="password"
+							:placeholder="getText('password', store.lang)"
+							required
+						/>
+						<span
+							class="icon material-symbols-outlined"
+							style="font-size: 24px; color: white"
+						>
+							lock
+						</span>
+					</div>
+					<div
+						v-if="errorMsg"
+						class="my-1 fs-6 roboto-bold text-center"
+						style="color: #da4834"
+					>
+						{{ errorMsg }}
+					</div>
+					<ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{
+						getText('login', store.lang)
+					}}</ButtonComp>
+				</form>
+				<p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">or</p>
+				<ButtonComp @click="redirectTo42" class="btn-lg fs-5 col-7 mx-auto">
+					{{ getText('loginWith42', store.lang) }}
+				</ButtonComp>
+				<div
+					class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
+				>
+					{{ getText('dontHaveAcc', store.lang) }}
+					<RouterLink class="register-link roboto-bold" to="/register">{{
+						getText('register', store.lang)
+					}}</RouterLink>
+				</div>
+
+			</div>
     </div>
   </section>
 </template>
@@ -230,15 +254,33 @@ onMounted(async () => {
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
 }
 
-.icon-back {
+
+.router-link {
   position: absolute;
   top: 0.5rem;
   left: 1rem;
   color: white;
   transition: all 0.2s ease;
 }
+.router-link:hover {
+  color: #f58562;
+}
+.router-link:focus {
+	color: #f58562;
+}
+
+.icon-back {
+  color: white;
+  transition: all 0.2s ease;
+}
 .icon-back:hover {
   color: #f58562;
+}
+.icon-back:focus {
+	color: #f58562;
+}
+.router-link:focus .icon-back {
+	color: #f58562;
 }
 
 h2 {
@@ -274,6 +316,10 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
   -webkit-text-fill-color: white;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+.text-input {
+  border-bottom: solid 2px white;
 }
 
 .register {

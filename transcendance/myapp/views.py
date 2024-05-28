@@ -209,7 +209,7 @@ class UserLoginAPIView(APIView):
                     [user.email],
                     fail_silently=False,
                 )
-                if totp.verify(int(otp)):
+                if totp.verify(int(otp_token)):
                     login(request, user)
                     jwt_token = RefreshToken.for_user(user)
                     print(f" !!!! YEAH !!!!! STOP loggin VERIFICATION NOW !!!!!")  # Debug
@@ -252,6 +252,7 @@ class VerifyOTPAPIView(APIView):
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
         print(f"!!!!!!!!Is two_fa_activated verify? !!!!!!!!!!!: {player.two_fa_activated}") #debug
+        print(f"!!!!!!!!Is two_fa_requested verify? !!!!!!!!!!!: {player.two_fa_requested}") #debug
         if player and player.two_fa_requested :
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
             totp.time = time.time()
@@ -259,6 +260,7 @@ class VerifyOTPAPIView(APIView):
             if totp.verify(int(otp)):
                 player.two_fa_activated = True  # Set the 2FA activated flag
                 player.save()
+                print(f"!!!!!!!!Is two_fa_activated verify2? !!!!!!!!!!!: {player.two_fa_activated}") #debug
                 print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug
                 return Response({"message": "you have activated 2FA !"}, status=status.HTTP_200_OK)
             else:

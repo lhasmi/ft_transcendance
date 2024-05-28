@@ -1,21 +1,30 @@
-FROM node:lts-alpine
+# Use the official Node.js image from the Docker Hub
+FROM node:18
 
-# install simple http server for serving static content
-# RUN npm install -g http-server
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
-# make the 'app' folder the current working directory
-WORKDIR /app
+# Copy package.json and package-lock.json (if present)
+COPY package.json ./
+COPY package-lock.json* ./
 
-# copy both 'package.json' and 'package-lock.json' (if available)
-COPY package*.json ./
+# Clean npm cache and remove node_modules if they exist
+RUN npm cache clean --force && rm -rf node_modules
 
-# install project dependencies
+# Ensure no npm credentials are used and use the default registry
+RUN npm config set registry https://registry.npmjs.org/ && npm config delete _auth && npm config delete username && npm config delete _password && npm config delete email && npm config delete always-auth
+
+# Install dependencies
 RUN npm install
 
-# copy project files and folders to the current working directory (i.e. 'app' folder)
+# Copy the rest of the application code to the working directory
 COPY . .
 
-# build app for production with minification
-
+# Expose the port the app runs on
 EXPOSE 5173
-CMD [ "npm", "run", "dev" ]
+
+# Set the HOST environment variable
+ENV HOST=0.0.0.0
+
+# Start the application
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

@@ -1,0 +1,4 @@
+models.py -> line 46  TO be merged with the class Match !!!! 
+serializers.py -> line 2, 14, 56, 62, 72 to 76, 87, line 114
+myapp/urls.py -> line 4, 10, line 26
+views.py -> line 21 and 22, line 351, line 360

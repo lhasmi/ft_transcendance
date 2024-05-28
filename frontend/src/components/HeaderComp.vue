@@ -4,38 +4,52 @@ import ProfileModalComp from './ProfileModalComp.vue'
 import FriendsModalComp from './FriendsModalComp.vue'
 import ButtonComp from './ButtonComp.vue'
 import { store } from '../store/store.js'
+import { logout } from '../utils/utils.js'
 import { getText } from '../language/language.js'
 
 // variables
 const language = ref('')
 
 // functions
-const logout = () => {
-  store.userAuthorised = false
-}
+// const logout = () => {
+//   localStorage.removeItem('access')
+//   localStorage.removeItem('refresh')
+//   localStorage.removeItem('lang')
+//   store.userAuthorised = false
+//   store.username = ''
+//   store.email = ''
+//   store.picture = ''
+//   store.socket.close()
+//   store.socket = null
+// }
 
 const toggleLanguage = () => {
-	const languages = ['en', 'de', 'ru']
-	const index = languages.indexOf(language.value)
+  const languages = ['en', 'de', 'ru']
+  const index = languages.indexOf(language.value)
 
-	language.value = index !== languages.length - 1 ? languages[index + 1] : languages[0]
-	store.lang = language.value
-	localStorage.setItem('lang', language.value)
+  language.value =
+    index !== languages.length - 1 ? languages[index + 1] : languages[0]
+  store.lang = language.value
+  localStorage.setItem('lang', language.value)
 }
 
 onMounted(() => {
-	language.value = localStorage.getItem('lang') || 'en'
-	store.lang = language.value
-	localStorage.setItem('lang', language.value)
+  language.value = localStorage.getItem('lang') || 'en'
+  store.lang = language.value
+  localStorage.setItem('lang', language.value)
 })
-
 </script>
 
 <template>
   <!-- Header -->
   <header class="container-md mt-2">
-    <nav class="navbar navbar-expand-lg bg-white bg-opacity-10 m-auto myshadow rounded-4 py-2" style="width: 100%;">
-      <RouterLink class="navbar-brand ms-5 fs-2 roboto-bold" to="/">ft_transcendence</RouterLink>
+    <nav
+      class="navbar navbar-expand-lg bg-white bg-opacity-10 m-auto myshadow rounded-4 py-2"
+      style="width: 100%"
+    >
+      <RouterLink class="navbar-brand ms-5 fs-2 roboto-bold" to="/"
+        >ft_transcendence</RouterLink
+      >
       <button
         class="navbar-toggler me-3"
         type="button"
@@ -50,10 +64,14 @@ onMounted(() => {
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav ms-auto">
           <div v-if="!store.userAuthorised" class="d-flex">
-            <RouterLink class="nav-link mx-4 fs-4 roboto-medium align-self-center" to="/register"
+            <RouterLink
+              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
+              to="/register"
               >{{ getText('register', language) }}</RouterLink
             >
-            <RouterLink class="nav-link mx-4 fs-4 roboto-medium align-self-center" to="/login"
+            <RouterLink
+              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
+              to="/login"
               >{{ getText('login', language) }}</RouterLink
             >
           </div>
@@ -72,11 +90,19 @@ onMounted(() => {
             >
               {{ getText('friends', language) }}
             </button>
-            <button @click="logout" class="nav-link mx-4 fs-4 roboto-medium align-self-center">
+            <button
+              @click="logout"
+              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
+            >
               {{ getText('logout', language) }}
             </button>
           </div>
-					<ButtonComp @click="toggleLanguage" class="mx-4" style="width: 40px;">{{ language }}</ButtonComp>
+          <ButtonComp
+            @click="toggleLanguage"
+            class="mx-4"
+            style="width: 40px"
+            >{{ language }}</ButtonComp
+          >
         </div>
       </div>
     </nav>
@@ -114,8 +140,8 @@ onMounted(() => {
 }
 
 .language {
-	border: none;
-	background: none;
+  border: none;
+  background: none;
 }
 /* !Header */
 </style>

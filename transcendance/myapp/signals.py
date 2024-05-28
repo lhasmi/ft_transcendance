@@ -19,7 +19,6 @@ def create_player_profile(sender, instance=None, created=False, **kwargs):
         try:
             with transaction.atomic():
                 player = Player.objects.create(user=instance)
-                # player.generate_secret_key()  # REMOVED Generate and save the secret key upon creation
                 logger.info(f"Player profile created for user {instance.username}")
         except Exception as e:
             logger.error(f"Failed to create player profile for user {instance.username}: {e}")

@@ -7,10 +7,11 @@ from .models import Player, Match, MyMatch
 # Defines how player entries are displayed and managed in the Django admin interface.
 class PlayerAdmin(admin.ModelAdmin):
     # List display for the fields to display in the list view.
-    list_display = ('get_username', 'get_email', 'display_name', 'profile_picture', 'created_at', 'online_status', 'otp_enabled')
+    list_display = ('get_username', 'get_email', 'display_name', 'profile_picture', 'created_at', 'online_status', 'two_fa_activated')
     readonly_fields = ('profile_picture', 'created_at')
     search_fields = ('user__username', 'user__email', 'display_name')
-    list_filter = ('online_status', 'otp_enabled')  # Add filter for OTP enabled/disabled
+    list_filter = ('online_status', 'two_fa_activated')  
+   
     actions = ['reset_otp']
 
     def get_username(self, obj):
@@ -23,15 +24,16 @@ class PlayerAdmin(admin.ModelAdmin):
     get_email.admin_order_field = 'user__email'
     get_email.short_description = 'Email'
 
-    def otp_enabled(self, obj):
-        return bool(obj.otp_enabled)  # Check the otp_enabled field
-    otp_enabled.boolean = True
-    otp_enabled.short_description = 'OTP Enabled'
+    def two_fa_activated(self, obj):
+        return bool(obj.two_fa_activated)  # Check the wo_fa_activated field
+    two_fa_activated.boolean = True
+    two_fa_activated.short_description = 'two fa activated'
 
     # Operates directly from the Django admin interface, on multiple selected players
     def reset_otp(self, request, queryset):  # Calls generate_secret_key on each player to reset their OTP secret key.
         for player in queryset:
             player.generate_secret_key()
+            two_fa_activated.boolean = True
             player.save()
         self.message_user(request, "OTP reset for selected players.")
     reset_otp.short_description = 'Reset OTP for selected players'

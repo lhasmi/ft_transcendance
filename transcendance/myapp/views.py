@@ -7,6 +7,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
@@ -44,6 +45,15 @@ def validate_image(image):
         raise DjangoValidationError("The maximum file size that can be uploaded is 2MB")
     if not image.name.endswith(('.png', '.jpg', '.jpeg')):
         raise DjangoValidationError("Only JPEG and PNG files are allowed.")
+
+def validate_user_password(password, user=None):
+    """
+    Validate the password and raise ValidationError if criteria not met.
+    """
+    try:
+        validate_password(password, user=user)
+    except ValidationError as e:
+        raise ValidationError({'password': list(e.messages)})
 
 class PlayerViewSet(viewsets.ModelViewSet):
     """
@@ -111,7 +121,7 @@ class OAuth2CallbackAPIView(APIView):
                 'client_secret': settings.OAUTH_CLIENT_SECRET,
             }
             token_url = f"{token_url}?grant_type=authorization_code&code={code}&redirect_uri={settings.OAUTH_REDIRECT_URI}&client_id={settings.OAUTH_CLIENT_ID}&client_secret={settings.OAUTH_CLIENT_SECRET}"
-            response = requests.post(token_url)
+            response = requests.post(token_url, data=data)
             print("auth2!!!")# Debug
             response_data = response.json()
             access_token = response_data.get('access_token')
@@ -130,13 +140,13 @@ class OAuth2CallbackAPIView(APIView):
 
             if not email or not login_name:
                 return JsonResponse({'error': 'Failed to obtain user information'}, status=400)
-
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
                 print("auth!!  User.objects.create_user   !!")# Debug
                 user = User.objects.create_user(username=login_name, email=email, password="")
                 user.save()
+            player = getattr(user, 'player', None)
             if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
                 secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
                 totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
@@ -150,7 +160,7 @@ class OAuth2CallbackAPIView(APIView):
                 )
                 return Response({'message': 'OTP sent to your email. Please verify to complete login.',
                                  'username': login_name
-                }, status=status.HTTP_200_OK)
+                                }, status=status.HTTP_200_OK)
             else: # Directly log in the 42user if 2FA is not activated
                 login(request, user)
                 jwt_token = RefreshToken.for_user(user)
@@ -173,6 +183,10 @@ class UserRegistrationAPIView(APIView):
         if not username or not password or not email:
             return Response({"error": "Username, password and email are required fields."},
                             status=status.HTTP_400_BAD_REQUEST)
+        try:
+            validate_user_password(password)
+        except ValidationError as e:
+            return Response({"error": e.message_dict}, status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_email(email)
         except DjangoValidationError as e:
@@ -388,6 +402,10 @@ class UserProfileUpdateAPIView(APIView):
                         return Response({"error": "This email is already in use by another user."}, status=status.HTTP_400_BAD_REQUEST)
                     user.email = email
                 if password:
+                    try:
+                        validate_user_password(password, user=user)
+                    except ValidationError as ve:
+                        return Response({'error': ve.message_dict}, status=status.HTTP_400_BAD_REQUEST)
                     user.set_password(password)
                     user.save()
                     logout(request)  # Log out from all sessions after password change

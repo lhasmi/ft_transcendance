@@ -169,14 +169,6 @@ const shortEmail = (email) => {
   return first + email.substring(atSignPos)
 }
 
-const getCircleColor = (index) => { // TO BE REMOVED?
-  if (index >= data.gamesHistory.length)
-    return 'background: rgba(255, 255, 255, 0.1)'
-  return data.gamesHistory[index].score1 > data.gamesHistory[index].score2
-    ? 'background: #66bf6a'
-    : 'background: #da4834'
-}
-
 const changePicture = (e) => {
   console.log(e.target.files[0])
   console.log(URL.createObjectURL(e.target.files[0]))
@@ -538,12 +530,12 @@ onMounted(() => {
           </ButtonComp>
 					<div v-if="(data.two_fa_requested && !data.two_fa_activated) || requested2FA" class="col-9 col-md-7 mx-auto d-flex mb-3">
 						<input
-									v-model="otpCode"
-									class="text-input text-white text-center roboto-regular fs-6 me-3"
-									type="text"
-									id="otpCode"
-									placeholder="otp code"
-								/>
+							v-model="otpCode"
+							class="text-input text-white text-center roboto-regular fs-6 me-3"
+							type="text"
+							id="otpCode"
+							placeholder="otp code"
+						/>
 						<ButtonComp
 							@click="verifyOTP"
 							class="fs-6 col-9 col-md-7 mx-auto"

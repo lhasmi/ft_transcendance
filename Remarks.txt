@@ -10,7 +10,7 @@ and chose duel
 
 28.05.2024:
 
-- the game still stops at score 1
+- the game still stops at score 2- 0 then restart and back appears !!! 
 - the 2FA is enabled and I even logged in after using it, still, when I clik on profile the enable OTP butten is still staring at me with 
 the field for entering a code and send otp ! these should be replaced by "otp enabled" yes and maybe I should make some disabling possible then 
 
@@ -19,6 +19,9 @@ but I have stuff to do first
 - well done for the control ! after cliqing on the ? nothing to say :)
 
 - I would guess the game has to have a timer, otherwhise unteil when would th person play 
+
+- after I put some flags for the 3 stages of the 2 FA, we need a more airy design , where the otp button far a bit from verify, for avoiding 
+cliquing by mistake , 
 
 - can you read the subject again I am sure it was said the player must have a unique name , it is the same as the username ?? or a unique name 
 for the game ? if the later then reput the display_name I already designed to that end!

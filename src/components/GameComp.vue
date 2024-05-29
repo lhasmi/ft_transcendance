@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { store } from '@/store/store'
 import HelpModalComp from './HelpModalComp.vue'
+import ButtonComp from './ButtonComp.vue';
 
 const props = defineProps({
   isTournament: Boolean,
@@ -14,7 +15,7 @@ const score = ref({
   player2: 0,
 })
 
-const gameFinished = ref(false)
+const gameStop = ref(false)
 
 const emit = defineEmits(['winner', 'results'])
 
@@ -51,10 +52,13 @@ const setWinner = (winner, loser) => {
 // GAME
 let canvas
 let ctx
+let player1, player2, game, ball
 const playerWidth = 4
 const playerHeight = 100
 const playerSpeed = 3
 const ballSpeed = 2
+const maxScore = 2
+
 
 class Player {
   constructor(x = 0, y = 0) {
@@ -187,14 +191,14 @@ class Game {
     ctx.stroke()
   }
   animate() {
-    if (gameFinished.value) return
+    if (gameStop.value) return
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     this.#draw()
-    if (score.value.player1 == 1 || score.value.player2 == 1) {
-      gameFinished.value = true
+    if (score.value.player1 == maxScore || score.value.player2 == maxScore) {
+      gameStop.value = true
       if (props.isTournament == true) {
-        if (score.value.player1 == 1) setWinner(props.player1, props.player2)
-        if (score.value.player2 == 1) setWinner(props.player2, props.player1)
+        if (score.value.player1 == maxScore) setWinner(props.player1, props.player2)
+        if (score.value.player2 == maxScore) setWinner(props.player2, props.player1)
       } else {
         // 1 vs 1 game => send results to backend
         emitResults(
@@ -218,49 +222,66 @@ class Game {
   }
 }
 
+const handleKeydown = (e) => {
+	if (e.key == 'w') {
+		player1.upKeyPressed = true
+	} else if (e.key == 's') {
+		player1.downKeyPressed = true
+	} else if (e.key == 'ArrowUp') {
+		e.preventDefault()
+		player2.upKeyPressed = true
+	} else if (e.key == 'ArrowDown') {
+		e.preventDefault()
+		player2.downKeyPressed = true
+	}
+}
+
+const handleKeyup = (e) => {
+	if (e.key == 'w') {
+		player1.upKeyPressed = false
+	} else if (e.key == 's') {
+		player1.downKeyPressed = false
+	} else if (e.key == 'ArrowUp') {
+		player2.upKeyPressed = false
+	} else if (e.key == 'ArrowDown') {
+		player2.downKeyPressed = false
+	} else if (e.key == ' ') {
+		game.startGame = !game.startGame
+	}
+}
+
 onMounted(() => {
+	if (store.userAuthorised) {
+    player1.value = store.username
+    player2.value = 'opponent'
+  }
   canvas = document.getElementById('canvasId')
   ctx = canvas.getContext('2d')
   canvas.width = 700
   canvas.height = 466
-  const player1 = new Player(32, canvas.height / 2 - playerHeight / 2)
-  const player2 = new Player(
+  player1 = new Player(32, canvas.height / 2 - playerHeight / 2)
+  player2 = new Player(
     canvas.width - playerWidth - 32,
     canvas.height / 2 - playerHeight / 2
   )
-  const ball = new Ball(canvas.width / 2, canvas.height / 2, player1, player2)
-  const game = new Game(ctx, player1, player2, ball)
+  ball = new Ball(canvas.width / 2, canvas.height / 2, player1, player2)
+  game = new Game(ctx, player1, player2, ball)
   game.animate()
-  if (store.userAuthorised) {
-    player1.value = store.username
-    player2.value = 'opponent'
-  }
-  addEventListener('keydown', (e) => {
-    if (e.key == 'w') {
-      player1.upKeyPressed = true
-    } else if (e.key == 's') {
-      player1.downKeyPressed = true
-    } else if (e.key == 'ArrowUp') {
-      e.preventDefault()
-      player2.upKeyPressed = true
-    } else if (e.key == 'ArrowDown') {
-      e.preventDefault()
-      player2.downKeyPressed = true
-    }
-  })
-  addEventListener('keyup', (e) => {
-    if (e.key == 'w') {
-      player1.upKeyPressed = false
-    } else if (e.key == 's') {
-      player1.downKeyPressed = false
-    } else if (e.key == 'ArrowUp') {
-      player2.upKeyPressed = false
-    } else if (e.key == 'ArrowDown') {
-      player2.downKeyPressed = false
-    } else if (e.key == ' ') {
-      game.startGame = !game.startGame
-    }
-  })
+  addEventListener('keydown', (e) => handleKeydown(e, player1, player2))
+  addEventListener('keyup', (e) => {handleKeyup(e, player1, player2, game)})
+
+	// const player1UpElement = document.getElementById('player1Up')
+	// player1UpElement.addEventListener('mousedown', (e) => {
+	// 	e.preventDefault()
+	// 	console.log('mousedown')
+	// 	player1.upKeyPressed = true
+	// })
+	// player1UpElement.addEventListener('mouseup', (e) => {
+	// 	e.preventDefault()
+	// 	console.log('mouseup')
+	// 	player1.upKeyPressed = false
+	// })
+
 })
 </script>
 
@@ -279,7 +300,16 @@ onMounted(() => {
         </p>
       </div>
     </div>
-    <canvas class="canvas mx-auto" id="canvasId"></canvas>
+		<div class="canvas-wrapper">
+			<canvas class="canvas mx-auto" id="canvasId"></canvas>
+			<div id="player1Up" class="player1-touch-up"></div>
+			<div class="player1-touch-down"></div>
+			<div class="player2-touch-up"></div>
+			<div class="player2-touch-down"></div>
+			<div v-if="gameStop" class="gamestop">
+				<ButtonComp>restart</ButtonComp>
+			</div>
+		</div>
 
     <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1 mx-auto"
@@ -295,6 +325,46 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.gamestop {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+}
+
+.canvas-wrapper {
+	position: relative;
+}
+
+.player1-touch-up {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 50%;
+	width: 10%;
+}
+.player1-touch-down {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	height: 50%;
+	width: 10%;
+}
+.player2-touch-up {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 50%;
+	width: 10%;
+
+}
+.player2-touch-down {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	height: 50%;
+	width: 10%;
+}
+
 .canvas {
   @media screen and (max-width: 600px) {
     border: 2px solid #f58562;

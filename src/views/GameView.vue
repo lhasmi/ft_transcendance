@@ -32,13 +32,6 @@ const sendTestData = async (player1, player2, score1, score2) => {
       Authorization: `Bearer ${localStorage.getItem('access')}`,
     },
     body: JSON.stringify({
-      // players: [player1, player2],
-      // winner: score1 > score2 ? player1 : player2,
-      // // played_on: '2023-05-20T14:28:23.382Z',
-      // // details: 'Match details here.',
-      // user_score: score1,
-      // opponent_score: score2,
-      //
       player1: player1,
       player2: player2,
       score1: score1,

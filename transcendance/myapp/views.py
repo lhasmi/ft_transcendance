@@ -140,6 +140,17 @@ class OAuth2CallbackAPIView(APIView):
 
             if not email or not login_name:
                 return JsonResponse({'error': 'Failed to obtain user information'}, status=400)
+                        
+            if User.objects.filter(email=email).exists():# Check if the email is already taken
+                return JsonResponse({'error': 'Email is already taken.'}, status=400)
+
+            # Check if the username is already taken, and if so, modify it to make it unique
+            if User.objects.filter(username=login_name).exists():
+                original_login_name = login_name
+                counter = 1
+                while User.objects.filter(username=login_name).exists():
+                    login_name = f"{original_login_name}{counter}"
+                    counter += 1
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:

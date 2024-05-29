@@ -5,8 +5,10 @@ from .views import (
     UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, 
     UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, 
     Enable2FAAPIView, VerifyOTPAPIView, TestEmailView, MyMatchHistoryAPIView,
-    MyMatchViewSet, OAuth2LoginAPIView, OAuth2CallbackAPIView, Disable2FAAPIView
+    MyMatchViewSet, OAuth2LoginAPIView, OAuth2CallbackAPIView, Disable2FAAPIView,
+    VerifyLoginOTPAPIView
 )
+
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
 router.register(r'players', PlayerViewSet) #registering viewsets with the router.
@@ -17,6 +19,7 @@ urlpatterns = [
     path('', include(router.urls)),
 	path('register/', UserRegistrationAPIView.as_view(), name='register'),
     path('login/', UserLoginAPIView.as_view(), name='login'),
+    path('verify-login-otp/', VerifyLoginOTPAPIView.as_view(), name='verify-login-otp'),
     path('update-profile/', UserProfileUpdateAPIView.as_view(), name='update-profile'),
     path('add-friend/', FriendRequestAPIView.as_view(), name='add-friend'),
     path('match-history/', MatchHistoryAPIView.as_view(), name='match-history'),

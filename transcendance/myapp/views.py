@@ -141,20 +141,17 @@ class OAuth2CallbackAPIView(APIView):
             if not email or not login_name:
                 return JsonResponse({'error': 'Failed to obtain user information'}, status=400)
                         
-            if User.objects.filter(email=email).exists():# Check if the email is already taken
-                return JsonResponse({'error': 'Email is already taken.'}, status=400)
-
-            # Check if the username is already taken, and if so, modify it to make it unique
-            if User.objects.filter(username=login_name).exists():
-                return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
-                # original_login_name = login_name
-                # counter = 1
-                # while User.objects.filter(username=login_name).exists():
-                #     login_name = f"{original_login_name}{counter}"
-                #     counter += 1
-            try:
+            try:# Check if user with the email already exists
                 user = User.objects.get(email=email)
-            except User.DoesNotExist:
+                if user.username != login_name:# If user exists, check if the username matches
+                    return JsonResponse({'error': 'Username does not match with the email.'}, status=400)
+            except User.DoesNotExist:# If user does not exist, check if the email is taken
+                if User.objects.filter(email=email).exists():
+                    return JsonResponse({'error': 'Email is already taken.'}, status=400)
+                # Check if the username is taken
+                if User.objects.filter(username=login_name).exists():
+                    return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+                # Create the new user
                 print("auth!!  User.objects.create_user   !!")# Debug
                 user = User.objects.create_user(username=login_name, email=email, password="")
                 user.save()

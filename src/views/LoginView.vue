@@ -174,6 +174,7 @@ onMounted(async () => {
 					// NEED TO GET USERNAME IN CALLBACK RESPONSE
 					renderOtpPrompt.value = true
 					console.log("NEED TO PROMPT OTP CODE")
+					username.value = data.username
 				} else {
 					localStorage.setItem('access', data.access)
 					localStorage.setItem('refresh', data.refresh)

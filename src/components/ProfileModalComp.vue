@@ -44,6 +44,9 @@ const loadData = async () => {
       data.picture = 'http://127.0.0.1:8000' + newData.profile_picture
 			data.two_fa_activated = newData.two_fa_activated
 			data.two_fa_requested = newData.two_fa_requested
+			activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
+			requested2FA.value = data.two_fa_requested ? data.two_fa_requested : false
+
       errorMsg.value = ''
     }
   } catch {
@@ -259,8 +262,9 @@ const verifyOTP = async () => {
 
 onMounted(() => {
   const profileModal = document.getElementById('profileModal')
-  profileModal.addEventListener('show.bs.modal', (e) => {
-    loadData()
+  profileModal.addEventListener('show.bs.modal', async (e) => {
+    await loadData()
+		// activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
   })
   profileModal.addEventListener('hidden.bs.modal', (e) => {
     loader.value = true
@@ -515,7 +519,7 @@ onMounted(() => {
               2FA
           </p>
 					<ButtonComp
-						v-if="data.two_fa_activated || activated2FA"
+						v-if="activated2FA"
             @click="disable2FA"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
           >
@@ -526,9 +530,9 @@ onMounted(() => {
             @click="enable2FA"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
           >
-             {{ data.two_fa_requested || requested2FA ? 'resend code' : 'enable' }}
+             {{ requested2FA ? 'resend code' : 'enable' }}
           </ButtonComp>
-					<div v-if="(data.two_fa_requested && !data.two_fa_activated) || requested2FA" class="col-9 col-md-7 mx-auto d-flex mb-3">
+					<div v-if="requested2FA && !activated2FA" class="col-9 col-md-7 mx-auto d-flex mb-3">
 						<input
 							v-model="otpCode"
 							class="text-input text-white text-center roboto-regular fs-6 me-3"

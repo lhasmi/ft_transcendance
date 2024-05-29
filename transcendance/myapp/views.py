@@ -146,11 +146,12 @@ class OAuth2CallbackAPIView(APIView):
 
             # Check if the username is already taken, and if so, modify it to make it unique
             if User.objects.filter(username=login_name).exists():
-                original_login_name = login_name
-                counter = 1
-                while User.objects.filter(username=login_name).exists():
-                    login_name = f"{original_login_name}{counter}"
-                    counter += 1
+                return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+                # original_login_name = login_name
+                # counter = 1
+                # while User.objects.filter(username=login_name).exists():
+                #     login_name = f"{original_login_name}{counter}"
+                #     counter += 1
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:

@@ -19,8 +19,16 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['id', 'user', 'profile_picture', 'created_at', 'display_name', 'online_status', 'friends']
-        extra_kwargs = {'profile_picture': {'required': False}}
+        fields = [
+            'id', 'user', 'profile_picture', 'created_at', 'display_name', 
+            'online_status', 'friends', 'two_fa_requested', 'two_fa_activated'
+        ]
+        extra_kwargs = {
+            'profile_picture': {'required': False},
+            'two_fa_requested': {'read_only': True},
+            'two_fa_activated': {'read_only': True}#read_only prevents from being 
+            #altered through API endpoints 
+        }
     
     def get_friends(self, obj):
         friends = obj.friends.all()

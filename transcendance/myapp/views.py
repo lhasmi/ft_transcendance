@@ -259,7 +259,7 @@ class VerifyOTPAPIView(APIView):
             print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
             if totp.verify(int(otp)):
                 player.two_fa_activated = True  # Set the 2FA activated flag
-                player.two_fa_requested = False  # Optionally reset the request flag
+                player.two_fa_requested = False  # reset the request flag
                 player.save()
                 print(f"!!!!!!!!Is two_fa_activated verify2? !!!!!!!!!!!: {player.two_fa_activated}") #debug
                 print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug

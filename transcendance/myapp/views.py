@@ -259,6 +259,7 @@ class VerifyOTPAPIView(APIView):
             print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
             if totp.verify(int(otp)):
                 player.two_fa_activated = True  # Set the 2FA activated flag
+                player.two_fa_requested = False  # Optionally reset the request flag
                 player.save()
                 print(f"!!!!!!!!Is two_fa_activated verify2? !!!!!!!!!!!: {player.two_fa_activated}") #debug
                 print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug
@@ -280,6 +281,8 @@ class Enable2FAAPIView(APIView):
         if not player.secret_key:
             player.generate_secret_key()
             player.save()
+        player.two_fa_requested = True 
+        player.save()
         totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
         otp_token = totp.token()
         send_mail(
@@ -289,8 +292,6 @@ class Enable2FAAPIView(APIView):
             [user.email],
             fail_silently=False,
         )
-        player.two_fa_requested = True 
-        player.save()
         return Response({"message": "OTP sent to your email. If you provided a real eamil, you will see it !. Please verify to enable 2FA."}, status=status.HTTP_200_OK)
 
 class Disable2FAAPIView(APIView):
@@ -299,6 +300,7 @@ class Disable2FAAPIView(APIView):
         """
         Disable 2FA for the user.
         """
+        user = request.user
         player = request.user.player
         player.two_fa_requested = False
         player.two_fa_activated = False
@@ -316,7 +318,10 @@ class UserProfileUpdateAPIView(APIView):
         try:
             player = user.player
             serializer = PlayerSerializer(player)
-            return Response(serializer.data)
+            data = serializer.data
+            data['two_fa_requested'] = player.two_fa_requested
+            data['two_fa_activated'] = player.two_fa_activated
+            return Response(data)
         except Player.DoesNotExist:
             return Response({"error": "Player profile does not exist"}, status=status.HTTP_404_NOT_FOUND)
     

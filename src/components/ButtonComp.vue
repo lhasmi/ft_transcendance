@@ -1,14 +1,22 @@
 <script setup>
 const props = defineProps({
   linkTo: String,
-  disabled: Boolean
+  disabled: Boolean,
 })
 </script>
 <template>
-  <button v-if="!linkTo" class="btn btn-primary roboto-bold rounded-4" :disabled="disabled">
+  <button
+    v-if="!linkTo"
+    class="btn btn-primary roboto-bold rounded-4"
+    :disabled="disabled"
+  >
     <slot></slot>
   </button>
-  <RouterLink v-else class="btn btn-primary btn-lg roboto-bold fs-3 rounded-4" :to="linkTo">
+  <RouterLink
+    v-else
+    class="btn btn-primary btn-lg roboto-bold fs-3 rounded-4"
+    :to="linkTo"
+  >
     <slot></slot>
   </RouterLink>
 </template>
@@ -20,6 +28,13 @@ const props = defineProps({
   border: none;
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
   font-weight: 700;
+  /* text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000; */
+  /* -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: rgb(36, 36, 36); */
   font-family: 'Roboto', sans-serif;
   transition: all 0.2s ease;
 }

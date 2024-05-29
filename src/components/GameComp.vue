@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import router from '@/router'
 import { store } from '@/store/store'
 import HelpModalComp from './HelpModalComp.vue'
-import ButtonComp from './ButtonComp.vue';
+import ButtonComp from './ButtonComp.vue'
 
 const props = defineProps({
   isTournament: Boolean,
@@ -16,6 +17,7 @@ const score = ref({
 })
 
 const gameStop = ref(false)
+const gameStart = ref(true)
 
 const emit = defineEmits(['winner', 'results'])
 
@@ -58,7 +60,6 @@ const playerHeight = 100
 const playerSpeed = 3
 const ballSpeed = 2
 const maxScore = 2
-
 
 class Player {
   constructor(x = 0, y = 0) {
@@ -191,67 +192,77 @@ class Game {
     ctx.stroke()
   }
   animate() {
-    if (gameStop.value) return
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    this.#draw()
-    if (score.value.player1 == maxScore || score.value.player2 == maxScore) {
-      gameStop.value = true
-      if (props.isTournament == true) {
-        if (score.value.player1 == maxScore) setWinner(props.player1, props.player2)
-        if (score.value.player2 == maxScore) setWinner(props.player2, props.player1)
-      } else {
-        // 1 vs 1 game => send results to backend
-        emitResults(
-          props.player1,
-          props.player2,
-          score.value.player1,
-          score.value.player2
-        )
+    if (!gameStop.value) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      this.#draw()
+      if (score.value.player1 == maxScore || score.value.player2 == maxScore) {
+        gameStop.value = true
+        if (props.isTournament == true) {
+          if (score.value.player1 == maxScore)
+            setWinner(props.player1, props.player2)
+          if (score.value.player2 == maxScore)
+            setWinner(props.player2, props.player1)
+        } else {
+          // 1 vs 1 game => send results to backend
+          emitResults(
+            props.player1,
+            props.player2,
+            score.value.player1,
+            score.value.player2
+          )
+        }
       }
-    }
-    if (this.startGame) {
-      this.player1.update()
-      this.player2.update()
-      this.ball.update()
-    } else {
-      this.player1.draw()
-      this.player2.draw()
-      this.ball.draw()
+      if (gameStart.value == false) {
+        this.player1.update()
+        this.player2.update()
+        this.ball.update()
+      } else {
+        this.player1.draw()
+        this.player2.draw()
+        this.ball.draw()
+      }
     }
     requestAnimationFrame(this.animate.bind(this))
   }
 }
 
 const handleKeydown = (e) => {
-	if (e.key == 'w') {
-		player1.upKeyPressed = true
-	} else if (e.key == 's') {
-		player1.downKeyPressed = true
-	} else if (e.key == 'ArrowUp') {
-		e.preventDefault()
-		player2.upKeyPressed = true
-	} else if (e.key == 'ArrowDown') {
-		e.preventDefault()
-		player2.downKeyPressed = true
-	}
+  if (e.key == 'w') {
+    player1.upKeyPressed = true
+  } else if (e.key == 's') {
+    player1.downKeyPressed = true
+  } else if (e.key == 'ArrowUp') {
+    e.preventDefault()
+    player2.upKeyPressed = true
+  } else if (e.key == 'ArrowDown') {
+    e.preventDefault()
+    player2.downKeyPressed = true
+  }
 }
 
 const handleKeyup = (e) => {
-	if (e.key == 'w') {
-		player1.upKeyPressed = false
-	} else if (e.key == 's') {
-		player1.downKeyPressed = false
-	} else if (e.key == 'ArrowUp') {
-		player2.upKeyPressed = false
-	} else if (e.key == 'ArrowDown') {
-		player2.downKeyPressed = false
-	} else if (e.key == ' ') {
-		game.startGame = !game.startGame
-	}
+  if (e.key == 'w') {
+    player1.upKeyPressed = false
+  } else if (e.key == 's') {
+    player1.downKeyPressed = false
+  } else if (e.key == 'ArrowUp') {
+    player2.upKeyPressed = false
+  } else if (e.key == 'ArrowDown') {
+    player2.downKeyPressed = false
+  }
+  // else if (e.key == ' ') {
+  //   game.startGame = !game.startGame
+  // }
+}
+
+const restartGame = () => {
+  score.value.player1 = 0
+  score.value.player2 = 0
+  gameStop.value = false
 }
 
 onMounted(() => {
-	if (store.userAuthorised) {
+  if (store.userAuthorised) {
     player1.value = store.username
     player2.value = 'opponent'
   }
@@ -268,20 +279,22 @@ onMounted(() => {
   game = new Game(ctx, player1, player2, ball)
   game.animate()
   addEventListener('keydown', (e) => handleKeydown(e, player1, player2))
-  addEventListener('keyup', (e) => {handleKeyup(e, player1, player2, game)})
+  addEventListener('keyup', (e) => {
+    handleKeyup(e, player1, player2, game)
+  })
+  if (props.isTournament) gameStart.value = false
 
-	// const player1UpElement = document.getElementById('player1Up')
-	// player1UpElement.addEventListener('mousedown', (e) => {
-	// 	e.preventDefault()
-	// 	console.log('mousedown')
-	// 	player1.upKeyPressed = true
-	// })
-	// player1UpElement.addEventListener('mouseup', (e) => {
-	// 	e.preventDefault()
-	// 	console.log('mouseup')
-	// 	player1.upKeyPressed = false
-	// })
-
+  const player1UpElement = document.getElementById('player1Up')
+  player1UpElement.addEventListener('touchstart', (e) => {
+    e.preventDefault()
+    console.log('mousedown')
+    player1.upKeyPressed = true
+  })
+  player1UpElement.addEventListener('touchend', (e) => {
+    e.preventDefault()
+    console.log('mouseup')
+    player1.upKeyPressed = false
+  })
 })
 </script>
 
@@ -300,16 +313,43 @@ onMounted(() => {
         </p>
       </div>
     </div>
-		<div class="canvas-wrapper">
-			<canvas class="canvas mx-auto" id="canvasId"></canvas>
-			<div id="player1Up" class="player1-touch-up"></div>
-			<div class="player1-touch-down"></div>
-			<div class="player2-touch-up"></div>
-			<div class="player2-touch-down"></div>
-			<div v-if="gameStop" class="gamestop">
-				<ButtonComp>restart</ButtonComp>
-			</div>
-		</div>
+    <div class="canvas-wrapper">
+      <canvas class="canvas mx-auto" id="canvasId"></canvas>
+      <div id="player1Up" class="player1-touch-up"></div>
+      <div class="player1-touch-down"></div>
+      <div class="player2-touch-up"></div>
+      <div class="player2-touch-down"></div>
+      <div
+        v-if="gameStart && !props.isTournament"
+        class="gamestop d-flex flex-column justify-content-center align-items-center rounded-4 myshadow friends-modal border-0"
+      >
+        <ButtonComp
+          @click="gameStart = false"
+          class="mb-2 btn-lg"
+          style="width: 120px"
+        >
+          start
+        </ButtonComp>
+      </div>
+      <div
+        v-else-if="gameStop && !props.isTournament"
+        class="gamestop d-flex flex-column justify-content-center align-items-center rounded-4 myshadow friends-modal border-0"
+      >
+        <ButtonComp
+          @click="restartGame"
+          class="mb-2 btn-lg"
+          style="width: 120px"
+        >
+          restart
+        </ButtonComp>
+        <ButtonComp
+          @click="router.push('/')"
+          class="btn-lg"
+          style="width: 120px"
+          >back</ButtonComp
+        >
+      </div>
+    </div>
 
     <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1 mx-auto"
@@ -325,44 +365,61 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.myshadow {
+  box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
+}
+
+.friends-modal {
+  background: linear-gradient(
+    145deg,
+    rgba(60, 26, 153, 0.97) 23%,
+    55%,
+    rgba(92, 42, 132, 0.97) 85%
+  );
+  backdrop-filter: blur(2px);
+}
+
 .gamestop {
-	position: absolute;
-	left: 50%;
-	top: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 140px;
 }
 
 .canvas-wrapper {
-	position: relative;
+  position: relative;
 }
 
 .player1-touch-up {
-	position: absolute;
-	top: 0;
-	left: 0;
-	height: 50%;
-	width: 10%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 50%;
+  width: 10%;
+  background: rgba(255, 0, 0, 0.162);
 }
 .player1-touch-down {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	height: 50%;
-	width: 10%;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 50%;
+  width: 10%;
 }
 .player2-touch-up {
-	position: absolute;
-	top: 0;
-	right: 0;
-	height: 50%;
-	width: 10%;
-
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 50%;
+  width: 10%;
 }
 .player2-touch-down {
-	position: absolute;
-	top: 50%;
-	right: 0;
-	height: 50%;
-	width: 10%;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  height: 50%;
+  width: 10%;
 }
 
 .canvas {

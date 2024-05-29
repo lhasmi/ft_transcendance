@@ -111,8 +111,6 @@ class OAuth2CallbackAPIView(APIView):
                 'client_secret': settings.OAUTH_CLIENT_SECRET,
             }
             token_url = f"{token_url}?grant_type=authorization_code&code={code}&redirect_uri={settings.OAUTH_REDIRECT_URI}&client_id={settings.OAUTH_CLIENT_ID}&client_secret={settings.OAUTH_CLIENT_SECRET}"
-            # print(token_url)
-            # return JsonResponse({'url': token_url, 'data': data})
             response = requests.post(token_url)
             print("auth2!!!")# Debug
             response_data = response.json()
@@ -127,7 +125,6 @@ class OAuth2CallbackAPIView(APIView):
             user_info_response = requests.get(user_info_url, headers=headers)
             print("auth4!!!")# Debug
             user_info = user_info_response.json()
-
             email = user_info.get('email')
             login_name = user_info.get('login')
 
@@ -140,13 +137,28 @@ class OAuth2CallbackAPIView(APIView):
                 print("auth!!  User.objects.create_user   !!")# Debug
                 user = User.objects.create_user(username=login_name, email=email, password="")
                 user.save()
-            login(request, user)
-            jwt_token = RefreshToken.for_user(user)
-            return Response({
-                "message": "User created successfully", 
-                "refresh": str(jwt_token), 
-                "access": str(jwt_token.access_token)
-            }, status=status.HTTP_201_CREATED)
+            if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
+                secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
+                totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
+                otp_token = totp.token()
+                send_mail(
+                    'Your OTP',
+                    f'Your one-time password is {otp_token}. Please enter it to complete your login.',
+                    os.getenv('EMAIL_HOST_USER'), 
+                    [user.email],
+                    fail_silently=False,
+                )
+                return Response({'message': 'OTP sent to your email. Please verify to complete login.',
+                                 'username': login_name
+                }, status=status.HTTP_200_OK)
+            else: # Directly log in the 42user if 2FA is not activated
+                login(request, user)
+                jwt_token = RefreshToken.for_user(user)
+                return Response({
+                    "message": "User created successfully", 
+                    "refresh": str(jwt_token), 
+                    "access": str(jwt_token.access_token)
+                }, status=status.HTTP_201_CREATED)
         return JsonResponse({'error': 'No code provided'}, status=400)
 
 class UserRegistrationAPIView(APIView):

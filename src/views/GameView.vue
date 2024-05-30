@@ -96,7 +96,7 @@ const sendTestData = async (player1, player2, score1, score2) => {
       "
       :isTournament="false"
       :player1="store.userAuthorised ? store.username : 'player1'"
-      player2="player2"
+      :player2="store.userAuthorised ? 'opponent' : 'player2'"
     />
     <!-- <button
       class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"

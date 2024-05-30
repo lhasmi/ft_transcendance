@@ -262,10 +262,10 @@ const restartGame = () => {
 }
 
 onMounted(() => {
-  if (store.userAuthorised) {
-    player1.value = store.username
-    player2.value = 'opponent'
-  }
+  // if (store.userAuthorised) {
+  //   player1.value = store.username
+  //   player2.value = 'opponent'
+  // }
   canvas = document.getElementById('canvasId')
   ctx = canvas.getContext('2d')
   canvas.width = 700
@@ -287,13 +287,38 @@ onMounted(() => {
   const player1UpElement = document.getElementById('player1Up')
   player1UpElement.addEventListener('touchstart', (e) => {
     e.preventDefault()
-    console.log('mousedown')
     player1.upKeyPressed = true
   })
   player1UpElement.addEventListener('touchend', (e) => {
     e.preventDefault()
-    console.log('mouseup')
     player1.upKeyPressed = false
+  })
+  const player1DownElement = document.getElementById('player1Down')
+  player1DownElement.addEventListener('touchstart', (e) => {
+    e.preventDefault()
+    player1.downKeyPressed = true
+  })
+  player1DownElement.addEventListener('touchend', (e) => {
+    e.preventDefault()
+    player1.downKeyPressed = false
+  })
+  const player2UpElement = document.getElementById('player2Up')
+  player2UpElement.addEventListener('touchstart', (e) => {
+    e.preventDefault()
+    player2.upKeyPressed = true
+  })
+  player2UpElement.addEventListener('touchend', (e) => {
+    e.preventDefault()
+    player2.upKeyPressed = false
+  })
+  const player2DownElement = document.getElementById('player2Down')
+  player2DownElement.addEventListener('touchstart', (e) => {
+    e.preventDefault()
+    player2.downKeyPressed = true
+  })
+  player2DownElement.addEventListener('touchend', (e) => {
+    e.preventDefault()
+    player2.downKeyPressed = false
   })
 })
 </script>
@@ -316,9 +341,9 @@ onMounted(() => {
     <div class="canvas-wrapper">
       <canvas class="canvas mx-auto" id="canvasId"></canvas>
       <div id="player1Up" class="player1-touch-up"></div>
-      <div class="player1-touch-down"></div>
-      <div class="player2-touch-up"></div>
-      <div class="player2-touch-down"></div>
+      <div id="player1Down" class="player1-touch-down"></div>
+      <div id="player2Up" class="player2-touch-up"></div>
+      <div id="player2Down" class="player2-touch-down"></div>
       <div
         v-if="gameStart && !props.isTournament"
         class="gamestop d-flex flex-column justify-content-center align-items-center rounded-4 myshadow friends-modal border-0"
@@ -398,7 +423,6 @@ onMounted(() => {
   left: 0;
   height: 50%;
   width: 10%;
-  background: rgba(255, 0, 0, 0.162);
 }
 .player1-touch-down {
   position: absolute;

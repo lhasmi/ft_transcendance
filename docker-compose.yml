@@ -19,7 +19,7 @@ services:
       - static_volume:/app/transcendance/static
       - media_volume:/app/transcendance/media
     env_file:
-      - ./backend/.env
+      - ./backend/transcendance/.env
     expose:
       - 8000
     networks:

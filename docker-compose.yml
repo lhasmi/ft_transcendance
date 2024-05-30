@@ -30,9 +30,9 @@ services:
   db:
     image: postgres:13
     environment:
-      - POSTGRES_DB=djangotrans_db
-      - POSTGRES_USER=lh_db
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -42,7 +42,7 @@ services:
     image: nginx:alpine
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro  # Ensure this line is included
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - static_volume:/app/transcendance/static
       - media_volume:/app/transcendance/media
     ports:

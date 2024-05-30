@@ -1,6 +1,29 @@
 # ft_transcendance
 # see the notion page for detailled logs
 
+### Chosen Modules (7):
+
+# Web
+◦ 1 Major module: Use a Framework as backend.
+◦ 2 Minor module: Use a front-end framework or toolkit.
+◦ 2 Minor module: Use a database for the backend.
+
+# User Management
+◦ 3 Major module: Standard user management, authentication, users across
+tournaments.
+◦ 4 Major module: Implementing a remote authentication.
+
+# Gameplay and user experience
+◦ 5 Minor module: Game Customization Options.
+# Accessibility
+◦ 5 Minor module: Support on all devices.
+
+# Cybersecurity
+◦ 6 Major module: Implement Two-Factor Authentication (2FA) and JWT.
+◦ 7 Minor module: Expanding Browser Compatibility.
+◦ 7 Minor module: Multiple language supports.
+
+
 ### testing the Apis with curl
 # To test the Player list and creation endpoint:
 
@@ -134,14 +157,4 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -node
 pip3 install Werkzeug
 python manage.py runserver_plus --cert-file cert.pem --key-file key.pem
 
-# for Frontend :  
- to handle entering the OTP (one time password) sent via email or SMS during the login process.
 
- example of how the frontend can send data about match results
-
-{
-    "players": ["player1", "player2"],
-    "winner": "player1",
-    "played_on": "2023-05-20T14:28:23.382Z",
-    "details": "Match details here."
-}

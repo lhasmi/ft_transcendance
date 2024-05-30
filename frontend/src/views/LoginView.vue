@@ -14,7 +14,7 @@ const errorMsg = ref('')
 // functions
 const redirectTo42 = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/oauth/login/')
+    const response = await fetch('http://backend:80/oauth/login/')
     if (!response.ok) {
       console.log(response)
       console.log('redirectTo42: bad response')

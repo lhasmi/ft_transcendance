@@ -38,3 +38,5 @@ Twisted==24.3.0
 txaio==23.1.1
 typing_extensions==4.12.0
 zope.interface==6.4.post2
+uvicorn==0.21.1
+gunicorn==20.1.0

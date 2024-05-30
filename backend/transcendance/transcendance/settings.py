@@ -45,8 +45,8 @@ ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost']
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
+        'http://localhost:5173',
+        'http://localhost:80',
 )
 
 ADMIN_MAIL = os.getenv('ADMIN_MAIL', 'default_admin_email@example.com')
@@ -195,10 +195,6 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-        'OPTIONS': {
-            'user_attributes': ('username', 'email', 'first_name', 'last_name'),
-            'max_similarity': 0.7,
-        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',

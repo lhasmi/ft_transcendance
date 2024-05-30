@@ -7,6 +7,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
@@ -44,6 +45,15 @@ def validate_image(image):
         raise DjangoValidationError("The maximum file size that can be uploaded is 2MB")
     if not image.name.endswith(('.png', '.jpg', '.jpeg')):
         raise DjangoValidationError("Only JPEG and PNG files are allowed.")
+
+def validate_user_password(password, user=None):
+    """
+    Validate the password and raise ValidationError if criteria not met.
+    """
+    try:
+        validate_password(password, user=user)
+    except ValidationError as e:
+        raise ValidationError({'password': list(e.messages)})
 
 class PlayerViewSet(viewsets.ModelViewSet):
     """
@@ -111,9 +121,7 @@ class OAuth2CallbackAPIView(APIView):
                 'client_secret': settings.OAUTH_CLIENT_SECRET,
             }
             token_url = f"{token_url}?grant_type=authorization_code&code={code}&redirect_uri={settings.OAUTH_REDIRECT_URI}&client_id={settings.OAUTH_CLIENT_ID}&client_secret={settings.OAUTH_CLIENT_SECRET}"
-            # print(token_url)
-            # return JsonResponse({'url': token_url, 'data': data})
-            response = requests.post(token_url)
+            response = requests.post(token_url, data=data)
             print("auth2!!!")# Debug
             response_data = response.json()
             access_token = response_data.get('access_token')
@@ -127,28 +135,49 @@ class OAuth2CallbackAPIView(APIView):
             user_info_response = requests.get(user_info_url, headers=headers)
             print("auth4!!!")# Debug
             user_info = user_info_response.json()
-
             email = user_info.get('email')
             login_name = user_info.get('login')
 
             if not email or not login_name:
                 return JsonResponse({'error': 'Failed to obtain user information'}, status=400)
-
-            try:
+                        
+            try:# Check if user with the email already exists
                 user = User.objects.get(email=email)
-            except User.DoesNotExist:
+                if user.username != login_name:# If user exists, check if the username matches
+                    return JsonResponse({'error': 'Username does not match with the email.'}, status=400)
+            except User.DoesNotExist:# If user does not exist, check if the email is taken
+                if User.objects.filter(email=email).exists():
+                    return JsonResponse({'error': 'Email is already taken.'}, status=400)
+                # Check if the username is taken
+                if User.objects.filter(username=login_name).exists():
+                    return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+                # Create the new user
                 print("auth!!  User.objects.create_user   !!")# Debug
                 user = User.objects.create_user(username=login_name, email=email, password="")
-                # user.set_unusable_password()
                 user.save()
-            login(request, user)
-            # return JsonResponse({'message': 'User logged in successfully', 'token': access_token})
-            jwt_token = RefreshToken.for_user(user)
-            return Response({
-                "message": "User created successfully", 
-                "refresh": str(jwt_token), 
-                "access": str(jwt_token.access_token)
-            }, status=status.HTTP_201_CREATED)
+            player = getattr(user, 'player', None)
+            if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
+                secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
+                totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
+                otp_token = totp.token()
+                send_mail(
+                    'Your OTP',
+                    f'Your one-time password is {otp_token}. Please enter it to complete your login.',
+                    os.getenv('EMAIL_HOST_USER'), 
+                    [user.email],
+                    fail_silently=False,
+                )
+                return Response({'message': 'OTP sent to your email. Please verify to complete login.',
+                                 'username': login_name
+                                }, status=status.HTTP_200_OK)
+            else: # Directly log in the 42user if 2FA is not activated
+                login(request, user)
+                jwt_token = RefreshToken.for_user(user)
+                return Response({
+                    "message": "User created successfully", 
+                    "refresh": str(jwt_token), 
+                    "access": str(jwt_token.access_token)
+                }, status=status.HTTP_201_CREATED)
         return JsonResponse({'error': 'No code provided'}, status=400)
 
 class UserRegistrationAPIView(APIView):
@@ -164,6 +193,10 @@ class UserRegistrationAPIView(APIView):
             return Response({"error": "Username, password and email are required fields."},
                             status=status.HTTP_400_BAD_REQUEST)
         try:
+            validate_user_password(password)
+        except ValidationError as e:
+            return Response({"error": e.message_dict}, status=status.HTTP_400_BAD_REQUEST)
+        try:
             validate_email(email)
         except DjangoValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -177,7 +210,7 @@ class UserRegistrationAPIView(APIView):
             user.player.save()
         jwt_token = RefreshToken.for_user(user)
         player = getattr(user, 'player', None) #debug
-        print(f"!!!!!!!!Is otp_enabled in register  1 ? !!!!!!!!!!!: {player.otp_enabled}") #debug
+        print(f"!!!!!!!!Is two_fa_activated in register  1 ? !!!!!!!!!!!: {player.two_fa_activated}") #debug
         return Response({
             "message": "User created successfully", 
             "refresh": str(jwt_token), 
@@ -199,12 +232,10 @@ class UserLoginAPIView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             player = getattr(user, 'player', None)
-            print(f"!!!!!!!!Is otp_enabled ? !!!!!!!!!!!: {player.otp_enabled}") #debug
-            if player and player.otp_enabled:  # Check if the player has a set 2Fauth using OTP;
-                print(f"!!!!!!!! YES but WHY?? !!!!!!!!!!!: {player.otp_enabled}") #debug
+            print(f"!!!!!!!!Is two_fa_activated ? !!!!!!!!!!!: {player.two_fa_activated}") #debug
+            if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
                 secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
                 totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
-                print(f"Type of totp login: {type(totp)}")
                 otp_token = totp.token()
                 send_mail(
                     'Your OTP',
@@ -214,7 +245,7 @@ class UserLoginAPIView(APIView):
                     fail_silently=False,
                 )
                 return Response({'message': 'OTP sent to your email. Please verify to complete login.'}, status=status.HTTP_200_OK)
-            else: # Directly log in the user if OTP is not enabled
+            else: # Directly log in the user if 2FA is not activated
                 login(request, user)
                 jwt_token = RefreshToken.for_user(user)
                 return Response({
@@ -224,13 +255,8 @@ class UserLoginAPIView(APIView):
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
 
-# For users with 2FA enabled, the initial login does not complete 
-# authentication process.
-# JWT tokens are not issued in the initial login because the OTP verification 
-# step is pending. Once the OTP is verified, user’s identity is fully confirmed.
-# JWT tokens are issued here because this marks the completion of the authentication process.
-class VerifyOTPAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+class VerifyLoginOTPAPIView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         """
@@ -247,23 +273,60 @@ class VerifyOTPAPIView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
-        print(f"!!!!!!!!Is otp_enabled verify? !!!!!!!!!!!: {player.otp_enabled}") #debug
-        if player and player.otp_enabled:
+        if player and player.two_fa_activated:
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
             totp.time = time.time()
-            print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
             if totp.verify(int(otp)):
                 login(request, user)
                 jwt_token = RefreshToken.for_user(user)
-                print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug
+                print(f" !!!! YEAH !!!!! STOP loggin VERIFICATION NOW !!!!!")  # Debug
                 return Response({
                     'access': str(jwt_token.access_token),
-                    'refresh': str(jwt_token),
+                    'refresh': str(jwt_token)
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({'error': f'Invalid OTP. Please try again or contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({'error': 'OTP setup not found for user'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# JWT tokens are not issued in the initial login because the OTP verification 
+# step is pending. Once the OTP is verified, user’s identity is fully confirmed.
+# JWT tokens are issued here because this marks the completion of the authentication process.
+class VerifyOTPAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]  # only an authenticated person can activate 2FA
+    def post(self, request):
+        """
+        Verify the OTP for completing the 2 FA activation process.
+        """
+        username = request.data.get('username')
+        otp = request.data.get('otp')
+
+        if not username or not otp:
+            return Response({'error': 'Please provide both username and OTP'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        player = getattr(user, 'player', None)
+        print(f"!!!!!!!!Is two_fa_activated verify? !!!!!!!!!!!: {player.two_fa_activated}") #debug
+        print(f"!!!!!!!!Is two_fa_requested verify? !!!!!!!!!!!: {player.two_fa_requested}") #debug
+        if player and player.two_fa_requested :
+            totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
+            totp.time = time.time()
+            print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
+            if totp.verify(int(otp)):
+                player.two_fa_activated = True  # Set the 2FA activated flag
+                player.two_fa_requested = False  # reset the request flag
+                player.save()
+                print(f"!!!!!!!!Is two_fa_activated verify2? !!!!!!!!!!!: {player.two_fa_activated}") #debug
+                print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug
+                return Response({"message": "you have activated 2FA !"}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': f'Invalid OTP. Please contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'error': '2FA not requested or already activated.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class Enable2FAAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -275,8 +338,10 @@ class Enable2FAAPIView(APIView):
         user = request.user
         player = user.player
         if not player.secret_key:
-            player.generate_secret_key() # This will also set otp_enabled to True
+            player.generate_secret_key()
             player.save()
+        player.two_fa_requested = True 
+        player.save()
         totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
         otp_token = totp.token()
         send_mail(
@@ -286,7 +351,22 @@ class Enable2FAAPIView(APIView):
             [user.email],
             fail_silently=False,
         )
-        return Response({"message": "OTP sent to your email. If you provided a real eamil, you will see it !. Please verify to enable 2FA."}, status=status.HTTP_200_OK)
+        return Response({"message": "OTP sent to your email. If you provided a real eamil, you will see it !. Please verify to enable 2FA."}, status=status.HTTP_200_OK)#, "username": login_name
+
+class Disable2FAAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        """
+        Disable 2FA for the user.
+        """
+        user = request.user
+        player = request.user.player
+        player.two_fa_requested = False
+        player.two_fa_activated = False
+        player.secret_key = ''  # clear the secret key
+        player.save()
+        return Response({"message": "Two-factor authentication has been disabled."}, status=status.HTTP_200_OK)
+    
 
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -297,7 +377,10 @@ class UserProfileUpdateAPIView(APIView):
         try:
             player = user.player
             serializer = PlayerSerializer(player)
-            return Response(serializer.data)
+            data = serializer.data
+            data['two_fa_requested'] = player.two_fa_requested
+            data['two_fa_activated'] = player.two_fa_activated
+            return Response(data)
         except Player.DoesNotExist:
             return Response({"error": "Player profile does not exist"}, status=status.HTTP_404_NOT_FOUND)
     
@@ -328,6 +411,10 @@ class UserProfileUpdateAPIView(APIView):
                         return Response({"error": "This email is already in use by another user."}, status=status.HTTP_400_BAD_REQUEST)
                     user.email = email
                 if password:
+                    try:
+                        validate_user_password(password, user=user)
+                    except ValidationError as ve:
+                        return Response({'error': ve.message_dict}, status=status.HTTP_400_BAD_REQUEST)
                     user.set_password(password)
                     user.save()
                     logout(request)  # Log out from all sessions after password change

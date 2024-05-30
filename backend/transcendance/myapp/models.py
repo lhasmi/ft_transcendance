@@ -12,8 +12,9 @@ class Player(models.Model):
     friends = models.ManyToManyField('self', blank=True, symmetrical=True)
     secret_key = models.CharField(max_length=100, blank=True, null=True)  # to store TOTP secret key
     two_fa_method = models.CharField(max_length=10, choices=[('email', 'Email')], default='email')
-    otp_enabled = models.BooleanField(default=False) 
-    
+    two_fa_requested = models.BooleanField(default=False) 
+    two_fa_activated = models.BooleanField(default=False) 
+
     def __str__(self):
         return f"{self.user.username}'s Player Profile"
     def set_online(self):## For status online tracking
@@ -26,9 +27,10 @@ class Player(models.Model):
     def generate_secret_key(self):
         if not self.secret_key:
             self.secret_key = get_random_string(20)
-            self.otp_enabled = True  # Enable OTP when a secret key is generated
             self.save()
 
+    # otp_enabled = models.BooleanField(default=False) 
+# self.otp_enabled = True  # Enable OTP when a secret key is generated
 class Match(models.Model):
     players = models.ManyToManyField(Player, related_name="matches")
     winner = models.ForeignKey(Player, related_name="won_matches", on_delete=models.SET_NULL, null=True)

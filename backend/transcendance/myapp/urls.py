@@ -5,8 +5,10 @@ from .views import (
     UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, 
     UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, 
     Enable2FAAPIView, VerifyOTPAPIView, TestEmailView, MyMatchHistoryAPIView,
-    MyMatchViewSet, OAuth2LoginAPIView, OAuth2CallbackAPIView
+    MyMatchViewSet, OAuth2LoginAPIView, OAuth2CallbackAPIView, Disable2FAAPIView,
+    VerifyLoginOTPAPIView
 )
+
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
 router.register(r'players', PlayerViewSet) #registering viewsets with the router.
@@ -17,6 +19,7 @@ urlpatterns = [
     path('', include(router.urls)),
 	path('register/', UserRegistrationAPIView.as_view(), name='register'),
     path('login/', UserLoginAPIView.as_view(), name='login'),
+    path('verify-login-otp/', VerifyLoginOTPAPIView.as_view(), name='verify-login-otp'),
     path('update-profile/', UserProfileUpdateAPIView.as_view(), name='update-profile'),
     path('add-friend/', FriendRequestAPIView.as_view(), name='add-friend'),
     path('match-history/', MatchHistoryAPIView.as_view(), name='match-history'),
@@ -24,12 +27,10 @@ urlpatterns = [
     path('user-stats/', UserStatsAPIView.as_view(), name='user-stats'),
     path('update-online-status/', UpdateOnlineStatusAPIView.as_view(), name='update-online-status'),
     path('list-friends/', ListFriendsAPIView.as_view(), name='list-friends'),
-    # bellow path MUST stay: is used to enable 2FA for a user by generating a secret key and sending an OTP via email. 
-    # It allows the user to activate 2FA on their account.
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
     path('test-email/', TestEmailView.as_view(), name='test-email'),  # TEST debug
-    
+    path('disable-2fa/', Disable2FAAPIView.as_view(), name='disable-2fa'),
     path('oauth/login/', OAuth2LoginAPIView.as_view(), name='oauth2_login'),
     path('oauth/callback/', OAuth2CallbackAPIView.as_view(), name='oauth2_callback'),
 ]

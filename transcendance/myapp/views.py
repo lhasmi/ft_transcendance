@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Case, When, Value, BooleanField, Q
@@ -148,12 +148,10 @@ class OAuth2CallbackAPIView(APIView):
             except User.DoesNotExist:# If user does not exist, check if the email is taken
                 if User.objects.filter(email=email).exists():
                     return JsonResponse({'error': 'Email is already taken.'}, status=400)
-                # Check if the username is taken
-                if User.objects.filter(username=login_name).exists():
+                if User.objects.filter(username=login_name).exists():# Check if the username is taken
                     return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
-                # Create the new user
                 print("auth!!  User.objects.create_user   !!")# Debug
-                user = User.objects.create_user(username=login_name, email=email, password="")
+                user = User.objects.create_user(username=login_name, email=email, password="") # Create the new user
                 user.save()
             player = getattr(user, 'player', None)
             if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
@@ -194,8 +192,8 @@ class UserRegistrationAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_user_password(password)
-        except ValidationError as e:
-            return Response({"error": e.message_dict}, status=status.HTTP_400_BAD_REQUEST)
+        except DRFValidationError as e:# handle the validation error
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_email(email)
         except DjangoValidationError as e:
@@ -413,8 +411,8 @@ class UserProfileUpdateAPIView(APIView):
                 if password:
                     try:
                         validate_user_password(password, user=user)
-                    except ValidationError as ve:
-                        return Response({'error': ve.message_dict}, status=status.HTTP_400_BAD_REQUEST)
+                    except DRFValidationError as e:# handle the validation error
+                        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                     user.set_password(password)
                     user.save()
                     logout(request)  # Log out from all sessions after password change

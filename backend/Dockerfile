@@ -32,4 +32,5 @@ EXPOSE 8000
 ENV DJANGO_SETTINGS_MODULE=transcendance.settings
 
 # Run Gunicorn with Uvicorn worker for ASGI support
+# RUN python /transcendance/manage.py migrate
 CMD ["gunicorn", "transcendance.asgi:application", "-b", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker"]

@@ -63,7 +63,7 @@ const loadData = async () => {
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(
-      '/api/ƒmy-matches-history/'
+      '/api/my-matches-history/'
     )
     const newData = await response.json()
     if (!response.ok) {

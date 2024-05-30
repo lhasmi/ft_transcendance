@@ -17,9 +17,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - static_volume:/app/transcendance/static
-      - media_volume:/app/transcendance/media
+      - media_volume:/app/media
     env_file:
-      - ./backend/.env
+      - ./backend/transcendance/.env
     expose:
       - 8000
     networks:
@@ -29,14 +29,14 @@ services:
 
   db:
     image: postgres:13
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file:
+      - ./backend/transcendance/.env
+    command: sh -c "echo $POSTGRES_DB && echo $POSTGRES_USER && echo $POSTGRES_PASSWORD && tail -f /dev/null"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+
 
   nginx:
     image: nginx:alpine

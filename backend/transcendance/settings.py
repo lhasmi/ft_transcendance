@@ -41,7 +41,7 @@ OAUTH_REDIRECT_URI = os.getenv('OAUTH_REDIRECT_URI')
 
 # split the ALLOWED_HOSTS string from the .env file into a Python list. 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-ALLOWED_HOSTS=['backend',, '127.0.0.1', 'localhost']
+ALLOWED_HOSTS=['backend', '127.0.0.1', 'localhost']
 
 CORS_ORIGIN_ALLOW_ALL = False
 

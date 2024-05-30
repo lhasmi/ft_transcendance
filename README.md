@@ -4,24 +4,31 @@
 ### Chosen Modules (7):
 
 # Web
-◦ 1 Major module: Use a Framework as backend.
-◦ 2 Minor module: Use a front-end framework or toolkit.
-◦ 2 Minor module: Use a database for the backend.
+◦ 1 Major module: Use a Framework as backend. TESTED
+◦ 2 Minor module: Use a front-end framework or toolkit. TESTED
+◦ 2 Minor module: Use a database for the backend. TESTED
 
 # User Management
 ◦ 3 Major module: Standard user management, authentication, users across
-tournaments.
-◦ 4 Major module: Implementing a remote authentication.
+tournaments.  TESTED
+◦ 4 Major module: Implementing a remote authentication. (42 API) TESTED
 
 # Gameplay and user experience
-◦ 5 Minor module: Game Customization Options.
+◦ 5 Minor module: Game Customization Options. TO BE TESTED
 # Accessibility
-◦ 5 Minor module: Support on all devices.
+◦ 5 Minor module: Support on all devices.   TO BE TESTED
+        Key features and objectives include:
+        ◦Make sure the website is responsive, adapting to different screen sizes and ori-
+        entations, ensuring a consistent user experience on desktops, laptops, tablets,
+        and smartphones.
+        ◦Ensure that users can easily navigate and interact with the website using
+        different input methods, such as touchscreens, keyboards, and mice, depending
+        on the device they are using
 
 # Cybersecurity
-◦ 6 Major module: Implement Two-Factor Authentication (2FA) and JWT.
-◦ 7 Minor module: Expanding Browser Compatibility.
-◦ 7 Minor module: Multiple language supports.
+◦ 6 Major module: Implement Two-Factor Authentication (2FA) and JWT. TESTED
+◦ 7 Minor module: Expanding Browser Compatibility.  TO BE TESTED
+◦ 7 Minor module: Multiple language supports. TESTED
 
 
 ### testing the Apis with curl

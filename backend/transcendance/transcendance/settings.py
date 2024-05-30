@@ -35,13 +35,13 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
 OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
 
-# OAUTH_REDIRECT_URI = 'http://localhost:5173/login/'
 OAUTH_REDIRECT_URI = os.getenv('OAUTH_REDIRECT_URI')
 # ALLOWED_HOSTS = []
 
 # split the ALLOWED_HOSTS string from the .env file into a Python list. 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-ALLOWED_HOSTS=['backend', '127.0.0.1', 'localhost']
+# ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['backend', 'localhost', '127.0.0.1']
 
 CORS_ORIGIN_ALLOW_ALL = False
 
@@ -66,6 +66,7 @@ INSTALLED_APPS = [
 	'myapp',
 	'corsheaders',
     'django_otp', # One-Time Password, it works for few minutes
+    # 'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -227,6 +228,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+# STATIC_URL = '/Users/lailah/transcendance/ft_transcendance/static/'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Default primary key field type

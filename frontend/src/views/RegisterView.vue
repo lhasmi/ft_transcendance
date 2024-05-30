@@ -47,7 +47,7 @@ const submit = async (e) => {
   errorMsg.value = ''
 
   try {
-    const response = await fetch('http://127.0.0.1:8000/register/', {
+    const response = await fetch('/api/register/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const submit = async (e) => {
   }
   if (errorMsg.value != '') return
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const response = await fetchWithJWT('api/update-profile/')
     if (!response.ok) {
       console.log("can't login with existing JWT")
       return
@@ -83,7 +83,7 @@ const submit = async (e) => {
     store.userAuthorised = true
     store.username = data.user.username
     store.email = data.user.email
-    store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+    store.picture = 'api' + data.profile_picture
     console.log('logged in as ' + store.username)
 		connectWithSocket()
     // socket connection to track online status

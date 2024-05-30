@@ -35,12 +35,13 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
 OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
 
-OAUTH_REDIRECT_URI = 'http://localhost:5173/login/'
+OAUTH_REDIRECT_URI = os.getenv('OAUTH_REDIRECT_URI')
 # ALLOWED_HOSTS = []
 
 # split the ALLOWED_HOSTS string from the .env file into a Python list. 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost']
+# ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['backend', 'localhost', '127.0.0.1']
 
 CORS_ORIGIN_ALLOW_ALL = False
 

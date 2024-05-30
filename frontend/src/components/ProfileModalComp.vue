@@ -31,7 +31,7 @@ const loadData = async () => {
   loader.value = true
   try {
     console.log('fetch profile')
-    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const response = await fetchWithJWT('/api/update-profile/')
     const newData = await response.json()
     console.log(newData)
     if (!response.ok) {
@@ -39,7 +39,7 @@ const loadData = async () => {
     } else {
       data.username = newData.user.username
       data.email = newData.user.email
-      data.picture = 'http://127.0.0.1:8000' + newData.profile_picture
+      data.picture = '/api' + newData.profile_picture
       errorMsg.value = ''
     }
   } catch {
@@ -63,7 +63,7 @@ const loadData = async () => {
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(
-      'http://127.0.0.1:8000/my-matches-history/'
+      '/api/ƒmy-matches-history/'
     )
     const newData = await response.json()
     if (!response.ok) {
@@ -117,7 +117,7 @@ const saveChanges = async (e) => {
 
   try {
     const response = await fetchWithJWT(
-      'http://127.0.0.1:8000/update-profile/',
+      '/api/update-profile/',
       'PUT',
       formData
     )
@@ -220,7 +220,7 @@ const getLostAmount = () => {
 const enable2FA = async () => {
   console.log('enable2FA')
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/enable-2fa/', 'POST')
+    const response = await fetchWithJWT('/api/enable-2fa/', 'POST')
     if (!response.ok) {
       console.log('enable 2FA error: ')
       console.log(response)
@@ -239,7 +239,7 @@ const verifyOTP = async () => {
 	console.log("username: " + store.username)
 	console.log("otp code: " + otpCode.value)
   try {
-    const response = await fetchWithJWTJson('http://127.0.0.1:8000/verify-otp/', 'POST', {
+    const response = await fetchWithJWTJson('/api/verify-otp/', 'POST', {
 			username: store.username,
 			otp: otpCode.value
 		})

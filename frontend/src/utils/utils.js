@@ -97,7 +97,7 @@ export const connectWithSocket = () => {
 	let wsProtocol = protocol == 'https' ? 'wss' : 'ws'
 
 	store.socket = new WebSocket(
-		`${wsProtocol}://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
+		`${wsProtocol}://ws/status/?token=${localStorage.getItem('access')}`
 	)
 	store.socket.onopen = () => {
 		console.log(

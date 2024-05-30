@@ -99,7 +99,7 @@ class OAuth2LoginAPIView(APIView):
     def get(self, request):
         auth_url = "https://api.intra.42.fr/oauth/authorize"
         client_id = settings.OAUTH_CLIENT_ID
-        redirect_uri = settings.OAUTH_REDIRECT_URI
+        redirect_uri = 'http://localhost:80/login/'
         scope = "public"
         response_type = "code"
         authorization_url = f"{auth_url}?client_id={client_id}&response_type={response_type}&redirect_uri={redirect_uri}&scope={scope}"

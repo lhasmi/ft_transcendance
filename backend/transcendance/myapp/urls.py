@@ -9,15 +9,14 @@ from .views import (
     VerifyLoginOTPAPIView
 )
 
-
-router = DefaultRouter() #for standard API URL management allowing CRUD
-router.register(r'players', PlayerViewSet) #registering viewsets with the router.
+router = DefaultRouter()
+router.register(r'players', PlayerViewSet)
 router.register(r'games', MatchViewSet)
 router.register(r'my-games', MyMatchViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-	path('register/', UserRegistrationAPIView.as_view(), name='register'),
+    path('register/', UserRegistrationAPIView.as_view(), name='register'),
     path('login/', UserLoginAPIView.as_view(), name='login'),
     path('verify-login-otp/', VerifyLoginOTPAPIView.as_view(), name='verify-login-otp'),
     path('update-profile/', UserProfileUpdateAPIView.as_view(), name='update-profile'),
@@ -29,7 +28,7 @@ urlpatterns = [
     path('list-friends/', ListFriendsAPIView.as_view(), name='list-friends'),
     path('enable-2fa/', Enable2FAAPIView.as_view(), name='enable-2fa'),
     path('verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
-    path('test-email/', TestEmailView.as_view(), name='test-email'),  # TEST debug
+    path('test-email/', TestEmailView.as_view(), name='test-email'),
     path('disable-2fa/', Disable2FAAPIView.as_view(), name='disable-2fa'),
     path('oauth/login/', OAuth2LoginAPIView.as_view(), name='oauth2_login'),
     path('oauth/callback/', OAuth2CallbackAPIView.as_view(), name='oauth2_callback'),

@@ -1,22 +1,35 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.10
+# Use a slim Python image as base
+FROM python:3.10-slim
 
-# Set the working directory inside the container
-WORKDIR /usr/src/app
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt ./
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code to the working directory
+# Copy the rest of the application code
 COPY . .
 
-# Expose the port the app runs on
+# Set the correct work directory to where manage.py is located
+WORKDIR /app/transcendance
+
+# Expose port
 EXPOSE 8000
 
-# Add an entrypoint script
-COPY entrypoint.sh /usr/src/app/entrypoint.sh
-RUN chmod +x /usr/src/app/entrypoint.sh
+# Set Django settings module
+ENV DJANGO_SETTINGS_MODULE=transcendance.settings
 
-# Run the entrypoint script
-CMD ["/usr/src/app/entrypoint.sh"]
+# Run Gunicorn with Uvicorn worker for ASGI support
+CMD ["gunicorn", "transcendance.asgi:application", "-b", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker"]

@@ -33,7 +33,7 @@ const loadFriends = async () => {
   console.log('load friends')
   loader.value = true
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/list-friends/')
+    const response = await fetchWithJWT('api/list-friends/')
     const data = await response.json()
     console.log(data)
     if (!response.ok) {
@@ -53,7 +53,7 @@ const addFriend = async () => {
   }
   try {
     const response = await fetchWithJWTJson(
-      'http://127.0.0.1:8000/add-friend/',
+      'api/add-friend/',
       'POST',
       {
         username: friendToAdd.value,
@@ -84,7 +84,7 @@ const fetchFriendsGames = async (username) => {
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(
-      `http://127.0.0.1:8000/my-matches-history/?target=${username}`
+      `api/my-matches-history/?target=${username}`
     )
     const newData = await response.json()
     if (!response.ok) {

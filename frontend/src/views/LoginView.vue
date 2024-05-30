@@ -14,7 +14,7 @@ const errorMsg = ref('')
 // functions
 const redirectTo42 = async () => {
   try {
-    const response = await fetch('http://backend:80/oauth/login/')
+    const response = await fetch('/api/oauth/login/')
     if (!response.ok) {
       console.log(response)
       console.log('redirectTo42: bad response')
@@ -42,7 +42,7 @@ const submit = async (e) => {
   errorMsg.value = ''
 
   try {
-    const response = await fetch('http://127.0.0.1:8000/login/', {
+    const response = await fetch('/api/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ const submit = async (e) => {
   }
   if (errorMsg.value !== '') return
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const response = await fetchWithJWT('/api/update-profile/')
     if (!response.ok) {
       console.log("can't login with existing JWT")
       return
@@ -82,7 +82,7 @@ const submit = async (e) => {
     store.userAuthorised = true
     store.username = data.user.username
     store.email = data.user.email
-    store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+    store.picture = 'api' + data.profile_picture
     console.log('logged in as ' + store.username)
 		
 		 connectWithSocket()
@@ -106,7 +106,7 @@ onMounted(async () => {
   if (query) { // check if query starts with '?code=' ???
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/oauth/callback/${query}`
+        `api/oauth/callback/${query}`
       )
 			if (!response.ok) {
 				console.log('/oauth/callback/ response not ok: ' + response.status)
@@ -123,7 +123,7 @@ onMounted(async () => {
     }
     try {
       const response = await fetchWithJWT(
-        'http://127.0.0.1:8000/update-profile/'
+        'api/update-profile/'
       )
       if (!response.ok) {
         console.log("can't login with existing JWT")
@@ -133,7 +133,7 @@ onMounted(async () => {
       store.userAuthorised = true
       store.username = data.user.username
       store.email = data.user.email
-      store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+      store.picture = 'api' + data.profile_picture
       console.log('logged in as ' + store.username)
     } catch (error) {
       console.log('catch: ' + error)

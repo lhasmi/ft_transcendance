@@ -8,7 +8,7 @@ const props = defineProps({
   games: Object,
 })
 
-const picture = `http://127.0.0.1:8000${props.data.profile_picture}`
+const picture = `api${props.data.profile_picture}`
 
 // variables
 

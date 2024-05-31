@@ -5,9 +5,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - static_volume:/app/static
-      - media_volume:/app/media
     networks:
       - app-network
 
@@ -42,11 +39,12 @@ services:
     image: nginx:alpine
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro  # Ensure this line is included
-      - static_volume:/app/transcendance/static
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/app/transcendance/staticfiles
       - media_volume:/app/transcendance/media
     ports:
       - "80:80"
+      - "443:443"  # HTTPS port
     depends_on:
       - frontend
       - backend

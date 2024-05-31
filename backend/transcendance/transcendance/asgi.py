@@ -1,9 +1,10 @@
 import os
 import django
+import logging
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
-import logging
+from myapp.middleware import TokenAuthMiddleware
+from myapp.routing import websocket_urlpatterns
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -16,16 +17,12 @@ logging.debug("Django setup completed.")
 django_asgi_app = get_asgi_application()
 logging.debug("ASGI application initialized.")
 
-from myapp.middleware import TokenAuthMiddleware
-from myapp.routing import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": TokenAuthMiddleware(
-        AuthMiddlewareStack(
-            URLRouter(
-                websocket_urlpatterns
-            )
+        URLRouter(
+            websocket_urlpatterns
         )
     ),
 })

@@ -29,7 +29,7 @@ services:
     environment:
       - POSTGRES_DB=djangotrans_db
       - POSTGRES_USER=lh_db
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=lhpwdb
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

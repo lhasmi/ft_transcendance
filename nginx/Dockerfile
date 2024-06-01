@@ -13,7 +13,6 @@ RUN mkdir -p /etc/nginx/certs && \
 
 # Copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY conf.d /etc/nginx/conf.d
 
 # Expose ports
 EXPOSE 80 443

@@ -4,6 +4,8 @@ FROM python:3.10-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+# Set Django settings module relative to the Python module path, not the file system path.
+ENV DJANGO_SETTINGS_MODULE=transcendance.settings
 
 # Install system dependencies
 RUN apt-get update && \
@@ -22,8 +24,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
+
 # Set the correct work directory to where manage.py is located
 WORKDIR /app/transcendance
+
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
@@ -34,8 +38,6 @@ RUN chmod +x /entrypoint.sh
 # Expose port
 EXPOSE 8000
 
-# Set Django settings module
-ENV DJANGO_SETTINGS_MODULE=transcendance.settings
 
 # Use entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]

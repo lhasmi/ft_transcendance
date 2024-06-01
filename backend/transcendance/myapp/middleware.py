@@ -1,24 +1,21 @@
-from channels.db import database_sync_to_async
-from channels.auth import AuthMiddlewareStack
-from channels.middleware import BaseMiddleware
-from django.contrib.auth.models import AnonymousUser
-from django.db import close_old_connections
-from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from jwt import decode as jwt_decode
-from django.conf import settings
-from urllib.parse import parse_qs
-
-from channels.middleware import BaseMiddleware
-from channels.auth import AuthMiddlewareStack
-from rest_framework_simplejwt.tokens import AccessToken
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth import get_user_model
-import urllib.parse
 import logging
+import urllib.parse
+
+from channels.db import database_sync_to_async
+from channels.middleware import BaseMiddleware
+from django.contrib.auth.models import AnonymousUser
+from rest_framework_simplejwt.tokens import AccessToken
+from django.contrib.auth import get_user_model
+
+# from rest_framework_simplejwt.tokens import UntypedToken
+# from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+# from jwt import decode as jwt_decode
+# from django.conf import settings
+# from urllib.parse import parse_qs
+
 
 User = get_user_model()
-logger = logging.getLogger(__name__) # for debug, willp rint statements of what happens
+logger = logging.getLogger(__name__) # for debug, will print statements of what happens
 
 class TokenAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
@@ -43,6 +40,7 @@ class TokenAuthMiddleware(BaseMiddleware):
 
         return await super().__call__(scope, receive, send)
 
+
     @database_sync_to_async
     def get_user(self, user_id):
         try:
@@ -50,6 +48,7 @@ class TokenAuthMiddleware(BaseMiddleware):
         except User.DoesNotExist:
             return AnonymousUser()
 
+from channels.auth import AuthMiddlewareStack
 # AuthMiddlewareStack now uses TokenAuthMiddleware instead of default
 def TokenAuthMiddlewareStack(inner):
     return TokenAuthMiddleware(AuthMiddlewareStack(inner))

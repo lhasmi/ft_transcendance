@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Apply database migrations
-python /usr/src/app/transcendance/manage.py migrate --noinput || true
+python manage.py migrate
 
-# Start the server
-python /usr/src/app/transcendance/manage.py runserver 0.0.0.0:8000
+# Start the Django development server
+exec python manage.py runserver 0.0.0.0:8000

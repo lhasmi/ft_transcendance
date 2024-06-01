@@ -116,13 +116,12 @@ class OAuth2CallbackAPIView(APIView):
             data = {
                 'grant_type': 'authorization_code',
                 'code': code,
-                'redirect_uri': settings.OAUTH_REDIRECT_URI,
+                'redirect_uri': 'http://localhost:80/login/',
                 'client_id': settings.OAUTH_CLIENT_ID,
                 'client_secret': settings.OAUTH_CLIENT_SECRET,
             }
             token_url = f"{token_url}?grant_type=authorization_code&code={code}&redirect_uri={settings.OAUTH_REDIRECT_URI}&client_id={settings.OAUTH_CLIENT_ID}&client_secret={settings.OAUTH_CLIENT_SECRET}"
             response = requests.post(token_url, data=data)
-            print("auth2!!!")# Debug
             response_data = response.json()
             access_token = response_data.get('access_token')
 
@@ -131,9 +130,7 @@ class OAuth2CallbackAPIView(APIView):
 
             user_info_url = 'https://api.intra.42.fr/v2/me'
             headers = {'Authorization': f'Bearer {access_token}'}
-            print("auth3!!!")# Debug
             user_info_response = requests.get(user_info_url, headers=headers)
-            print("auth4!!!")# Debug
             user_info = user_info_response.json()
             email = user_info.get('email')
             login_name = user_info.get('login')

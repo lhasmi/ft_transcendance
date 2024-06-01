@@ -22,6 +22,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Set the correct work directory to where manage.py is located
 WORKDIR /app/transcendance
 
@@ -31,6 +35,5 @@ EXPOSE 8000
 # Set Django settings module
 ENV DJANGO_SETTINGS_MODULE=transcendance.settings
 
-# Run Gunicorn with Uvicorn worker for ASGI support
-# RUN python /transcendance/manage.py migrate
-CMD ["gunicorn", "transcendance.asgi:application", "-b", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker"]
+# Use the entrypoint script to run migrations and start the server
+ENTRYPOINT ["/entrypoint.sh"]

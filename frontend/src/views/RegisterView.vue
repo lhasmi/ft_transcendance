@@ -69,7 +69,7 @@ const submit = async (e) => {
       store.userAuthorised = true
       router.push('/')
     }
-  } catch {
+  } catch {z
     errorMsg.value = 'fetch request failed'
   }
   if (errorMsg.value != '') return

@@ -1,7 +1,16 @@
 #!/bin/sh
 
-# Apply database migrations
-python /usr/src/app/transcendance/manage.py migrate --noinput || true
+# Exit immediately if a command exits with a non-zero status
+set -e
 
-# Start the server
-python /usr/src/app/transcendance/manage.py runserver 0.0.0.0:8000
+# Apply database migrations
+echo "Applying database migrations..."
+python manage.py migrate --noinput || true
+
+# Collect static files
+echo "Collecting static files..."
+python manage.py collectstatic --noinput || true
+
+# Start the application
+echo "Starting server..."
+exec "$@"

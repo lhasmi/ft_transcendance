@@ -221,11 +221,11 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Bellow configuration tells Django to collect static files into the staticfiles dir when collectstatic is run.
+# The STATICFILES_DIRS is used to specify additional locations the static files should be gathered from.
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where collectstatic will place collected files
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # This points to your static directory in the project
-]
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

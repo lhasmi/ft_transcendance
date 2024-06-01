@@ -173,7 +173,12 @@ WSGI_APPLICATION = 'transcendance.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 # HALT: store db credentials in an .env file and then access these from settings.py 
 # for that install python-dotenv, which allows to load env vars from .env file into Django
-
+# Debug print for database settings
+print("Database Name: ", os.getenv('DB_NAME'))
+print("Database User: ", os.getenv('DB_USER'))
+print("Database Password: ", os.getenv('DB_PASSWORD'))
+print("Database Host: ", os.getenv('DB_HOST'))
+print("Database Port: ", os.getenv('DB_PORT'))
 
 DATABASES = {
     'default': {
@@ -181,7 +186,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),  # Default to localhost
+        'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT', '5432'),  # Default to 5432 
     }
 }

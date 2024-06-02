@@ -17,7 +17,7 @@ const canFetchProfile = ref(false)
 // functions
 const redirectTo42 = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/oauth/login/')
+    const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/oauth/login/`)
     if (!response.ok) {
       console.log(response)
       console.log('redirectTo42: bad response')
@@ -33,7 +33,7 @@ const redirectTo42 = async () => {
 
 const submit = async (e) => {
   e.preventDefault()
-	canFetchProfile.value = false
+  canFetchProfile.value = false
 
   if (!username.value) {
     errorMsg.value = getError('usernameEmpty', store.lang)
@@ -46,54 +46,62 @@ const submit = async (e) => {
   errorMsg.value = ''
 
   try {
-    const response = await fetch('http://127.0.0.1:8000/login/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-      }),
-    })
+    const response = await fetch(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/login/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+        }),
+      }
+    )
     if (!response.ok) {
-			console.log("/login/ response not ok: " + response.status)
-			const data = await response.json()
+      console.log('/login/ response not ok: ' + response.status)
+      const data = await response.json()
       errorMsg.value = data.error
     } else {
-			const data = await response.json()
-			console.log(data)
-			if (data.message == 'OTP sent to your email. Please verify to complete login.') {
-				// display an input field for OTP
-				// send request to verify OTP => on success receive the jwt and login the user
-				//                            => on failure display prompt again with button to resend the email
-				renderOtpPrompt.value = true
-				console.log("NEED TO PROMPT OTP CODE")
-			} else {
-				localStorage.setItem('access', data.access)
-				localStorage.setItem('refresh', data.refresh)
-				canFetchProfile.value = true
-			}
+      const data = await response.json()
+      console.log(data)
+      if (
+        data.message ==
+        'OTP sent to your email. Please verify to complete login.'
+      ) {
+        // display an input field for OTP
+        // send request to verify OTP => on success receive the jwt and login the user
+        //                            => on failure display prompt again with button to resend the email
+        renderOtpPrompt.value = true
+        console.log('NEED TO PROMPT OTP CODE')
+      } else {
+        localStorage.setItem('access', data.access)
+        localStorage.setItem('refresh', data.refresh)
+        canFetchProfile.value = true
+      }
     }
   } catch {
     errorMsg.value = 'fetch request failed'
   }
   if (renderOtpPrompt.value) return
-	if (!canFetchProfile.value) return
+  if (!canFetchProfile.value) return
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const response = await fetchWithJWT(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`
+    )
     if (!response.ok) {
       console.log("can't login with existing JWT")
     } else {
-			const data = await response.json()
-			store.userAuthorised = true
-			store.username = data.user.username
-			store.email = data.user.email
-			store.picture = 'http://127.0.0.1:8000' + data.profile_picture
-			console.log('logged in as ' + store.username)
-			router.push('/')	
-			connectWithSocket()
-		}
+      const data = await response.json()
+      store.userAuthorised = true
+      store.username = data.user.username
+      store.email = data.user.email
+      store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
+      console.log('logged in as ' + store.username)
+      router.push('/')
+      connectWithSocket()
+    }
   } catch (error) {
     console.log('catch: ' + error)
   }
@@ -101,53 +109,55 @@ const submit = async (e) => {
 
 const sendOTP = async () => {
   console.log('verify-otp')
-	console.log("username: " + username.value)
-	console.log("otp code: " + otpCode.value)
+  console.log('username: ' + username.value)
+  console.log('otp code: ' + otpCode.value)
 
-	canFetchProfile.value = false
+  canFetchProfile.value = false
   try {
-    const response = await fetch('http://127.0.0.1:8000/verify-login-otp/', {
-			method: 'POST',
-			headers: {
+    const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/verify-login-otp/`, {
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         username: username.value,
         otp: otpCode.value,
       }),
-		})
+    })
     if (!response.ok) {
       console.log('verify-otp error: ')
       console.log(response)
-			const data = await response.json()
-			console.log(data)
-			errorMsg.value = data.error
+      const data = await response.json()
+      console.log(data)
+      errorMsg.value = data.error
     } else {
       const data = await response.json()
       console.log('verify-otp success: ')
       console.log(data)
-			localStorage.setItem('access', data.access)
-			localStorage.setItem('refresh', data.refresh)
-			canFetchProfile.value = true
+      localStorage.setItem('access', data.access)
+      localStorage.setItem('refresh', data.refresh)
+      canFetchProfile.value = true
     }
   } catch (error) {
     console.log('verify-otp fetch error: ' + error)
   }
-	if (!canFetchProfile.value) return
+  if (!canFetchProfile.value) return
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const response = await fetchWithJWT(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`
+    )
     if (!response.ok) {
       console.log("can't login with existing JWT")
     } else {
-			const data = await response.json()
-			store.userAuthorised = true
-			store.username = data.user.username
-			store.email = data.user.email
-			store.picture = 'http://127.0.0.1:8000' + data.profile_picture
-			console.log('logged in as ' + store.username)
-			router.push('/')
-			connectWithSocket()
-		}
+      const data = await response.json()
+      store.userAuthorised = true
+      store.username = data.user.username
+      store.email = data.user.email
+      store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
+      console.log('logged in as ' + store.username)
+      router.push('/')
+      connectWithSocket()
+    }
   } catch (error) {
     console.log('catch: ' + error)
   }
@@ -156,38 +166,42 @@ const sendOTP = async () => {
 onMounted(async () => {
   const query = window.location.search
   query ? console.log('query:' + query) : null
-  if (query) { // check if query starts with '?code=' ???
+  if (query) {
+    // check if query starts with '?code=' ???
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/oauth/callback/${query}`
+        `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/oauth/callback/${query}`
       )
-			if (!response.ok) {
-				console.log('/oauth/callback/ response not ok: ' + response.status)
-				const data = response.json()
-				console.log(data)
-				errorMsg.value = data.error // ???
-			} else {
-				const data = await response.json()
-				console.log("callback")
-				console.log(data)
-				if (data.message == 'OTP sent to your email. Please verify to complete login.') {
-					// NEED TO GET USERNAME IN CALLBACK RESPONSE
-					renderOtpPrompt.value = true
-					console.log("NEED TO PROMPT OTP CODE")
-					username.value = data.username
-				} else {
-					localStorage.setItem('access', data.access)
-					localStorage.setItem('refresh', data.refresh)
-					canFetchProfile.value = true
-				}
-			}
+      if (!response.ok) {
+        console.log('/oauth/callback/ response not ok: ' + response.status)
+        const data = response.json()
+        console.log(data)
+        errorMsg.value = data.error // ???
+      } else {
+        const data = await response.json()
+        console.log('callback')
+        console.log(data)
+        if (
+          data.message ==
+          'OTP sent to your email. Please verify to complete login.'
+        ) {
+          // NEED TO GET USERNAME IN CALLBACK RESPONSE
+          renderOtpPrompt.value = true
+          console.log('NEED TO PROMPT OTP CODE')
+          username.value = data.username
+        } else {
+          localStorage.setItem('access', data.access)
+          localStorage.setItem('refresh', data.refresh)
+          canFetchProfile.value = true
+        }
+      }
     } catch (error) {
       console.log('catch: ' + error)
     }
-		if (!canFetchProfile.value) return
+    if (!canFetchProfile.value) return
     try {
       const response = await fetchWithJWT(
-        'http://127.0.0.1:8000/update-profile/'
+        `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`
       )
       if (!response.ok) {
         console.log("can't login with existing JWT")
@@ -197,10 +211,10 @@ onMounted(async () => {
       store.userAuthorised = true
       store.username = data.user.username
       store.email = data.user.email
-      store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+      store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
       console.log('logged in as ' + store.username)
-			router.push('/')
-			connectWithSocket()
+      router.push('/')
+      connectWithSocket()
     } catch (error) {
       console.log('catch: ' + error)
     }
@@ -216,108 +230,114 @@ onMounted(async () => {
       class="col-11 col-md-8 col-lg-5 col-xl-4 bg-white bg-opacity-10 rounded-4 myshadow d-flex flex-column"
     >
       <div class="d-flex justify-content-center position-relative">
-				<RouterLink to="/" aria-label="back button" class="router-link">
-					<span
-						class="icon-back material-symbols-outlined"
-						style="font-size: 2.6rem"
-						aria-label="back button"
-					>
-						keyboard_backspace
-					</span>
-				</RouterLink>
-					
+        <RouterLink to="/" aria-label="back button" class="router-link">
+          <span
+            class="icon-back material-symbols-outlined"
+            style="font-size: 2.6rem"
+            aria-label="back button"
+          >
+            keyboard_backspace
+          </span>
+        </RouterLink>
+
         <h2 class="text-center roboto-bold my-2">
           {{ getText('login', store.lang) }}
         </h2>
       </div>
       <hr class="splitter col-12 mx-auto m-0 mb-2" />
-			<div v-if="renderOtpPrompt" class="col-11 col-md-8 mx-auto d-flex flex-column">
-				<p class="m-0 mx-auto mb-3 text-center text-white roboto-regular fs-5">otp code has been sent to your email</p>
-				<div class="col-9 mx-auto mb-3">
-					<input
-						v-model="otpCode"
-						class=" text-input text-white text-center roboto-regular fs-6"
-						type="text"
-						id="otpCode"
-						placeholder="otp code"
-					/>
-				</div>
-				<div
-					v-if="errorMsg"
-					class="my-1 fs-6 roboto-bold text-center"
-					style="color: #da4834"
-				>
-					{{ errorMsg }}
-				</div>
-				<ButtonComp
-					@click="sendOTP"
-					class="fs-6 col-9 col-md-7 mx-auto mb-4"
-					style="width: 120px;"
-				>
-					send OTP
-				</ButtonComp>
-			</div>
-			<div v-else class="d-flex flex-column">
-				<form class="d-flex flex-column">
-					<div
-						class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
-					>
-						<input
-							v-model="username"
-							type="text"
-							id="username"
-							:placeholder="getText('username', store.lang)"
-							required
-						/>
-						<span
-							class="icon material-symbols-outlined"
-							style="font-size: 24px; color: white"
-						>
-							person
-						</span>
-					</div>
-					<div
-						class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
-					>
-						<input
-							v-model="password"
-							type="password"
-							id="password"
-							:placeholder="getText('password', store.lang)"
-							required
-						/>
-						<span
-							class="icon material-symbols-outlined"
-							style="font-size: 24px; color: white"
-						>
-							lock
-						</span>
-					</div>
-					<div
-						v-if="errorMsg"
-						class="my-1 fs-6 roboto-bold text-center"
-						style="color: #da4834"
-					>
-						{{ errorMsg }}
-					</div>
-					<ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{
-						getText('login', store.lang)
-					}}</ButtonComp>
-				</form>
-				<p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">or</p>
-				<ButtonComp @click="redirectTo42" class="btn-lg fs-5 col-7 mx-auto">
-					{{ getText('loginWith42', store.lang) }}
-				</ButtonComp>
-				<div
-					class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
-				>
-					{{ getText('dontHaveAcc', store.lang) }}
-					<RouterLink class="register-link roboto-bold" to="/register">{{
-						getText('register', store.lang)
-					}}</RouterLink>
-				</div>
-
-			</div>
+      <div
+        v-if="renderOtpPrompt"
+        class="col-11 col-md-8 mx-auto d-flex flex-column"
+      >
+        <p class="m-0 mx-auto mb-3 text-center text-white roboto-regular fs-5">
+          otp code has been sent to your email
+        </p>
+        <div class="col-9 mx-auto mb-3">
+          <input
+            v-model="otpCode"
+            class="text-input text-white text-center roboto-regular fs-6"
+            type="text"
+            id="otpCode"
+            placeholder="otp code"
+          />
+        </div>
+        <div
+          v-if="errorMsg"
+          class="my-1 fs-6 roboto-bold text-center"
+          style="color: #da4834"
+        >
+          {{ errorMsg }}
+        </div>
+        <ButtonComp
+          @click="sendOTP"
+          class="fs-6 col-9 col-md-7 mx-auto mb-4"
+          style="width: 120px"
+        >
+          send OTP
+        </ButtonComp>
+      </div>
+      <div v-else class="d-flex flex-column">
+        <form class="d-flex flex-column">
+          <div
+            class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
+          >
+            <input
+              v-model="username"
+              type="text"
+              id="username"
+              :placeholder="getText('username', store.lang)"
+              required
+            />
+            <span
+              class="icon material-symbols-outlined"
+              style="font-size: 24px; color: white"
+            >
+              person
+            </span>
+          </div>
+          <div
+            class="input-container col-8 mx-auto mt-4 mb-2 d-flex justify-content-around align-items-center"
+          >
+            <input
+              v-model="password"
+              type="password"
+              id="password"
+              :placeholder="getText('password', store.lang)"
+              required
+            />
+            <span
+              class="icon material-symbols-outlined"
+              style="font-size: 24px; color: white"
+            >
+              lock
+            </span>
+          </div>
+          <div
+            v-if="errorMsg"
+            class="my-1 fs-6 roboto-bold text-center"
+            style="color: #da4834"
+          >
+            {{ errorMsg }}
+          </div>
+          <ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{
+            getText('login', store.lang)
+          }}</ButtonComp>
+        </form>
+        <p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">
+          or
+        </p>
+        <ButtonComp @click="redirectTo42" class="btn-lg fs-5 col-7 mx-auto">
+          {{ getText('loginWith42', store.lang) }}
+        </ButtonComp>
+        <div
+          class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
+        >
+          {{ getText('dontHaveAcc', store.lang) }}
+          <RouterLink class="register-link roboto-bold" to="/register">{{
+            getText('register', store.lang)
+          }}</RouterLink>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -326,7 +346,6 @@ onMounted(async () => {
 .myshadow {
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
 }
-
 
 .router-link {
   position: absolute;
@@ -339,7 +358,7 @@ onMounted(async () => {
   color: #f58562;
 }
 .router-link:focus {
-	color: #f58562;
+  color: #f58562;
 }
 
 .icon-back {
@@ -350,10 +369,10 @@ onMounted(async () => {
   color: #f58562;
 }
 .icon-back:focus {
-	color: #f58562;
+  color: #f58562;
 }
 .router-link:focus .icon-back {
-	color: #f58562;
+  color: #f58562;
 }
 
 h2 {

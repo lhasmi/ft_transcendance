@@ -35,12 +35,13 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
 OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
 
-OAUTH_REDIRECT_URI = 'http://localhost:5173/login/'
+# OAUTH_REDIRECT_URI = 'http://localhost:5173/login/'
+OAUTH_REDIRECT_URI = os.getenv('OAUTH_REDIRECT_URI')
 # ALLOWED_HOSTS = []
 
 # split the ALLOWED_HOSTS string from the .env file into a Python list. 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS=['http://localhost:5173', '127.0.0.1', 'localhost', os.getenv('HOST_IP')]
 
 CORS_ORIGIN_ALLOW_ALL = False
 
@@ -92,12 +93,9 @@ ROOT_URLCONF = 'transcendance.urls'
 ASGI_APPLICATION = 'transcendance.asgi.application'
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
-    },
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
 
 REST_FRAMEWORK = {
@@ -216,7 +214,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # If application needs to support multiple languages or specific time zones, configure accordingly.
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Berlin'
 
 USE_I18N = True
 

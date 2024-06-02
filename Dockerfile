@@ -1,21 +1,22 @@
-FROM node:lts-alpine
-
-# install simple http server for serving static content
-# RUN npm install -g http-server
-
-# make the 'app' folder the current working directory
+FROM node:lts-alpine as build
 WORKDIR /app
-
-# copy both 'package.json' and 'package-lock.json' (if available)
 COPY package*.json ./
-
-# install project dependencies
 RUN npm install
-
-# copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
+ARG VITE_APP_API_URL
+ENV VITE_APP_API_URL=$VITE_APP_API_URL
+RUN npm run build
 
-# build app for production with minification
+FROM nginx:latest
+COPY --from=build /app/dist /bin/www
+# Install OpenSSL to generate SSL certificates
+RUN apt-get update && apt-get install -y openssl
+# Generate self-signed SSL certificates
+RUN mkdir -p /etc/nginx/certs && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/nginx/certs/server.key \
+    -out /etc/nginx/certs/server.crt \
+    -subj "/CN=ft_transcendence"
 
-EXPOSE 5173
-CMD [ "npm", "run", "dev" ]
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+CMD [ "nginx", "-g", "daemon off;" ]

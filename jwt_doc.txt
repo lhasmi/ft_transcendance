@@ -1,0 +1,78 @@
+1. install:
+	pip install djangorestframework-simplejwt
+
+2. settings.py -> REST_FRAMEWORK:
+	replace: 'rest_framework.authentication.TokenAuthentication',
+	with: 'rest_framework_simplejwt.authentication.JWTAuthentication',
+
+3. root urls.py:
+	add import:
+		from rest_framework_simplejwt.views import (
+    	TokenObtainPairView,
+    	TokenRefreshView,
+		)
+	in urlpatters add endpoints:
+		path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+4. settings.py:
+	add import:
+		from datetime import timedelta
+	add simplejwt settings:
+		SIMPLE_JWT = {
+			"ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+			"REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+			"ROTATE_REFRESH_TOKENS": False,
+			"BLACKLIST_AFTER_ROTATION": False,
+			"UPDATE_LAST_LOGIN": False,
+
+			"ALGORITHM": "HS256",
+			"SIGNING_KEY": settings.SECRET_KEY,
+			"VERIFYING_KEY": "",
+			"AUDIENCE": None,
+			"ISSUER": None,
+			"JSON_ENCODER": None,
+			"JWK_URL": None,
+			"LEEWAY": 0,
+
+			"AUTH_HEADER_TYPES": ("Bearer",),
+			"AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+			"USER_ID_FIELD": "id",
+			"USER_ID_CLAIM": "user_id",
+			"USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+			"AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+			"TOKEN_TYPE_CLAIM": "token_type",
+			"TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+			"JTI_CLAIM": "jti",
+
+			"SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+			"SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+			"SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+			"TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+			"TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+			"TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+			"TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+			"SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+			"SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+		}
+
+5. change token creation logic:
+	in myapp/views.py:
+		add import:
+			from rest_framework_simplejwt.tokens import RefreshToken
+	in class UserRegistrationAPIView(APIView):
+		replace: token = Token.objects.get_or_create(user=user)[0].key
+		with: token = RefreshToken.for_user(user)
+
+		replace: return Response({"message": "User created successfully", "token": token}, status=status.HTTP_201_CREATED)
+		with: return Response({"message": "User created successfully", "refresh": str(token), "access": str(token.access_token)}, status=status.HTTP_201_CREATED)
+
+	in class UserLoginAPIView(APIView):
+		replace: token, created = Token.objects.get_or_create(user=user)
+		with: token = RefreshToken.for_user(user)
+
+		replace: return Response({'token': token.key}, status=status.HTTP_200_OK)
+		with: return Response({'access': str(token.access_token), 'refresh': str(token)}, status=status.HTTP_200_OK)

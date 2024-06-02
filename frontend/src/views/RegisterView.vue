@@ -106,7 +106,7 @@ const validateEmail = (str) => {
       class="col-9 col-md-6 col-xl-4 bg-white bg-opacity-10 rounded-4 myshadow d-flex flex-column"
     >
       <div class="d-flex justify-content-center position-relative">
-        <RouterLink to="/">
+        <RouterLink to="/" aria-label="back button" class="router-link">
           <span
             class="icon-back material-symbols-outlined"
             style="font-size: 2.6rem"
@@ -220,14 +220,29 @@ const validateEmail = (str) => {
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
 }
 
-.icon-back {
+.router-link {
   position: absolute;
   top: 0.5rem;
   left: 1rem;
   color: white;
   transition: all 0.2s ease;
 }
-.icon-back:hover {
+.router-link:hover {
+  color: #f58562;
+}
+.router-link:focus {
+  color: #f58562;
+}
+
+.icon-back {
+  color: white;
+  transition: all 0.2s ease;
+}
+.icon-back:hover,
+.icon-back:focus {
+  color: #f58562;
+}
+.router-link:focus .icon-back {
   color: #f58562;
 }
 

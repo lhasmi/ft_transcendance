@@ -365,12 +365,13 @@ onMounted(async () => {
   color: white;
   transition: all 0.2s ease;
 }
-.icon-back:hover {
-  color: #f58562;
-}
+.icon-back:hover,
 .icon-back:focus {
   color: #f58562;
 }
+/* .icon-back:focus {
+  color: #f58562;
+} */
 .router-link:focus .icon-back {
   color: #f58562;
 }

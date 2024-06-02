@@ -357,16 +357,18 @@ onMounted(() => {
             <div
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
             >
-              <label for="picture" class="roboto-bold text-white fs-6"
-                >{{ getText('picture', store.lang) }}:</label
-              >
-              <input
-                @change="changePicture"
-                class="picture-input text-white roboto-regular fs-6 ms-2"
-                type="file"
-                id="picture"
-                accept="image/*"
-              />
+							<div class="picture-selector d-flex align-items-center">
+								<label for="picture" class="roboto-bold text-white fs-6"
+									>{{ getText('picture', store.lang) }}:</label
+								>
+								<input
+									@change="changePicture"
+									class="picture-input text-white roboto-regular fs-6 ms-2"
+									type="file"
+									id="picture"
+									accept="image/*"
+								/>
+							</div>
             </div>
             <div
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
@@ -606,6 +608,18 @@ onMounted(() => {
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
 }
 
+/* .picture-selector:focus-within {
+	.picture-input::-webkit-file-selector-button {
+		border-color: #f58562;
+	}
+} */
+input[type=file]::-webkit-file-upload-button:hover {
+	border-color: #f58562;
+}
+input[type=file]::-webkit-file-upload-button:focus {
+	border-color: #f58562;
+}
+
 .profile-modal {
   background: linear-gradient(
     145deg,
@@ -631,7 +645,8 @@ onMounted(() => {
   color: white;
   transition: all 0.2s ease;
 }
-.icon-close:hover {
+.icon-close:hover,
+.icon-close:focus {
   color: #f58562;
 }
 
@@ -644,7 +659,8 @@ onMounted(() => {
   color: white;
   transition: all 0.2s ease;
 }
-.icon-back:hover {
+.icon-back:hover,
+.icon-back:focus {
   color: #f58562;
 }
 
@@ -674,7 +690,8 @@ onMounted(() => {
   color: white;
   transition: all 0.3s ease;
 }
-.picture-input::file-selector-button:hover {
+.picture-input::file-selector-button:hover,
+.picture-input::file-selector-button:focus {
   border-color: #f58562;
   cursor: pointer;
 }

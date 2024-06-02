@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from django.core.mail import send_mail
 from django.db import transaction
@@ -16,7 +17,6 @@ from django.db.models import Case, When, Value, BooleanField, Q
 from django.shortcuts import get_object_or_404
 from django_otp.oath import TOTP
 from rest_framework import viewsets, status, permissions, filters
-from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -52,8 +52,8 @@ def validate_user_password(password, user=None):
     """
     try:
         validate_password(password, user=user)
-    except ValidationError as e:
-        raise ValidationError({'password': list(e.messages)})
+    except DjangoValidationError as e:
+        raise DjangoValidationError({'password': list(e.messages)})
 
 class PlayerViewSet(viewsets.ModelViewSet):
     """
@@ -192,8 +192,8 @@ class UserRegistrationAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_user_password(password)
-        except DRFValidationError as e:# handle the validation error
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except DjangoValidationError as e:# handle the validation error
+            return Response({'password_error': e}, status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_email(email)
         except DjangoValidationError as e:
@@ -411,8 +411,8 @@ class UserProfileUpdateAPIView(APIView):
                 if password:
                     try:
                         validate_user_password(password, user=user)
-                    except DRFValidationError as e:# handle the validation error
-                        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                    except DjangoValidationError as e:# handle the validation error
+                        return Response({'password_error': e}, status=status.HTTP_400_BAD_REQUEST)
                     user.set_password(password)
                     user.save()
                     logout(request)  # Log out from all sessions after password change

@@ -1,7 +1,7 @@
 import { store } from '../store/store.js'
 
 const refreshAccessToken = async () => {
-  const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}token/refresh/`, {
+  const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/token/refresh/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

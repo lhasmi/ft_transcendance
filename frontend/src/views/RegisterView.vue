@@ -54,7 +54,10 @@ const submit = async (e) => {
     const data = await response.json()
     console.log(data)
     if (!response.ok) {
-      errorMsg.value = data.error
+			if (data.password_error)
+				errorMsg.value = data.password_error[0][1][0]
+			else
+				errorMsg.value = data.error
     } else {
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
@@ -70,7 +73,8 @@ const submit = async (e) => {
       `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`
     )
     if (!response.ok) {
-      console.log("can't login with existing JWT")
+      console.log("couldn't fetch profile data")
+			// logout ???
       return
     }
     const data = await response.json()

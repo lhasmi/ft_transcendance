@@ -1,2 +1,10 @@
 .env
 .DS_Store
+node_modules/
+backend/myapp/__pycache__/
+backend/transcendance/__pycache__/
+backend/media/
+*.log
+*.pot
+*.pyc
+__pycache__

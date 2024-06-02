@@ -324,7 +324,7 @@ onMounted(() => {
       <div id="player2Down" class="player2-touch-down"></div>
       <div
         v-if="gameStart && !props.isTournament"
-        class="gamestop d-flex flex-column justify-content-center align-items-center rounded-4 myshadow friends-modal border-0"
+        class="gamestop d-flex flex-column justify-content-center align-items-center rounded-4 myshadow friends-modal"
       >
         <ButtonComp
           @click="gameStart = false"
@@ -336,7 +336,7 @@ onMounted(() => {
       </div>
       <div
         v-else-if="gameStop && !props.isTournament"
-        class="gamestop d-flex flex-column justify-content-center align-items-center rounded-4 myshadow friends-modal border-0"
+        class="gamestop d-flex flex-column justify-content-center align-items-center rounded-4 myshadow friends-modal"
       >
         <ButtonComp
           @click="restartGame"
@@ -389,6 +389,7 @@ onMounted(() => {
   transform: translate(-50%, -50%);
   width: 220px;
   height: 140px;
+	border: 2px solid #f58562;
 }
 
 .canvas-wrapper {

@@ -65,7 +65,7 @@ const addFriend = async () => {
 }
 
 const getStatusColor = (status) => {
-  if (status == true) return 'background: #66bf6a'
+  if (status >= 1) return 'background: #66bf6a'
   else return 'background: rgba(255, 255, 255, 0.1)'
 }
 

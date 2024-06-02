@@ -123,12 +123,16 @@ const saveChanges = async (e) => {
     const newData = await response.json()
     console.log(newData)
     if (!response.ok) {
-      errorMsg.value = newData.error
-      console.log(newData.error + '!!!')
-      return
+			if (newData.password_error)
+				errorMsg.value = newData.password_error[0][1][0]
+			else
+				errorMsg.value = newData.error
+			return
     } else {
       console.log('profile updated')
-      // update store.username if username changed
+			if (newUsername.value)
+				store.username = newUsername.value
+
     }
   } catch {
     console.log('fetch request failed')

@@ -29,28 +29,6 @@ const setWinner = (winner, loser) => {
   emit('winner', winner, loser)
 }
 
-// const sendGameResult = async () => {
-//   const response = await fetch('http://127.0.0.1:8000/games/', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       Authorization: `Bearer ${localStorage.getItem('access')}`,
-//     },
-//     body: JSON.stringify({
-//       players: ['vpaul', 'admin'],
-//       winner: 'vpaul',
-//       played_on: '2023-05-20T14:28:23.382Z',
-//       details: 'Match details here.',
-//     }),
-//   })
-
-//   const data = await response.json()
-//   console.log(data)
-//   if (!response.ok) {
-//     console.log('error: ' + data.error)
-//   }
-// }
-
 // GAME
 let canvas
 let ctx

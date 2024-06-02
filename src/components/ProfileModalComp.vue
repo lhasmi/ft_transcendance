@@ -33,7 +33,9 @@ const loadData = async () => {
   loader.value = true
   try {
     console.log('fetch profile')
-    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const response = await fetchWithJWT(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`
+    )
     const newData = await response.json()
     console.log(newData)
     if (!response.ok) {
@@ -41,11 +43,11 @@ const loadData = async () => {
     } else {
       data.username = newData.user.username
       data.email = newData.user.email
-      data.picture = 'http://127.0.0.1:8000' + newData.profile_picture
-			data.two_fa_activated = newData.two_fa_activated
-			data.two_fa_requested = newData.two_fa_requested
-			activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
-			requested2FA.value = data.two_fa_requested ? data.two_fa_requested : false
+      data.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + newData.profile_picture
+      data.two_fa_activated = newData.two_fa_activated
+      data.two_fa_requested = newData.two_fa_requested
+      activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
+      requested2FA.value = data.two_fa_requested ? data.two_fa_requested : false
 
       errorMsg.value = ''
     }
@@ -58,7 +60,7 @@ const loadData = async () => {
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(
-      'http://127.0.0.1:8000/my-matches-history/'
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/my-matches-history/`
     )
     const newData = await response.json()
     if (!response.ok) {
@@ -114,7 +116,7 @@ const saveChanges = async (e) => {
 
   try {
     const response = await fetchWithJWT(
-      'http://127.0.0.1:8000/update-profile/',
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`,
       'PUT',
       formData
     )
@@ -126,6 +128,7 @@ const saveChanges = async (e) => {
       return
     } else {
       console.log('profile updated')
+      // update store.username if username changed
     }
   } catch {
     console.log('fetch request failed')
@@ -209,7 +212,10 @@ const getLostAmount = () => {
 const enable2FA = async () => {
   console.log('enable2FA')
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/enable-2fa/', 'POST')
+    const response = await fetchWithJWT(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/enable-2fa/`,
+      'POST'
+    )
     if (!response.ok) {
       console.log('enable 2FA error: ')
       console.log(response)
@@ -217,7 +223,7 @@ const enable2FA = async () => {
       const data = await response.json()
       console.log('enable 2FA success: ')
       console.log(data)
-			requested2FA.value = true
+      requested2FA.value = true
     }
   } catch (error) {
     console.log('enable 2FA fetch error: ' + error)
@@ -225,26 +231,33 @@ const enable2FA = async () => {
 }
 
 const disable2FA = async () => {
-	const response = await fetchWithJWT('http://127.0.0.1:8000/disable-2fa/', 'POST')
-	const data = await response.json()
-	if (!response.ok) {
-		console.log('/disable-2fa/ response not ok: ' + response.status)
-	} else {
-		console.log(data)
-		activated2FA.value = false
-		requested2FA.value = false
-	}
+  const response = await fetchWithJWT(
+    `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/disable-2fa/`,
+    'POST'
+  )
+  const data = await response.json()
+  if (!response.ok) {
+    console.log('/disable-2fa/ response not ok: ' + response.status)
+  } else {
+    console.log(data)
+    activated2FA.value = false
+    requested2FA.value = false
+  }
 }
 
 const verifyOTP = async () => {
   console.log('verify-otp')
-	console.log("username: " + store.username)
-	console.log("otp code: " + otpCode.value)
+  console.log('username: ' + store.username)
+  console.log('otp code: ' + otpCode.value)
   try {
-    const response = await fetchWithJWTJson('http://127.0.0.1:8000/verify-otp/', 'POST', {
-			username: store.username,
-			otp: otpCode.value
-		})
+    const response = await fetchWithJWTJson(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/verify-otp/`,
+      'POST',
+      {
+        username: store.username,
+        otp: otpCode.value,
+      }
+    )
     if (!response.ok) {
       console.log('verify-otp error: ')
       console.log(response)
@@ -252,8 +265,8 @@ const verifyOTP = async () => {
       const data = await response.json()
       console.log('verify-otp success: ')
       console.log(data)
-			requested2FA.value = false
-			activated2FA.value = true
+      requested2FA.value = false
+      activated2FA.value = true
     }
   } catch (error) {
     console.log('verify-otp fetch error: ' + error)
@@ -264,7 +277,7 @@ onMounted(() => {
   const profileModal = document.getElementById('profileModal')
   profileModal.addEventListener('show.bs.modal', async (e) => {
     await loadData()
-		// activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
+    // activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
   })
   profileModal.addEventListener('hidden.bs.modal', (e) => {
     loader.value = true
@@ -335,14 +348,6 @@ onMounted(() => {
               id="profile_img"
               class="profile-img my-2 mx-auto rounded-4"
             />
-            <!--             
-						<img
-              src="../assets/profile_img.png"
-              alt="profile image"
-              id="profile_img"
-              class="profile-img my-2 mx-auto rounded-4"
-            />
-						 -->
           </div>
           <form action="">
             <div
@@ -509,45 +514,48 @@ onMounted(() => {
           >
             {{ getText('editProfile', store.lang) }}
           </ButtonComp>
-					
-					<hr class="splitter col-12 mx-auto m-0" />
-					<p
-              class="fs-5 my-2 mx-auto roboto-bold"
-              style="color: #f58562"
-              id="profileModalLabel"
+
+          <hr class="splitter col-12 mx-auto m-0" />
+          <p
+            class="fs-5 my-2 mx-auto roboto-bold"
+            style="color: #f58562"
+            id="profileModalLabel"
           >
-              2FA
+            2FA
           </p>
-					<ButtonComp
-						v-if="activated2FA"
+          <ButtonComp
+            v-if="activated2FA"
             @click="disable2FA"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
           >
             disable
           </ButtonComp>
           <ButtonComp
-						v-else
+            v-else
             @click="enable2FA"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
           >
-             {{ requested2FA ? 'resend code' : 'enable' }}
+            {{ requested2FA ? 'resend code' : 'enable' }}
           </ButtonComp>
-					<div v-if="requested2FA && !activated2FA" class="col-9 col-md-7 mx-auto d-flex mb-3">
-						<input
-							v-model="otpCode"
-							class="text-input text-white text-center roboto-regular fs-6 me-3"
-							type="text"
-							id="otpCode"
-							placeholder="otp code"
-						/>
-						<ButtonComp
-							@click="verifyOTP"
-							class="fs-6 col-9 col-md-7 mx-auto"
-							style="width: 120px;"
-						>
-							verify OTP
-						</ButtonComp>
-					</div>
+          <div
+            v-if="requested2FA && !activated2FA"
+            class="col-9 col-md-7 mx-auto d-flex mb-3"
+          >
+            <input
+              v-model="otpCode"
+              class="text-input text-white text-center roboto-regular fs-6 me-3"
+              type="text"
+              id="otpCode"
+              placeholder="otp code"
+            />
+            <ButtonComp
+              @click="verifyOTP"
+              class="fs-6 col-9 col-md-7 mx-auto"
+              style="width: 120px"
+            >
+              verify OTP
+            </ButtonComp>
+          </div>
           <hr class="splitter col-12 mx-auto m-0" />
           <div
             class="col-9 col-md-7 d-flex justify-content-around my-3 mx-auto roboto-bold mb-2 mb-md-3 text-white"

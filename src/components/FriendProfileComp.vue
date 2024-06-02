@@ -8,7 +8,7 @@ const props = defineProps({
   games: Object,
 })
 
-const picture = `http://127.0.0.1:8000${props.data.profile_picture}`
+const picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}${props.data.profile_picture}`
 
 // variables
 
@@ -16,15 +16,6 @@ const picture = `http://127.0.0.1:8000${props.data.profile_picture}`
 const getStatusColor = (status) => {
   if (status == true) return 'background: #66bf6a'
   else return 'background: rgba(255, 255, 255, 0.1)'
-}
-
-const getCircleColor = (index) => {
-  if (index >= props.data.gamesHistory.length)
-    return 'background: rgba(255, 255, 255, 0.1)'
-  return props.data.gamesHistory[index].score1 >
-    props.data.gamesHistory[index].score2
-    ? 'background: #66bf6a'
-    : 'background: #da4834'
 }
 
 // 2024-05-24T23:48:49.479760
@@ -100,18 +91,6 @@ onMounted(() => {
         <p class="text-center text-white m-0">{{ getLostAmount() }}</p>
       </div>
     </div>
-    <!-- <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">
-      {{ getText('lastGames', store.lang) }}
-    </h2> -->
-    <!-- <div
-      class="last_games_circles d-flex col-9 col-md-7 mx-auto justify-content-around mb-3"
-    >
-      <div class="circle" :style="getCircleColor(4)"></div>
-      <div class="circle" :style="getCircleColor(3)"></div>
-      <div class="circle" :style="getCircleColor(2)"></div>
-      <div class="circle" :style="getCircleColor(1)"></div>
-      <div class="circle" :style="getCircleColor(0)"></div>
-    </div> -->
     <hr class="splitter col-12 mx-auto m-0 mt-3" />
     <h2 class="fs-3 my-3 mx-auto roboto-bold" style="color: #f58562">
       {{ getText('gamesHistory', store.lang) }}

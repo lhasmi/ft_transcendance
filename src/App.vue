@@ -10,7 +10,7 @@ onMounted(async () => {
     if (localStorage.getItem('access') && localStorage.getItem('refresh')) {
       console.log('try to login...')
       const response = await fetchWithJWT(
-        'http://127.0.0.1:8000/update-profile/'
+        `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`
       )
       if (!response.ok) {
         console.log("can't login with existing JWT")
@@ -20,18 +20,9 @@ onMounted(async () => {
       store.userAuthorised = true
       store.username = data.user.username
       store.email = data.user.email
-      store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+      store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
       console.log('logged in as ' + store.username)
-			connectWithSocket()
-      // socket connection to track online status
-      // store.socket = new WebSocket(
-      //   `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
-      // )
-      // store.socket.onopen = () => {
-      //   console.log(
-      //     'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
-      //   )
-      // }
+      connectWithSocket()
     }
   } catch (error) {
     console.log(error)

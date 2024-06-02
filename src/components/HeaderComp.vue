@@ -11,18 +11,6 @@ import { getText } from '../language/language.js'
 const language = ref('')
 
 // functions
-// const logout = () => {
-//   localStorage.removeItem('access')
-//   localStorage.removeItem('refresh')
-//   localStorage.removeItem('lang')
-//   store.userAuthorised = false
-//   store.username = ''
-//   store.email = ''
-//   store.picture = ''
-//   store.socket.close()
-//   store.socket = null
-// }
-
 const toggleLanguage = () => {
   const languages = ['en', 'de', 'ru']
   const index = languages.indexOf(language.value)

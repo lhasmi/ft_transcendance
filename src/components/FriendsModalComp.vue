@@ -6,17 +6,6 @@ import ButtonComp from './ButtonComp.vue'
 import FriendProfileComp from './FriendProfileComp.vue'
 import { fetchWithJWT, fetchWithJWTJson } from '@/utils/utils.js'
 
-// test data
-let data = {
-  friends: [
-    { id: 1, username: 'friend1', status: 'online' },
-    { id: 2, username: 'friend2', status: 'online' },
-    { id: 3, username: 'friend3', status: 'offline' },
-    { id: 4, username: 'friend4', status: 'online' },
-    { id: 5, username: 'friend5', status: 'offline' },
-  ],
-}
-
 let friendsData
 let friendData
 let friendGamesHistory
@@ -33,7 +22,7 @@ const loadFriends = async () => {
   console.log('load friends')
   loader.value = true
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/list-friends/')
+    const response = await fetchWithJWT(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/list-friends/`)
     const data = await response.json()
     console.log(data)
     if (!response.ok) {
@@ -53,7 +42,7 @@ const addFriend = async () => {
   }
   try {
     const response = await fetchWithJWTJson(
-      'http://127.0.0.1:8000/add-friend/',
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/add-friend/`,
       'POST',
       {
         username: friendToAdd.value,
@@ -84,7 +73,7 @@ const fetchFriendsGames = async (username) => {
   try {
     console.log('fetch games history')
     const response = await fetchWithJWT(
-      `http://127.0.0.1:8000/my-matches-history/?target=${username}`
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/my-matches-history/?target=${username}`
     )
     const newData = await response.json()
     if (!response.ok) {
@@ -121,12 +110,10 @@ onMounted(() => {
   const friendsModal = document.getElementById('friendsModal')
   friendsModal.addEventListener('show.bs.modal', (e) => {
     loadFriends()
-    // addFriend('test')
   })
   friendsModal.addEventListener('hidden.bs.modal', (e) => {
     loader.value = true
     backFriendsModal()
-    // abort fetch if its still ongoing
   })
 })
 </script>

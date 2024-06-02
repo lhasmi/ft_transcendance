@@ -13,17 +13,10 @@ const password = ref('')
 const password2 = ref('')
 const errorMsg = ref('')
 
-// TODO backend (UserRegistrationAPIView):
-// add a rule for username min-length and max-length ?
-// add a rule for password min-lenght and max-length ?
-// check that email is in correct format
-// check that email is not already used
-
 // funcions
 const submit = async (e) => {
   e.preventDefault()
   // client side validation
-  // TODO: check username format and password format ???
   if (!username.value) {
     errorMsg.value = getError('usernameEmpty', store.lang)
     return
@@ -47,7 +40,7 @@ const submit = async (e) => {
   errorMsg.value = ''
 
   try {
-    const response = await fetch('http://127.0.0.1:8000/register/', {
+    const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/register/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,7 +56,6 @@ const submit = async (e) => {
     if (!response.ok) {
       errorMsg.value = data.error
     } else {
-      // store token, set userAuthorised to true, route to HomeView
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
       store.userAuthorised = true
@@ -74,7 +66,9 @@ const submit = async (e) => {
   }
   if (errorMsg.value != '') return
   try {
-    const response = await fetchWithJWT('http://127.0.0.1:8000/update-profile/')
+    const response = await fetchWithJWT(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/update-profile/`
+    )
     if (!response.ok) {
       console.log("can't login with existing JWT")
       return
@@ -83,18 +77,9 @@ const submit = async (e) => {
     store.userAuthorised = true
     store.username = data.user.username
     store.email = data.user.email
-    store.picture = 'http://127.0.0.1:8000' + data.profile_picture
+    store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
     console.log('logged in as ' + store.username)
-		connectWithSocket()
-    // socket connection to track online status
-    // store.socket = new WebSocket(
-    //   `ws://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
-    // )
-    // store.socket.onopen = () => {
-    //   console.log(
-    //     'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
-    //   )
-    // }
+    connectWithSocket()
   } catch (error) {
     console.log('catch: ' + error)
   }

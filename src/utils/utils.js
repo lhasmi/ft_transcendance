@@ -1,7 +1,7 @@
 import { store } from '../store/store.js'
 
 const refreshAccessToken = async () => {
-  const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+  const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}token/refresh/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -94,10 +94,10 @@ export const logout = () => {
 export const connectWithSocket = () => {
 	// socket connection to track online status
 	let protocol = window.location.protocol
-	let wsProtocol = protocol == 'https' ? 'wss' : 'ws'
+	let wsProtocol = protocol == 'https:' ? 'wss:' : 'ws:'
 
 	store.socket = new WebSocket(
-		`${wsProtocol}://localhost:8000/ws/status/?token=${localStorage.getItem('access')}`
+		`${wsProtocol}//${import.meta.env.VITE_APP_API_URL}/ws/status/?token=${localStorage.getItem('access')}`
 	)
 	store.socket.onopen = () => {
 		console.log(

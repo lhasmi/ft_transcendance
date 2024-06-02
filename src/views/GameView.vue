@@ -25,7 +25,7 @@ const handleFinishedMatch = async (player1, player2, score1, score2) => {
 }
 
 const sendTestData = async (player1, player2, score1, score2) => {
-  const response = await fetch('http://127.0.0.1:8000/my-games/', {
+  const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/my-games/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -98,48 +98,6 @@ const sendTestData = async (player1, player2, score1, score2) => {
       :player1="store.userAuthorised ? store.username : 'player1'"
       :player2="store.userAuthorised ? 'opponent' : 'player2'"
     />
-    <!-- <button
-      class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1"
-      style="width: 64px; height: 64px"
-      data-bs-toggle="modal"
-      data-bs-target="#helpModal"
-    >
-      ?
-    </button> -->
-
-    <!-- Modal -->
-    <!-- <div
-      class="modal fade"
-      id="helpModal"
-      tabindex="-1"
-      aria-labelledby="helpModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="helpModalLabel">Modal title</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">...</div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div> -->
   </section>
 </template>
 
@@ -155,37 +113,6 @@ const sendTestData = async (player1, player2, score1, score2) => {
   border-right: none;
   border-left: none;
 }
-
-/* .btn-primary {
-  --bs-btn-active-color: #f58562;
-  --bs-btn-active-bg: rgba(255, 255, 255, 0.1);
-  background-color: var(--bs-btn-active-bg);
-  border: none;
-  box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
-  font-weight: 700;
-  font-family: 'Roboto', sans-serif;
-  transition: all 0.2s ease;
-}
-.btn-primary:hover,
-.btn-primary:active {
-  color: #f58562;
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translate(2px, -2px);
-  box-shadow: -8px 8px 8px 0px rgba(0, 0, 0, 0.25);
-}
-
-.btn-primary:disabled {
-  --bs-btn-active-color: rgba(255, 255, 255, 0.5);
-  --bs-btn-active-bg: rgba(255, 255, 255, 0.07);
-  position: relative;
-  color: var(--bs-btn-active-color);
-  background-color: var(--bs-btn-active-bg);
-  pointer-events: all;
-}
-.btn-primary:hover:disabled {
-  transform: none;
-  box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
-} */
 
 /* test */
 .test-form {

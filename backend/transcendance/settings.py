@@ -65,7 +65,6 @@ INSTALLED_APPS = [
 	'myapp',
 	'corsheaders',
     'django_otp', # One-Time Password, it works for few minutes
-    # 'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -165,14 +164,16 @@ TEMPLATES = [
     },
 ]
 
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 WSGI_APPLICATION = 'transcendance.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-# HALT: store db credentials in an .env file and then access these from settings.py 
-# for that install python-dotenv, which allows to load env vars from .env file into Django
-
 
 DATABASES = {
     'default': {
@@ -180,8 +181,8 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),  # Default to localhost
-        'PORT': os.getenv('DB_PORT', '5432'),  # Default to 5432 
+        'HOST': os.getenv('DB_HOST'), 
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -211,7 +212,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-# If application needs to support multiple languages or specific time zones, configure accordingly.
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Europe/Berlin'
@@ -224,13 +224,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-# STATIC_URL = '/Users/lailah/transcendance/ft_transcendance/static/'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

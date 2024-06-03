@@ -122,7 +122,6 @@ class OAuth2CallbackAPIView(APIView):
             }
             token_url = f"{token_url}?grant_type=authorization_code&code={code}&redirect_uri={settings.OAUTH_REDIRECT_URI}&client_id={settings.OAUTH_CLIENT_ID}&client_secret={settings.OAUTH_CLIENT_SECRET}"
             response = requests.post(token_url, data=data)
-            print("auth2!!!")# Debug
             response_data = response.json()
             access_token = response_data.get('access_token')
 
@@ -131,9 +130,7 @@ class OAuth2CallbackAPIView(APIView):
 
             user_info_url = 'https://api.intra.42.fr/v2/me'
             headers = {'Authorization': f'Bearer {access_token}'}
-            print("auth3!!!")# Debug
             user_info_response = requests.get(user_info_url, headers=headers)
-            print("auth4!!!")# Debug
             user_info = user_info_response.json()
             email = user_info.get('email')
             login_name = user_info.get('login')
@@ -150,7 +147,6 @@ class OAuth2CallbackAPIView(APIView):
                     return JsonResponse({'error': 'Email is already taken.'}, status=400)
                 if User.objects.filter(username=login_name).exists():# Check if the username is taken
                     return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
-                print("auth!!  User.objects.create_user   !!")# Debug
                 user = User.objects.create_user(username=login_name, email=email, password="") # Create the new user
                 user.save()
             player = getattr(user, 'player', None)
@@ -190,6 +186,9 @@ class UserRegistrationAPIView(APIView):
         if not username or not password or not email:
             return Response({"error": "Username, password and email are required fields."},
                             status=status.HTTP_400_BAD_REQUEST)
+        if username.lower() == "opponent":  # Check if username is "opponent"
+            return Response({"error": "The username 'opponent' is reserved and cannot be used."},
+                            status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_user_password(password)
         except DjangoValidationError as e:# handle the validation error
@@ -208,7 +207,6 @@ class UserRegistrationAPIView(APIView):
             user.player.save()
         jwt_token = RefreshToken.for_user(user)
         player = getattr(user, 'player', None) #debug
-        print(f"!!!!!!!!Is two_fa_activated in register  1 ? !!!!!!!!!!!: {player.two_fa_activated}") #debug
         return Response({
             "message": "User created successfully", 
             "refresh": str(jwt_token), 
@@ -230,7 +228,6 @@ class UserLoginAPIView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             player = getattr(user, 'player', None)
-            print(f"!!!!!!!!Is two_fa_activated ? !!!!!!!!!!!: {player.two_fa_activated}") #debug
             if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
                 secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
                 totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
@@ -308,18 +305,13 @@ class VerifyOTPAPIView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
-        print(f"!!!!!!!!Is two_fa_activated verify? !!!!!!!!!!!: {player.two_fa_activated}") #debug
-        print(f"!!!!!!!!Is two_fa_requested verify? !!!!!!!!!!!: {player.two_fa_requested}") #debug
         if player and player.two_fa_requested :
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
             totp.time = time.time()
-            print(f"Expected OTP: {totp.token()}")  # Debug: Log the expected OTP
             if totp.verify(int(otp)):
                 player.two_fa_activated = True  # Set the 2FA activated flag
                 player.two_fa_requested = False  # reset the request flag
                 player.save()
-                print(f"!!!!!!!!Is two_fa_activated verify2? !!!!!!!!!!!: {player.two_fa_activated}") #debug
-                print(f" !!!! YEAH !!!!! STOP VERIFICATION NOW !!!!!")  # Debug
                 return Response({"message": "you have activated 2FA !"}, status=status.HTTP_200_OK)
             else:
                 return Response({'error': f'Invalid OTP. Please contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -384,6 +376,7 @@ class UserProfileUpdateAPIView(APIView):
     
     def put(self, request, *args, **kwargs):
         user = request.user
+        old_username = user.username # store old username
         try:
             player = user.player  # Accessing the Player model of this User
         except Player.DoesNotExist:
@@ -397,9 +390,17 @@ class UserProfileUpdateAPIView(APIView):
         try:
             with transaction.atomic(): # changes to DB are rolled back if any part fails
                 if username and username != user.username:
+                    if username.lower() == "opponent":  # Check if username is "opponent"
+                        return Response({"error": "The username 'opponent' is reserved and cannot be used."},
+                                status=status.HTTP_400_BAD_REQUEST)
                     if User.objects.filter(username=username).exists():
                         return Response({"error": "This username is already taken."}, status=status.HTTP_400_BAD_REQUEST)
                     user.username = username
+                    user.save()
+                    # Update games history for the new username
+                    MyMatch.objects.filter(player1=old_username).update(player1=username)
+                    MyMatch.objects.filter(player2=old_username).update(player2=username)
+                
                 if email and email != user.email:
                     try:
                         validate_email(email)  # Validate email format

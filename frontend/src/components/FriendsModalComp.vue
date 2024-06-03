@@ -22,7 +22,9 @@ const loadFriends = async () => {
   console.log('load friends')
   loader.value = true
   try {
-    const response = await fetchWithJWT(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/list-friends/`)
+    const response = await fetchWithJWT(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/list-friends/`
+    )
     const data = await response.json()
     console.log(data)
     if (!response.ok) {
@@ -140,6 +142,7 @@ onMounted(() => {
               "
               type="button"
               class="icon-back"
+              aria-label="back button"
             >
               <span class="material-symbols-outlined" style="font-size: 2.5rem">
                 keyboard_backspace
@@ -156,7 +159,7 @@ onMounted(() => {
               type="button"
               class="icon-close"
               data-bs-dismiss="modal"
-              aria-label="Close"
+              aria-label="close button"
             >
               <span class="material-symbols-outlined" style="font-size: 2rem">
                 close
@@ -197,6 +200,7 @@ onMounted(() => {
             v-for="item in friendsData"
             :key="item.id"
             @click="toFriendProfile(item)"
+            aria-label="to friend profile button"
           >
             <span class="col-2"></span>
             <p class="friend-item-name roboto-regular col-8 fs-5 mb-0">
@@ -234,7 +238,7 @@ onMounted(() => {
             >
               {{ errorMsg }}
             </div>
-            <ButtonComp @click="addFriend" class="">{{
+            <ButtonComp @click="addFriend" aria-label="add friend button">{{
               getText('add', store.lang)
             }}</ButtonComp>
           </div>
@@ -277,7 +281,8 @@ onMounted(() => {
   color: white;
   transition: all 0.2s ease;
 }
-.icon-close:hover {
+.icon-close:hover,
+.icon-close:focus {
   color: #f58562;
 }
 
@@ -290,7 +295,8 @@ onMounted(() => {
   color: white;
   transition: all 0.2s ease;
 }
-.icon-back:hover {
+.icon-back:hover,
+.icon-back:focus {
   color: #f58562;
 }
 

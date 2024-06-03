@@ -17,7 +17,9 @@ const canFetchProfile = ref(false)
 // functions
 const redirectTo42 = async () => {
   try {
-    const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/oauth/login/`)
+    const response = await fetch(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/oauth/login/`
+    )
     if (!response.ok) {
       console.log(response)
       console.log('redirectTo42: bad response')
@@ -97,7 +99,9 @@ const submit = async (e) => {
       store.userAuthorised = true
       store.username = data.user.username
       store.email = data.user.email
-      store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
+      store.picture =
+        `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` +
+        data.profile_picture
       console.log('logged in as ' + store.username)
       router.push('/')
       connectWithSocket()
@@ -114,16 +118,19 @@ const sendOTP = async () => {
 
   canFetchProfile.value = false
   try {
-    const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/verify-login-otp/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username.value,
-        otp: otpCode.value,
-      }),
-    })
+    const response = await fetch(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/verify-login-otp/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.value,
+          otp: otpCode.value,
+        }),
+      }
+    )
     if (!response.ok) {
       console.log('verify-otp error: ')
       console.log(response)
@@ -153,7 +160,9 @@ const sendOTP = async () => {
       store.userAuthorised = true
       store.username = data.user.username
       store.email = data.user.email
-      store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
+      store.picture =
+        `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` +
+        data.profile_picture
       console.log('logged in as ' + store.username)
       router.push('/')
       connectWithSocket()
@@ -211,7 +220,9 @@ onMounted(async () => {
       store.userAuthorised = true
       store.username = data.user.username
       store.email = data.user.email
-      store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
+      store.picture =
+        `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` +
+        data.profile_picture
       console.log('logged in as ' + store.username)
       router.push('/')
       connectWithSocket()
@@ -259,6 +270,7 @@ onMounted(async () => {
             type="text"
             id="otpCode"
             placeholder="otp code"
+            aria-label="input for otp code"
           />
         </div>
         <div
@@ -272,6 +284,7 @@ onMounted(async () => {
           @click="sendOTP"
           class="fs-6 col-9 col-md-7 mx-auto mb-4"
           style="width: 120px"
+          aria-label="send otp code button"
         >
           send OTP
         </ButtonComp>
@@ -287,6 +300,7 @@ onMounted(async () => {
               id="username"
               :placeholder="getText('username', store.lang)"
               required
+              aria-label="input for username"
             />
             <span
               class="icon material-symbols-outlined"
@@ -304,6 +318,7 @@ onMounted(async () => {
               id="password"
               :placeholder="getText('password', store.lang)"
               required
+              aria-label="input for password"
             />
             <span
               class="icon material-symbols-outlined"
@@ -319,23 +334,33 @@ onMounted(async () => {
           >
             {{ errorMsg }}
           </div>
-          <ButtonComp @click="submit" class="btn-lg fs-5 col-7 mx-auto mt-4">{{
-            getText('login', store.lang)
-          }}</ButtonComp>
+          <ButtonComp
+            @click="submit"
+            class="btn-lg fs-5 col-7 mx-auto mt-4"
+            aria-label="login button"
+            >{{ getText('login', store.lang) }}</ButtonComp
+          >
         </form>
         <p class="text-center fs-4 roboto-bold my-2" style="color: #f58562">
           or
         </p>
-        <ButtonComp @click="redirectTo42" class="btn-lg fs-5 col-7 mx-auto">
+        <ButtonComp
+          @click="redirectTo42"
+          class="btn-lg fs-5 col-7 mx-auto"
+          aria-label="login with 42"
+        >
           {{ getText('loginWith42', store.lang) }}
         </ButtonComp>
         <div
           class="register col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
         >
           {{ getText('dontHaveAcc', store.lang) }}
-          <RouterLink class="register-link roboto-bold" to="/register">{{
-            getText('register', store.lang)
-          }}</RouterLink>
+          <RouterLink
+            class="register-link roboto-bold"
+            to="/register"
+            aria-label="to registration page button"
+            >{{ getText('register', store.lang) }}</RouterLink
+          >
         </div>
       </div>
     </div>

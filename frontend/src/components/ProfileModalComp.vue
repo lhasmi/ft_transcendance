@@ -43,7 +43,9 @@ const loadData = async () => {
     } else {
       data.username = newData.user.username
       data.email = newData.user.email
-      data.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + newData.profile_picture
+      data.picture =
+        `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` +
+        newData.profile_picture
       data.two_fa_activated = newData.two_fa_activated
       data.two_fa_requested = newData.two_fa_requested
       activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
@@ -123,16 +125,13 @@ const saveChanges = async (e) => {
     const newData = await response.json()
     console.log(newData)
     if (!response.ok) {
-			if (newData.password_error)
-				errorMsg.value = newData.password_error[0][1][0]
-			else
-				errorMsg.value = newData.error
-			return
+      if (newData.password_error)
+        errorMsg.value = newData.password_error[0][1][0]
+      else errorMsg.value = newData.error
+      return
     } else {
       console.log('profile updated')
-			if (newUsername.value)
-				store.username = newUsername.value
-
+      if (newUsername.value) store.username = newUsername.value
     }
   } catch {
     console.log('fetch request failed')
@@ -309,6 +308,7 @@ onMounted(() => {
               @click="backProfileModal"
               type="button"
               class="icon-back"
+              aria-label="back button"
             >
               <span class="material-symbols-outlined" style="font-size: 2.5rem">
                 keyboard_backspace
@@ -327,7 +327,7 @@ onMounted(() => {
               type="button"
               class="icon-close"
               data-bs-dismiss="modal"
-              aria-label="Close"
+              aria-label="close button"
             >
               <span class="material-symbols-outlined" style="font-size: 2rem">
                 close
@@ -357,18 +357,18 @@ onMounted(() => {
             <div
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
             >
-							<div class="picture-selector d-flex align-items-center">
-								<label for="picture" class="roboto-bold text-white fs-6"
-									>{{ getText('picture', store.lang) }}:</label
-								>
-								<input
-									@change="changePicture"
-									class="picture-input text-white roboto-regular fs-6 ms-2"
-									type="file"
-									id="picture"
-									accept="image/*"
-								/>
-							</div>
+              <div class="picture-selector d-flex align-items-center">
+                <label for="picture" class="roboto-bold text-white fs-6"
+                  >{{ getText('picture', store.lang) }}:</label
+                >
+                <input
+                  @change="changePicture"
+                  class="picture-input text-white roboto-regular fs-6 ms-2"
+                  type="file"
+                  id="picture"
+                  accept="image/*"
+                />
+              </div>
             </div>
             <div
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
@@ -434,9 +434,12 @@ onMounted(() => {
             <div
               class="d-flex col-9 col-md-7 mx-auto justify-content-around my-4"
             >
-              <ButtonComp @click="saveChanges" class="save-btn fs-6">{{
-                getText('saveChanges', store.lang)
-              }}</ButtonComp>
+              <ButtonComp
+                @click="saveChanges"
+                class="save-btn fs-6"
+                aria-label="save button"
+                >{{ getText('saveChanges', store.lang) }}</ButtonComp
+              >
               <!-- <ButtonComp @click="backProfileModal" class="cancel-btn fs-6">{{ getText('cancel', store.lang) }}</ButtonComp> -->
             </div>
           </form>
@@ -517,6 +520,7 @@ onMounted(() => {
           <ButtonComp
             @click="toEditProfile"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
+            aria-label="to edit profile button"
           >
             {{ getText('editProfile', store.lang) }}
           </ButtonComp>
@@ -533,6 +537,7 @@ onMounted(() => {
             v-if="activated2FA"
             @click="disable2FA"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
+            aria-label="disable 2fa"
           >
             disable
           </ButtonComp>
@@ -540,6 +545,7 @@ onMounted(() => {
             v-else
             @click="enable2FA"
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
+            aria-label="enable 2fa"
           >
             {{ requested2FA ? 'resend code' : 'enable' }}
           </ButtonComp>
@@ -553,11 +559,13 @@ onMounted(() => {
               type="text"
               id="otpCode"
               placeholder="otp code"
+              aria-label="otp code"
             />
             <ButtonComp
               @click="verifyOTP"
               class="fs-6 col-9 col-md-7 mx-auto"
               style="width: 120px"
+              aria-label="verify otp code button"
             >
               verify OTP
             </ButtonComp>
@@ -585,6 +593,7 @@ onMounted(() => {
           <ButtonComp
             @click="toGamesHistory"
             class="fs-6 col-9 col-md-7 mx-auto mb-4"
+            aria-label="to games history button"
           >
             {{ getText('gamesHistory', store.lang) }}
           </ButtonComp>
@@ -613,11 +622,19 @@ onMounted(() => {
 		border-color: #f58562;
 	}
 } */
-input[type=file]::-webkit-file-upload-button:hover {
-	border-color: #f58562;
+input[type='file'] {
+  /* padding: 10px; */
+  border: 2px solid #fff;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
-input[type=file]::-webkit-file-upload-button:focus {
-	border-color: #f58562;
+input[type='file']:focus,
+input[type='file']:hover {
+  outline: none;
+  border-color: #f58562;
 }
 
 .profile-modal {
@@ -684,24 +701,9 @@ input[type=file]::-webkit-file-upload-button:focus {
   color: white;
 }
 .picture-input::file-selector-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
-  border-radius: 4px;
+  background: transparent;
+  border: none;
   color: white;
-  transition: all 0.3s ease;
-}
-.picture-input::file-selector-button:hover,
-.picture-input::file-selector-button:focus {
-  border-color: #f58562;
-  cursor: pointer;
-}
-
-.save-btn:hover {
-  color: #66bf6a;
-}
-
-.cancel-btn:hover {
-  color: #da4834;
 }
 
 /* input */

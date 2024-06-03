@@ -119,6 +119,7 @@ onMounted(() => {
             class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center"
             type="text"
             :id="n + (n - 1)"
+            aria-label="input for player name"
           />
         </div>
         <div class="col-sm-6 text-center">
@@ -130,6 +131,7 @@ onMounted(() => {
             class="text-input text-white roboto-regular fs-6 p-0 mb-3 text-center"
             type="text"
             :id="n + (n - 1) + 1"
+            aria-label="input for player name"
           />
         </div>
       </div>
@@ -143,6 +145,7 @@ onMounted(() => {
       <ButtonComp
         @click="toTableState"
         class="btn-lg mt-3 mb-4 fs-5 d-flex justify-content-center mx-auto col-6 col-lg-4"
+        aria-label="ready button"
         >{{ getText('ready', store.lang) }}</ButtonComp
       >
     </div>
@@ -186,6 +189,7 @@ onMounted(() => {
       <ButtonComp
         @click="toGameState"
         class="btn-lg mt-3 mb-4 fs-5 d-flex justify-content-center mx-auto col-7 col-lg-5"
+        aria-label="start button"
         >{{ getText('start', store.lang) }}</ButtonComp
       >
     </div>
@@ -235,12 +239,14 @@ onMounted(() => {
           @click="toRegistrationState(4)"
           class="btn-lg fs-3 me-4"
           style="width: 100px"
+          aria-label="choose 4 players"
           >4</ButtonComp
         >
         <ButtonComp
           @click="toRegistrationState(8)"
           class="btn-lg fs-3 ms-4"
           style="width: 100px"
+          aria-label="choose 8 players"
           >8</ButtonComp
         >
       </div>

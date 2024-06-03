@@ -40,24 +40,25 @@ const submit = async (e) => {
   errorMsg.value = ''
 
   try {
-    const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/register/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-        email: email.value,
-      }),
-    })
+    const response = await fetch(
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/register/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+          email: email.value,
+        }),
+      }
+    )
     const data = await response.json()
     console.log(data)
     if (!response.ok) {
-			if (data.password_error)
-				errorMsg.value = data.password_error[0][1][0]
-			else
-				errorMsg.value = data.error
+      if (data.password_error) errorMsg.value = data.password_error[0][1][0]
+      else errorMsg.value = data.error
     } else {
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
@@ -74,14 +75,16 @@ const submit = async (e) => {
     )
     if (!response.ok) {
       console.log("couldn't fetch profile data")
-			// logout ???
+      // logout ???
       return
     }
     const data = await response.json()
     store.userAuthorised = true
     store.username = data.user.username
     store.email = data.user.email
-    store.picture = `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` + data.profile_picture
+    store.picture =
+      `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` +
+      data.profile_picture
     console.log('logged in as ' + store.username)
     connectWithSocket()
   } catch (error) {
@@ -130,6 +133,7 @@ const validateEmail = (str) => {
             id="username"
             :placeholder="getText('username', store.lang)"
             required
+            aria-label="input for username"
           />
           <span
             class="icon material-symbols-outlined"
@@ -148,6 +152,7 @@ const validateEmail = (str) => {
             id="email"
             :placeholder="getText('email', store.lang)"
             required
+            aria-label="input for email"
           />
           <span
             class="icon material-symbols-outlined"
@@ -166,6 +171,7 @@ const validateEmail = (str) => {
             id="password"
             :placeholder="getText('password', store.lang)"
             required
+            aria-label="input for password"
           />
           <span
             class="icon material-symbols-outlined"
@@ -184,6 +190,7 @@ const validateEmail = (str) => {
             id="password2"
             :placeholder="getText('password', store.lang)"
             required
+            aria-label="input for password"
           />
           <span
             class="icon material-symbols-outlined"
@@ -199,17 +206,23 @@ const validateEmail = (str) => {
         >
           {{ errorMsg }}
         </div>
-        <ButtonComp @click="submit" class="btn-lg mt-4 fs-5 d-flex mx-auto">{{
-          getText('register', store.lang)
-        }}</ButtonComp>
+        <ButtonComp
+          @click="submit"
+          class="btn-lg mt-4 fs-5 d-flex mx-auto"
+          aria-label="register button"
+          >{{ getText('register', store.lang) }}</ButtonComp
+        >
       </form>
       <div
         class="login col-8 mx-auto text-white roboto-regular my-4 text-center fs-6"
       >
         {{ getText('alreadyHaveAcc', store.lang) }}
-        <RouterLink class="login-link roboto-bold" to="/login">{{
-          getText('login', store.lang)
-        }}</RouterLink>
+        <RouterLink
+          class="login-link roboto-bold"
+          to="/login"
+          aria-label="to login page button"
+          >{{ getText('login', store.lang) }}</RouterLink
+        >
       </div>
     </div>
   </section>

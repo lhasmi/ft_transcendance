@@ -24,7 +24,7 @@
               type="button"
               class="icon-close"
               data-bs-dismiss="modal"
-              aria-label="Close"
+              aria-label="close button"
             >
               <span class="material-symbols-outlined" style="font-size: 2rem">
                 close

@@ -34,7 +34,7 @@ let canvas
 let ctx
 let player1, player2, game, ball
 const playerWidth = 4
-const playerHeight = 100
+const playerHeight = 80
 const playerSpeed = 3
 const ballSpeed = 2
 const maxScore = 2
@@ -247,7 +247,7 @@ onMounted(() => {
   canvas = document.getElementById('canvasId')
   ctx = canvas.getContext('2d')
   canvas.width = 700
-  canvas.height = 466
+  canvas.height = 416
   player1 = new Player(32, canvas.height / 2 - playerHeight / 2)
   player2 = new Player(
     canvas.width - playerWidth - 32,
@@ -308,7 +308,10 @@ onMounted(() => {
         <p class="text-white text-center fs-4 mb-0 roboto-medium col-4">
           {{ props.player1 }}
         </p>
-        <p class="text-white text-center fs-2 mb-0 roboto-bold col-4">
+        <p
+          class="text-white text-center fs-2 mb-0 roboto-bold col-4"
+          aria-live="polite"
+        >
           {{ score.player1 }} : {{ score.player2 }}
         </p>
         <p class="text-white text-center fs-4 mb-0 roboto-medium col-4">
@@ -330,6 +333,7 @@ onMounted(() => {
           @click="gameStart = false"
           class="mb-2 btn-lg"
           style="width: 120px"
+          aria-label="start button"
         >
           start
         </ButtonComp>
@@ -342,6 +346,7 @@ onMounted(() => {
           @click="restartGame"
           class="mb-2 btn-lg"
           style="width: 120px"
+          aria-label="restart button"
         >
           restart
         </ButtonComp>
@@ -349,16 +354,18 @@ onMounted(() => {
           @click="router.push('/')"
           class="btn-lg"
           style="width: 120px"
+          aria-label="back button"
           >back</ButtonComp
         >
       </div>
     </div>
 
     <button
-      class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1 mx-auto"
+      class="btn btn-primary rounded-5 mt-3 d-flex justify-content-center align-items-center fs-1 mx-auto controls-btn"
       style="width: 64px; height: 64px"
       data-bs-toggle="modal"
       data-bs-target="#helpModal"
+      aria-label="open controls modal button"
     >
       ?
     </button>
@@ -370,6 +377,10 @@ onMounted(() => {
 <style scoped>
 .myshadow {
   box-shadow: -6px 6px 6px 0px rgba(0, 0, 0, 0.25);
+}
+
+.controls-btn:focus {
+  color: #f58562;
 }
 
 .friends-modal {
@@ -389,7 +400,7 @@ onMounted(() => {
   transform: translate(-50%, -50%);
   width: 220px;
   height: 140px;
-	border: 2px solid #f58562;
+  border: 2px solid #f58562;
 }
 
 .canvas-wrapper {

@@ -35,9 +35,13 @@ onMounted(() => {
       class="navbar navbar-expand-lg bg-white bg-opacity-10 m-auto myshadow rounded-4 py-2"
       style="width: 100%"
     >
-      <RouterLink class="navbar-brand ms-5 fs-2 roboto-bold" to="/"
-        >ft_transcendence</RouterLink
+      <RouterLink
+        class="navbar-brand ms-5 fs-2 roboto-bold"
+        to="/"
+        aria-label="to home page button"
       >
+        ft_transcendence
+      </RouterLink>
       <button
         class="navbar-toggler me-3"
         type="button"
@@ -55,11 +59,13 @@ onMounted(() => {
             <RouterLink
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               to="/register"
+              aria-label="to registration page button"
               >{{ getText('register', language) }}</RouterLink
             >
             <RouterLink
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               to="/login"
+              aria-label="to login page button"
               >{{ getText('login', language) }}</RouterLink
             >
           </div>
@@ -68,6 +74,7 @@ onMounted(() => {
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#profileModal"
+              aria-label="open profile modal button"
             >
               {{ getText('profile', language) }}
             </button>
@@ -75,12 +82,14 @@ onMounted(() => {
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#friendsModal"
+              aria-label="open friends modal button"
             >
               {{ getText('friends', language) }}
             </button>
             <button
               @click="logout"
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
+              aria-label="logout button"
             >
               {{ getText('logout', language) }}
             </button>
@@ -89,6 +98,7 @@ onMounted(() => {
             @click="toggleLanguage"
             class="mx-4"
             style="width: 40px"
+            aria-label="change language button"
             >{{ language }}</ButtonComp
           >
         </div>

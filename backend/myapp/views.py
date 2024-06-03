@@ -421,7 +421,7 @@ class UserProfileUpdateAPIView(APIView):
                     try:
                         validate_image(profile_picture)
                     except DjangoValidationError as ve:
-                        raise DRFValidationError({'profile_picture': [str(ve)]})
+                        raise DjangoValidationError(ve)
                     player.profile_picture = profile_picture
                 if display_name:
                     if Player.objects.filter(display_name=display_name).exclude(user=user).exists():

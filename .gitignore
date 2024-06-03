@@ -8,3 +8,4 @@ backend/media/
 *.pot
 *.pyc
 __pycache__
+backend_dev/

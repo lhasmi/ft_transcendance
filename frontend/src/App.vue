@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import HeaderComp from './components/HeaderComp.vue'
 import { store } from './store/store.js'
+import { getText } from './language/language.js'
 import { fetchWithJWT, connectWithSocket } from './utils/utils.js'
 
 onMounted(async () => {
@@ -34,7 +35,8 @@ onMounted(async () => {
   <main class="d-flex flex-column">
     <HeaderComp v-if="['login', 'register'].includes($route.name) == false" />
 
-    <RouterView />
+    <RouterView class="mb-2" />
+    <footer class="px-4 py-1 text-white text-center fs-6 roboto-regular mx-auto footer-help rounded-top-4">{{ getText('needHelp', store.lang) }}? lhasmi@student.42heilbronn.de</footer>
   </main>
 </template>
 
@@ -47,5 +49,9 @@ main {
   min-height: 100vh;
   max-width: 100vw;
   background: linear-gradient(145deg, #5c2a84 23%, 55%, #3b1a99 85%);
+}
+
+.footer-help {
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>

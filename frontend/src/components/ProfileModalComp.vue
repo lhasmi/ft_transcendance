@@ -131,7 +131,11 @@ const saveChanges = async (e) => {
       return
     } else {
       console.log('profile updated')
-      if (newUsername.value) store.username = newUsername.value
+      if (newUsername.value) {
+        store.username = newUsername.value
+        data.username = newUsername.value
+        console.log(store.username)
+      }
     }
   } catch {
     console.log('fetch request failed')
@@ -198,7 +202,7 @@ const getWonAmount = () => {
   if (data.gamesHistory.length == 0) return 0
   let counter = 0
   for (let i in data.gamesHistory) {
-    if (data.gamesHistory[i].winner == data.username) counter++
+    if (data.gamesHistory[i].winner == store.username) counter++
   }
   return counter
 }
@@ -207,7 +211,7 @@ const getLostAmount = () => {
   if (data.gamesHistory.length == 0) return 0
   let counter = 0
   for (let i in data.gamesHistory) {
-    if (data.gamesHistory[i].winner != data.username) counter++
+    if (data.gamesHistory[i].winner != store.username) counter++
   }
   return counter
 }

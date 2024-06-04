@@ -1,4 +1,10 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+import { store } from '@/store/store'
+import { getText } from '../language/language.js'
+
+const largeText = ref(false)
+</script>
 
 <template>
   <!-- Modal -->
@@ -18,7 +24,7 @@
               class="friends-modal-title modal-title fs-3 my-2 mx-auto roboto-bold"
               id="friendsModalLabel"
             >
-              controls
+              {{ getText('controls', store.lang) }}
             </h1>
             <button
               type="button"
@@ -33,25 +39,31 @@
           </div>
           <hr class="splitter col-12 mx-auto m-0 mb-2" />
         </div>
-        <div class="modal-body">
-          <div class="col-10 col-md-8 mx-auto d-flex justify-content-center">
-            <div class="">
-              <p class="roboto-medium fs-5 m-0" style="color: #f58562">
-                left player:
-              </p>
-              <p class="text-white roboto-regular fs-6 m-0">w - up</p>
-              <p class="text-white roboto-regular fs-6 m-0">s - down</p>
-              <p class="roboto-medium fs-5 m-0 mt-1" style="color: #f58562">
-                right player:
-              </p>
-              <p class="text-white roboto-regular fs-6 m-0">arrow up - up</p>
-              <p class="text-white roboto-regular fs-6 m-0">
-                arrow down - down
-              </p>
-              <p class="text-white roboto-regular fs-6 mt-3">
-                space - pause/unpause
-              </p>
+        <div class="modal-body m-0 p-0" style="height: 280px">
+          <div
+            class="col-10 col-md-9 mx-auto d-flex flex-column justify-content-center"
+          >
+            <div class="d-flex align-content-center mb-2">
+              <label for="large-text" class="m-0 text-white roboto-regular"
+                >{{ getText('largeText', store.lang) }}:</label
+              >
+              <input
+                v-model="largeText"
+                id="large-text"
+                type="checkbox"
+                class="ms-2"
+              />
             </div>
+            <p v-if="largeText" class="text-white roboto-regular fs-2">
+              <span style="color: #f58562">{{ getText('leftPlayer', store.lang) }}:</span> {{ getText('leftPlayerControls', store.lang) }} <br />
+              <span style="color: #f58562">{{ getText('rightPlayer', store.lang) }}:</span> {{ getText('rightPlayerControls', store.lang) }} <br />
+              <span style="color: #f58562">{{ getText('touchscreen', store.lang) }}:</span> {{ getText('touchscreenControls', store.lang) }}
+            </p>
+            <p v-else class="text-white roboto-regular fs-5">
+              <span style="color: #f58562">{{ getText('leftPlayer', store.lang) }}:</span> {{ getText('leftPlayerControls', store.lang) }} <br />
+              <span style="color: #f58562">{{ getText('rightPlayer', store.lang) }}:</span> {{ getText('rightPlayerControls', store.lang) }} <br />
+              <span style="color: #f58562">{{ getText('touchscreen', store.lang) }}:</span> {{ getText('touchscreenControls', store.lang) }}
+            </p>
           </div>
         </div>
       </div>
@@ -92,7 +104,8 @@
   color: white;
   transition: all 0.2s ease;
 }
-.icon-close:hover {
+.icon-close:hover,
+.icon-close:focus {
   color: #f58562;
 }
 

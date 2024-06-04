@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import router from '@/router'
 import { store } from '@/store/store'
+import { getText } from '../language/language.js'
 import HelpModalComp from './HelpModalComp.vue'
 import ButtonComp from './ButtonComp.vue'
 
@@ -37,7 +38,7 @@ const playerWidth = 4
 const playerHeight = 80
 const playerSpeed = 3
 const ballSpeed = 2
-const maxScore = 2
+const maxScore = 3
 
 class Player {
   constructor(x = 0, y = 0) {
@@ -335,7 +336,7 @@ onMounted(() => {
           style="width: 120px"
           aria-label="start button"
         >
-          start
+          {{ getText('start', store.lang) }}
         </ButtonComp>
       </div>
       <div
@@ -348,14 +349,14 @@ onMounted(() => {
           style="width: 120px"
           aria-label="restart button"
         >
-          restart
+          {{ getText('restart', store.lang) }}
         </ButtonComp>
         <ButtonComp
           @click="router.push('/')"
           class="btn-lg"
           style="width: 120px"
           aria-label="back button"
-          >back</ButtonComp
+          >{{ getText('back', store.lang) }}</ButtonComp
         >
       </div>
     </div>

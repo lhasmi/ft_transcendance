@@ -308,10 +308,13 @@ class VerifyOTPAPIView(APIView):
         if player and player.two_fa_requested :
             totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
             totp.time = time.time()
+            print(f"!!!!!!!!Is two_fa_activated ? !!!!!!!!!!!: {player.two_fa_activated}") #debug
+            print(f"!!!!!!!!Is two_fa_requested ? !!!!!!!!!!!: {player.two_fa_requested}") #debug
             if totp.verify(int(otp)):
                 player.two_fa_activated = True  # Set the 2FA activated flag
                 player.two_fa_requested = False  # reset the request flag
                 player.save()
+                print(f"!!!!!!!!Is two_fa_activated ? !!!!!!!!!!!: {player.two_fa_activated}") #debug
                 return Response({"message": "you have activated 2FA !"}, status=status.HTTP_200_OK)
             else:
                 return Response({'error': f'Invalid OTP. Please contact the admin at {settings.ADMIN_MAIL} if the issue persists.'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -331,6 +334,8 @@ class Enable2FAAPIView(APIView):
             player.generate_secret_key()
             player.save()
         player.two_fa_requested = True 
+        print(f"!!!!!!!!Is two_fa_activated enable? !!!!!!!!!!!: {player.two_fa_activated}") #debug
+        print(f"!!!!!!!!Is two_fa_requested enable? !!!!!!!!!!!: {player.two_fa_requested}") #debug
         player.save()
         totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
         otp_token = totp.token()
@@ -357,7 +362,6 @@ class Disable2FAAPIView(APIView):
         player.save()
         return Response({"message": "Two-factor authentication has been disabled."}, status=status.HTTP_200_OK)
     
-
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser,)  # file upload

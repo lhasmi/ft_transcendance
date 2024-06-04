@@ -21,8 +21,10 @@ services:
   backend:
     build:
       context: ./backend
-    # ports:
-    #   - '8000:8000'
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/static/:/app/static
+      - ./backend/media/:/app/media
     expose:
       - 8000
     depends_on:

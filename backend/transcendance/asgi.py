@@ -18,7 +18,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'transcendance.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
-    # "websocket": AllowedHostsOriginValidator( #restricts WebSocket connections to the ALLOWED_HOSTS configured in settings.py
     "websocket": TokenAuthMiddleware(
             URLRouter(
                 websocket_urlpatterns

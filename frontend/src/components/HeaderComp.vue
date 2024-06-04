@@ -36,6 +36,7 @@ onMounted(() => {
       style="width: 100%"
     >
       <RouterLink
+				tabindex="0"
         class="navbar-brand ms-5 fs-2 roboto-bold"
         to="/"
         aria-label="to home page button"
@@ -43,6 +44,7 @@ onMounted(() => {
         ft_transcendence
       </RouterLink>
       <button
+				tabindex="0"
         class="navbar-toggler me-3"
         type="button"
         data-bs-toggle="collapse"
@@ -57,12 +59,14 @@ onMounted(() => {
         <div class="navbar-nav ms-auto">
           <div v-if="!store.userAuthorised" class="d-flex">
             <RouterLink
+							tabindex="0"
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               to="/register"
               aria-label="to registration page button"
               >{{ getText('register', language) }}</RouterLink
             >
             <RouterLink
+							tabindex="0"
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               to="/login"
               aria-label="to login page button"
@@ -71,6 +75,7 @@ onMounted(() => {
           </div>
           <div v-else class="d-flex">
             <button
+							tabindex="0"
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#profileModal"
@@ -79,6 +84,7 @@ onMounted(() => {
               {{ getText('profile', language) }}
             </button>
             <button
+							tabindex="0"
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#friendsModal"
@@ -87,6 +93,7 @@ onMounted(() => {
               {{ getText('friends', language) }}
             </button>
             <button
+							tabindex="0"
               @click="logout"
               class="nav-link mx-4 fs-4 roboto-medium align-self-center"
               aria-label="logout button"
@@ -95,6 +102,7 @@ onMounted(() => {
             </button>
           </div>
           <ButtonComp
+						tabindex="0"
             @click="toggleLanguage"
             class="mx-4"
             style="width: 40px"

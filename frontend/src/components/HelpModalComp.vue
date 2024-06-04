@@ -55,15 +55,16 @@ const largeText = ref(false)
               />
             </div>
             <p v-if="largeText" class="text-white roboto-regular fs-2">
-              <span style="color: #f58562">{{ getText('leftPlayer', store.lang) }}:</span> {{ getText('leftPlayerControls', store.lang) }} <br />
-              <span style="color: #f58562">{{ getText('rightPlayer', store.lang) }}:</span> {{ getText('rightPlayerControls', store.lang) }} <br />
-              <span style="color: #f58562">{{ getText('touchscreen', store.lang) }}:</span> {{ getText('touchscreenControls', store.lang) }}
+              <span tabindex="0" style="color: #f58562">{{ getText('leftPlayer', store.lang) }}:</span> {{ getText('leftPlayerControls', store.lang) }} <br />
+              <span tabindex="0" style="color: #f58562">{{ getText('rightPlayer', store.lang) }}:</span> {{ getText('rightPlayerControls', store.lang) }} <br />
+              <span tabindex="0" style="color: #f58562">{{ getText('touchscreen', store.lang) }}:</span> {{ getText('touchscreenControls', store.lang) }}
             </p>
             <p v-else class="text-white roboto-regular fs-5">
-              <span style="color: #f58562">{{ getText('leftPlayer', store.lang) }}:</span> {{ getText('leftPlayerControls', store.lang) }} <br />
-              <span style="color: #f58562">{{ getText('rightPlayer', store.lang) }}:</span> {{ getText('rightPlayerControls', store.lang) }} <br />
-              <span style="color: #f58562">{{ getText('touchscreen', store.lang) }}:</span> {{ getText('touchscreenControls', store.lang) }}
+              <span tabindex="0" style="color: #f58562">{{ getText('leftPlayer', store.lang) }}:</span> {{ getText('leftPlayerControls', store.lang) }} <br />
+              <span tabindex="0" style="color: #f58562">{{ getText('rightPlayer', store.lang) }}:</span> {{ getText('rightPlayerControls', store.lang) }} <br />
+              <span tabindex="0" style="color: #f58562">{{ getText('touchscreen', store.lang) }}:</span> {{ getText('touchscreenControls', store.lang) }}
             </p>
+						<div tabindex="0"></div>
           </div>
         </div>
       </div>

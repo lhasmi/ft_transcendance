@@ -24,10 +24,11 @@ import ButtonComp from '../components/ButtonComp.vue'
       <div
         class="d-flex flex-column justify-content-center align-content-center col-8 mx-auto"
       >
-        <ButtonComp class="btn-lg fs-3" linkTo="/game" aria-label="play duel">{{
+        <ButtonComp tabindex="0" class="btn-lg fs-3" linkTo="/game" aria-label="play duel">{{
           getText('duel', store.lang)
         }}</ButtonComp>
         <ButtonComp
+					tabindex="0"
           class="btn-lg fs-3 mt-4"
           linkTo="/tournament"
           aria-label="play tournament"

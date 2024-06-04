@@ -105,6 +105,7 @@ onMounted(() => {
       class="col-9 col-md-7 mx-auto mb-1"
       v-for="item in props.games.slice().reverse()"
       :key="item.played_on"
+			tabindex="0"
     >
       <p class="game-date text-center text-white roboto-regular mb-1">
         {{ formatDateTime(item.played_on) }}
@@ -131,6 +132,7 @@ onMounted(() => {
         </p>
       </div>
     </div>
+		<div tabindex="0"></div>
   </div>
 </template>
 

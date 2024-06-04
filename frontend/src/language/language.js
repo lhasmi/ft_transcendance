@@ -169,6 +169,16 @@ const texts = {
 		de: 'starten',
 		ru: 'старт'
 	},
+	restart: {
+		en: 'restart',
+		de: 'neustart',
+		ru: 'рестарт'
+	},
+	back: {
+		en: 'back',
+		de: 'zurück',
+		ru: 'назад'
+	},
 	isWinner: {
 		en: 'is the winner',
 		de: 'ist gewinner',
@@ -189,7 +199,51 @@ const texts = {
 		de: 'duel',
 		ru: 'дуэль'
 	},
-
+	controls: {
+		en: 'controls',
+		de: 'kontrolle',
+		ru: 'управление'
+	},
+	largeText: {
+		en: 'large text',
+		de: 'großer Text',
+		ru: 'большой текст'
+	},
+	leftPlayer: {
+		en: 'left player',
+		de: 'linker spieler',
+		ru: 'левый игрок'
+	},
+	rightPlayer: {
+		en: 'right player',
+		de: 'rechter spieler',
+		ru: 'правый игрок'
+	},
+	touchscreen: {
+		en: 'touchscreen',
+		de: 'touchscreen',
+		ru: 'тачскрин'
+	},
+	leftPlayerControls: {
+		en: 'W - move up, S - move down',
+		de: 'W - nach oben bewegen, S - sich abwärts bewegen',
+		ru: 'W - двигаться вверх, S - двигаться вниз'
+	},
+	rightPlayerControls: {
+		en: 'arrow up - move up, arrow down - move down',
+		de: 'pfeil nach oben - nach oben bewegen, pfeil nach unten - sich abwärts bewegen',
+		ru: 'стрелка вверх - двигаться вверх, стрелка вниз - двигаться вниз'
+	},
+	touchscreenControls: {
+		en: 'press on the corners of the game screen to move paddle up and down',
+		de: 'drücken sie auf die ecken des spielbildschirms, um das paddel nach oben und unten zu bewegen',
+		ru: 'Нажимайте на углы игрового экрана, чтобы перемещать ракетку вверх и вниз'
+	},
+	needHelp: {
+		en: 'need help',
+		de: 'brauchen sie hilfe',
+		ru: 'нужна помощь'
+	},
 }
 
 const errors =	 {

@@ -400,6 +400,7 @@ class UserProfileUpdateAPIView(APIView):
                     # Update games history for the new username
                     MyMatch.objects.filter(player1=old_username).update(player1=username)
                     MyMatch.objects.filter(player2=old_username).update(player2=username)
+                    MyMatch.objects.filter(winner=old_username).update(winner=username)
                 
                 if email and email != user.email:
                     try:

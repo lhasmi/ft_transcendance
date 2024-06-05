@@ -1,4 +1,3 @@
-# myapp/management/commands/backfill_otp_enabled.py
 # to backfill the otp_enabled field for existing players
 from django.core.management.base import BaseCommand
 from myapp.models import Player

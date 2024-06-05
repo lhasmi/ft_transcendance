@@ -49,6 +49,8 @@ CORS_ORIGIN_WHITELIST = (
         'http://localhost:5173',
 )
 
+CSRF_TRUSTED_ORIGINS=['https://'+os.getenv('HOST_IP'), 'http://'+os.getenv('HOST_IP')]
+
 ADMIN_MAIL = os.getenv('ADMIN_MAIL', 'default_admin_email@example.com')
 
 INSTALLED_APPS = [

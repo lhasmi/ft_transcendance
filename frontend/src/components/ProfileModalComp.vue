@@ -26,6 +26,7 @@ const newPicture = ref(null)
 const newPassword = ref('')
 const newPassword2 = ref('')
 const errorMsg = ref('')
+const errorMsg2FA = ref('')
 const otpCode = ref('')
 const requested2FA = ref(false)
 const activated2FA = ref(false)
@@ -267,11 +268,12 @@ const verifyOTP = async () => {
         otp: otpCode.value,
       }
     )
+		const data = await response.json()
     if (!response.ok) {
       console.log('verify-otp error: ')
       console.log(response)
+			errorMsg2FA.value = data.error
     } else {
-      const data = await response.json()
       console.log('verify-otp success: ')
       console.log(data)
       requested2FA.value = false
@@ -588,6 +590,13 @@ onUnmounted(() => {
             </ButtonComp>
           </div>
           <!-- error msg -->
+					<div
+            v-if="errorMsg2FA"
+            class="my-1 fs-6 roboto-regular text-center"
+            style="color: #da4834"
+          >
+            {{ errorMsg2FA }}
+          </div>
           <hr class="splitter col-12 mx-auto m-0" />
           <div
             class="col-9 col-md-7 d-flex justify-content-around my-3 mx-auto roboto-bold mb-2 mb-md-3 text-white"

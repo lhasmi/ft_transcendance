@@ -36,8 +36,8 @@ let ctx
 let player1, player2, game, ball
 const playerWidth = 4
 const playerHeight = 80
-const playerSpeed = 3
-const ballSpeed = 2
+const playerSpeed = 4
+const ballSpeed = 3
 const maxScore = 3
 
 class Player {
@@ -146,6 +146,8 @@ class Ball {
       goalScorer == 1 ? score.value.player1++ : score.value.player2++
       this.posX = canvas.width / 2
       this.posY = canvas.height / 2
+			this.dirY = -this.dirY
+			this.dirX = -this.dirX
     }
     // modify position
     this.posX += this.dirX * this.v

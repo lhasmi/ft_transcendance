@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import ButtonComp from './ButtonComp.vue'
 import { store } from '../store/store.js'
 import { getText } from '../language/language.js'
@@ -14,6 +14,8 @@ let data = {
 }
 
 // variables
+let profileModal
+
 const editProfile = ref(false)
 const gamesHistory = ref(false)
 const title = ref('profile')
@@ -281,7 +283,7 @@ const verifyOTP = async () => {
 }
 
 onMounted(() => {
-  const profileModal = document.getElementById('profileModal')
+  profileModal = document.getElementById('profileModal')
   profileModal.addEventListener('show.bs.modal', async (e) => {
     await loadData()
     // activated2FA.value = data.two_fa_activated ? data.two_fa_activated : false
@@ -291,6 +293,15 @@ onMounted(() => {
     backProfileModal()
     // abort fetch if its still ongoing
   })
+})
+
+onUnmounted(() => {
+  // profileModal.classList.remove('show')
+  // profileModal.style.display = 'none'
+  let backdrops = document.getElementsByClassName('modal-backdrop');
+  for (let i = 0; i < backdrops.length; i++) {
+      backdrops[i].style.display = 'none';
+  }
 })
 </script>
 
@@ -304,7 +315,7 @@ onMounted(() => {
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
-      <div class="profile-modal modal-content myshadow border-0 rounded-4">
+      <div class="profile-modal modal-content myshadow border-0 rounded-4" style="height: 400px;">
         <div class="modal-header border-0 d-flex flex-column m-0 p-0">
           <div class="d-flex position-relative w-100">
             <button
@@ -545,7 +556,7 @@ onMounted(() => {
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
             aria-label="disable 2fa"
           >
-            disable
+          {{ getText('disable', store.lang) }}
           </ButtonComp>
           <ButtonComp
             v-else
@@ -553,7 +564,7 @@ onMounted(() => {
             class="fs-6 col-9 col-md-7 mx-auto mb-3"
             aria-label="enable 2fa"
           >
-            {{ requested2FA ? 'resend code' : 'enable' }}
+            {{ requested2FA ? getText('resendCode', store.lang) : getText('enable', store.lang) }}
           </ButtonComp>
           <div
             v-if="requested2FA && !activated2FA"
@@ -564,7 +575,7 @@ onMounted(() => {
               class="text-input text-white text-center roboto-regular fs-6 me-3"
               type="text"
               id="otpCode"
-              placeholder="otp code"
+              placeholder="otp"
               aria-label="otp code"
             />
             <ButtonComp
@@ -573,15 +584,16 @@ onMounted(() => {
               style="width: 120px"
               aria-label="verify otp code button"
             >
-              verify OTP
+              {{ getText('verify', store.lang) }} OTP
             </ButtonComp>
           </div>
+          <!-- error msg -->
           <hr class="splitter col-12 mx-auto m-0" />
           <div
             class="col-9 col-md-7 d-flex justify-content-around my-3 mx-auto roboto-bold mb-2 mb-md-3 text-white"
           >
             <div class="fs-4 roboto-bold" style="color: #f58562">
-              won
+              {{ getText('won', store.lang) }}
               <p class="text-center text-white m-0">{{ getWonAmount() }}</p>
             </div>
             <div
@@ -591,7 +603,7 @@ onMounted(() => {
               "
             ></div>
             <div class="fs-4 roboto-bold" style="color: #f58562">
-              lost
+              {{ getText('lost', store.lang) }}
               <p class="text-center text-white m-0">{{ getLostAmount() }}</p>
             </div>
           </div>

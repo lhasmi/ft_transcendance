@@ -244,6 +244,36 @@ const texts = {
 		de: 'brauchen sie hilfe',
 		ru: 'нужна помощь'
 	},
+	disable: {
+		en: 'disable',
+		de: 'deaktivieren',
+		ru: 'выключить'
+	},
+	enable: {
+		en: 'enable',
+		de: 'aktivieren',
+		ru: 'включить'
+	},
+	verify: {
+		en: 'verify',
+		de: 'verifizieren',
+		ru: 'подтвердить'
+	},
+	resendCode: {
+		en: 'resend code',
+		de: 'senden code',
+		ru: 'отправить код'
+	},
+	won: {
+		en: 'won',
+		de: 'gewonnen',
+		ru: 'победы'
+	},
+	lost: {
+		en: 'lost',
+		de: 'verloren',
+		ru: 'проигрыши'
+	},
 }
 
 const errors =	 {

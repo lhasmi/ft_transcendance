@@ -9,3 +9,4 @@ backend/media/
 *.pyc
 __pycache__
 backend_dev/
+backend_dev2/

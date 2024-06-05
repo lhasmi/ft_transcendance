@@ -4,7 +4,7 @@ import { store } from '../store/store.js'
 import { getText, getError } from '../language/language.js'
 import router from '@/router'
 import ButtonComp from '../components/ButtonComp.vue'
-import { fetchWithJWT, connectWithSocket } from '@/utils/utils'
+import { fetchWithJWT, connectWithSocket, logout } from '@/utils/utils'
 
 // variables
 const username = ref('')
@@ -23,11 +23,11 @@ const redirectTo42 = async () => {
     if (!response.ok) {
       console.log(response)
       console.log('redirectTo42: bad response')
+    } else {
+      const data = await response.json()
+      console.log(data)
+      window.location.href = data.link
     }
-    const data = await response.json()
-
-    console.log(data)
-    window.location.href = data.link // replace url
   } catch (error) {
     console.log(error)
   }
@@ -72,9 +72,6 @@ const submit = async (e) => {
         data.message ==
         'OTP sent to your email. Please verify to complete login.'
       ) {
-        // display an input field for OTP
-        // send request to verify OTP => on success receive the jwt and login the user
-        //                            => on failure display prompt again with button to resend the email
         renderOtpPrompt.value = true
         console.log('NEED TO PROMPT OTP CODE')
       } else {
@@ -172,10 +169,19 @@ const sendOTP = async () => {
   }
 }
 
+const backFromOTP = () => {
+  renderOtpPrompt.value = false
+  errorMsg.value = ''
+  otpCode.value = ''
+}
+
 onMounted(async () => {
+  if (store.userAuthorised) {
+    logout()
+  }
   const query = window.location.search
   query ? console.log('query:' + query) : null
-  if (query) {
+  if (query && query.startsWith('?code=')) {
     // check if query starts with '?code=' ???
     try {
       const response = await fetch(
@@ -183,9 +189,9 @@ onMounted(async () => {
       )
       if (!response.ok) {
         console.log('/oauth/callback/ response not ok: ' + response.status)
-        const data = response.json()
+        const data = await response.json()
         console.log(data)
-        errorMsg.value = data.error // ???
+        errorMsg.value = data.error
       } else {
         const data = await response.json()
         console.log('callback')
@@ -214,6 +220,7 @@ onMounted(async () => {
       )
       if (!response.ok) {
         console.log("can't login with existing JWT")
+        errorMsg.value = 'JWT invalid'
         return
       }
       const data = await response.json()
@@ -224,8 +231,8 @@ onMounted(async () => {
         `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}` +
         data.profile_picture
       console.log('logged in as ' + store.username)
-      router.push('/')
       connectWithSocket()
+      router.push('/')
     } catch (error) {
       console.log('catch: ' + error)
     }
@@ -241,7 +248,16 @@ onMounted(async () => {
       class="col-11 col-md-8 col-lg-5 col-xl-4 bg-white bg-opacity-10 rounded-4 myshadow d-flex flex-column"
     >
       <div class="d-flex justify-content-center position-relative">
-        <RouterLink to="/" aria-label="back button" class="router-link">
+        <button v-if="renderOtpPrompt" class="router-link" style="background: none; border: none" @click="backFromOTP">
+          <span
+            class="icon-back material-symbols-outlined"
+            style="font-size: 2.6rem"
+            aria-label="back button"
+          >
+            keyboard_backspace
+          </span>
+        </button>
+        <RouterLink v-else to="/" aria-label="back button" class="router-link">
           <span
             class="icon-back material-symbols-outlined"
             style="font-size: 2.6rem"

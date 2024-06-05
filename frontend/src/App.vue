@@ -36,7 +36,7 @@ onMounted(async () => {
     <HeaderComp v-if="['login', 'register'].includes($route.name) == false" />
 
     <RouterView class="mb-2" />
-    <footer class="px-4 py-1 text-white text-center fs-6 roboto-regular mx-auto footer-help rounded-top-4">{{ getText('needHelp', store.lang) }}? lhasmi@student.42heilbronn.de</footer>
+    <footer class="px-3 py-1 text-white text-center fs-6 roboto-regular mx-auto footer-help rounded-top-4">{{ getText('needHelp', store.lang) }}? lhasmi@student.42heilbronn.de</footer>
   </main>
 </template>
 

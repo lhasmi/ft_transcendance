@@ -1,9 +1,17 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { store } from '@/store/store'
 import { getText } from '../language/language.js'
 
 const largeText = ref(false)
+onUnmounted(() => {
+  // profileModal.classList.remove('show')
+  // profileModal.style.display = 'none'
+  let backdrops = document.getElementsByClassName('modal-backdrop');
+  for (let i = 0; i < backdrops.length; i++) {
+      backdrops[i].style.display = 'none';
+  }
+})
 </script>
 
 <template>

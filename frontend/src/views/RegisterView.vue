@@ -1,10 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { store } from '../store/store.js'
 import { getText, getError } from '../language/language.js'
 import router from '@/router'
 import ButtonComp from '../components/ButtonComp.vue'
-import { fetchWithJWT, connectWithSocket } from '@/utils/utils.js'
+import { fetchWithJWT, connectWithSocket, logout } from '@/utils/utils.js'
 
 // variables
 const username = ref('')
@@ -62,8 +62,8 @@ const submit = async (e) => {
     } else {
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
-      store.userAuthorised = true
-      router.push('/')
+      // store.userAuthorised = true
+      // router.push('/')
     }
   } catch {
     errorMsg.value = 'fetch request failed'
@@ -75,6 +75,7 @@ const submit = async (e) => {
     )
     if (!response.ok) {
       console.log("couldn't fetch profile data")
+      errorMsg.value = 'JWT invalid'
       // logout ???
       return
     }
@@ -87,6 +88,7 @@ const submit = async (e) => {
       data.profile_picture
     console.log('logged in as ' + store.username)
     connectWithSocket()
+    router.push('/')
   } catch (error) {
     console.log('catch: ' + error)
   }
@@ -98,6 +100,12 @@ const validateEmail = (str) => {
   if (str.match(validEmailRegex)) return true
   return false
 }
+
+onMounted(() => {
+  if (store.userAuthorised) {
+    logout()
+  }
+})
 </script>
 
 <template>

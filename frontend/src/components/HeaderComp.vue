@@ -76,7 +76,7 @@ onMounted(() => {
           <div v-else class="d-flex">
             <button
 							tabindex="0"
-              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
+              class="nav-link mx-4 fs-5 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#profileModal"
               aria-label="open profile modal button"
@@ -85,7 +85,7 @@ onMounted(() => {
             </button>
             <button
 							tabindex="0"
-              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
+              class="nav-link mx-4 fs-5 roboto-medium align-self-center"
               data-bs-toggle="modal"
               data-bs-target="#friendsModal"
               aria-label="open friends modal button"
@@ -95,7 +95,7 @@ onMounted(() => {
             <button
 							tabindex="0"
               @click="logout"
-              class="nav-link mx-4 fs-4 roboto-medium align-self-center"
+              class="nav-link mx-4 fs-5 roboto-medium align-self-center"
               aria-label="logout button"
             >
               {{ getText('logout', language) }}

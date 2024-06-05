@@ -2,6 +2,8 @@
 
 volumes:
   pg_data:
+  static_volume:
+  media_volume:
 
 services:
   postgres:
@@ -47,6 +49,9 @@ services:
       OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
       OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI}
       HOST_IP: ${HOST_IP}
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
 
   frontend-nginx:
     build:
@@ -60,3 +65,5 @@ services:
       - '443:443'
     depends_on:
       - backend
+    volumes:
+      - static_volume:/static

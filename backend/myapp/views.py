@@ -152,7 +152,7 @@ class OAuth2CallbackAPIView(APIView):
             player = getattr(user, 'player', None)
             if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
                 secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
-                totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
+                totp = TOTP(key=secret_key, step=200, digits=6)  # secret_key is stored in the player model
                 otp_token = totp.token()
                 send_mail(
                     'Your OTP',
@@ -230,7 +230,7 @@ class UserLoginAPIView(APIView):
             player = getattr(user, 'player', None)
             if player and player.two_fa_activated:  # Check if the player has already set 2Fauth using OTP;
                 secret_key = player.secret_key.encode('utf-8')  # Convert secret_key to bytes
-                totp = TOTP(key=secret_key, step=60, digits=6)  # secret_key is stored in the player model
+                totp = TOTP(key=secret_key, step=200, digits=6)  # secret_key is stored in the player model
                 otp_token = totp.token()
                 send_mail(
                     'Your OTP',
@@ -269,7 +269,7 @@ class VerifyLoginOTPAPIView(APIView):
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
         if player and player.two_fa_activated:
-            totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
+            totp = TOTP(key=player.secret_key.encode('utf-8'), step=200, digits=6)
             totp.time = time.time()
             if totp.verify(int(otp)):
                 login(request, user)
@@ -306,7 +306,7 @@ class VerifyOTPAPIView(APIView):
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         player = getattr(user, 'player', None)
         if player and player.two_fa_requested :
-            totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
+            totp = TOTP(key=player.secret_key.encode('utf-8'), step=200, digits=6)
             totp.time = time.time()
             if totp.verify(int(otp)):
                 player.two_fa_activated = True  # Set the 2FA activated flag
@@ -332,7 +332,7 @@ class Enable2FAAPIView(APIView):
             player.save()
         player.two_fa_requested = True 
         player.save()
-        totp = TOTP(key=player.secret_key.encode('utf-8'), step=60, digits=6)
+        totp = TOTP(key=player.secret_key.encode('utf-8'), step=200, digits=6)
         otp_token = totp.token()
         send_mail(
             'Your OTP',

@@ -62,6 +62,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all().select_related('user')
     serializer_class = PlayerSerializer
     filter_backends = (filters.OrderingFilter,)
+    permission_classes = [permissions.IsAuthenticated]
 
 class MatchViewSet(viewsets.ModelViewSet):
     """

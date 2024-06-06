@@ -12,8 +12,8 @@ class Player(models.Model):
     friends = models.ManyToManyField('self', blank=True, symmetrical=True)
     secret_key = models.CharField(max_length=100, blank=True, null=True)  # to store TOTP secret key
     two_fa_method = models.CharField(max_length=10, choices=[('email', 'Email')], default='email')
-    two_fa_requested = models.BooleanField(default=False) 
-    two_fa_activated = models.BooleanField(default=False) 
+    two_fa_requested = models.BooleanField(default=False)
+    two_fa_activated = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username}'s Player Profile"
@@ -29,15 +29,6 @@ class Player(models.Model):
             self.secret_key = get_random_string(20)
             self.save()
 
-    # otp_enabled = models.BooleanField(default=False) 
-# self.otp_enabled = True  # Enable OTP when a secret key is generated
-class Match(models.Model):
-    players = models.ManyToManyField(Player, related_name="matches")
-    winner = models.ForeignKey(Player, related_name="won_matches", on_delete=models.SET_NULL, null=True)
-    played_on = models.DateTimeField(auto_now_add=True) # Automatically set the date when the match is created
-    user_score = models.IntegerField(default=0)
-    opponent_score = models.IntegerField(default=0)
-
 class MyMatch(models.Model):
     player1 = models.CharField(null=True)
     player2 = models.CharField(null=True)
@@ -48,7 +39,7 @@ class MyMatch(models.Model):
 # Foreign Key Relations: using related_name for backwards navigation in relations.
 
 
-# In Player model, we link every player with a specific user instance, which allows to add custom 
+# In Player model, we link every player with a specific user instance, which allows to add custom
 # fields like profile_picture. This design inherits and extends the base User model capabilities
 # by association rather than by modifying the existing User model. It is called a One-to-One relationship
 # For status online/offline tracking

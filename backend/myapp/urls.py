@@ -1,19 +1,18 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    PlayerViewSet, MatchViewSet, UserRegistrationAPIView, UserLoginAPIView, 
-    UserProfileUpdateAPIView, FriendRequestAPIView, MatchHistoryAPIView, 
-    UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView, 
+    PlayerViewSet, UserRegistrationAPIView, UserLoginAPIView,
+    UserProfileUpdateAPIView, FriendRequestAPIView,
+    UserStatsAPIView, UpdateOnlineStatusAPIView, ListFriendsAPIView,
     Enable2FAAPIView, VerifyOTPAPIView, TestEmailView, MyMatchHistoryAPIView,
-    MyMatchViewSet, OAuth2LoginAPIView, OAuth2CallbackAPIView, Disable2FAAPIView,
+    MyMatchAPIView, OAuth2LoginAPIView, OAuth2CallbackAPIView, Disable2FAAPIView,
     VerifyLoginOTPAPIView
 )
 
 
 router = DefaultRouter() #for standard API URL management allowing CRUD
 router.register(r'players', PlayerViewSet) #registering viewsets with the router.
-router.register(r'games', MatchViewSet)
-router.register(r'my-games', MyMatchViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -22,7 +21,7 @@ urlpatterns = [
     path('verify-login-otp/', VerifyLoginOTPAPIView.as_view(), name='verify-login-otp'),
     path('update-profile/', UserProfileUpdateAPIView.as_view(), name='update-profile'),
     path('add-friend/', FriendRequestAPIView.as_view(), name='add-friend'),
-    path('match-history/', MatchHistoryAPIView.as_view(), name='match-history'),
+    path('my-games/', MyMatchAPIView.as_view(), name='my-games'),
     path('my-matches-history/', MyMatchHistoryAPIView.as_view(), name='my-match-history'),
     path('user-stats/', UserStatsAPIView.as_view(), name='user-stats'),
     path('update-online-status/', UpdateOnlineStatusAPIView.as_view(), name='update-online-status'),

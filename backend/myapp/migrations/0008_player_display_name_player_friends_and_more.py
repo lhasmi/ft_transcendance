@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('myapp', '0007_ensure_user_integrity'),
-        ('authtoken', '0004_alter_tokenproxy_options'), 
+        ('authtoken', '0004_alter_tokenproxy_options'),
     ]
 
     operations = [

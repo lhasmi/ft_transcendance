@@ -22,8 +22,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Player, Match, MyMatch
-from .serializers import PlayerSerializer, MatchSerializer, MyMatchSerializer
+from .models import Player, MyMatch
+from .serializers import PlayerSerializer, MyMatchSerializer
 
 
 def validate_email(email):
@@ -64,36 +64,20 @@ class PlayerViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.OrderingFilter,)
     permission_classes = [permissions.IsAuthenticated]
 
-class MatchViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for viewing and updating match history 
-    """
-    queryset = Match.objects.all()
-    ordering_fields = ['played_on']
-    ordering = ['-played_on']
-    serializer_class = MatchSerializer
 
-    def create(self, request, *args, **kwargs):#equivalent to post
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def update(self, request, *args, **kwargs):#equivalent to put
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
-class MyMatchViewSet(viewsets.ModelViewSet):
+class MyMatchAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = MyMatch.objects.all()
-    ordering_fields = ['played_on']
-    ordering = ['-played_on']
-    serializer_class = MyMatchSerializer
+
+    def post(self, request):
+        serializer = MyMatchSerializer(data=request.data)
+        if serializer.is_valid():
+            # Ensure that the user is creating a match involving themselves
+            if request.user.username not in [serializer.validated_data['player1']]:
+                return Response({"error": "You can only create matches in which you are a participant."},
+                                status=status.HTTP_403_FORBIDDEN)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class OAuth2LoginAPIView(APIView):
     permission_classes = [AllowAny]
@@ -138,7 +122,7 @@ class OAuth2CallbackAPIView(APIView):
 
             if not email or not login_name:
                 return JsonResponse({'error': 'Failed to obtain user information'}, status=400)
-                        
+
             try:# Check if user with the email already exists
                 user = User.objects.get(email=email)
                 if user.username != login_name:# If user exists, check if the username matches
@@ -158,7 +142,7 @@ class OAuth2CallbackAPIView(APIView):
                 send_mail(
                     'Your OTP',
                     f'Your one-time password is {otp_token}. Please enter it to complete your login.',
-                    os.getenv('EMAIL_HOST_USER'), 
+                    os.getenv('EMAIL_HOST_USER'),
                     [user.email],
                     fail_silently=False,
                 )
@@ -169,8 +153,8 @@ class OAuth2CallbackAPIView(APIView):
                 login(request, user)
                 jwt_token = RefreshToken.for_user(user)
                 return Response({
-                    "message": "User created successfully", 
-                    "refresh": str(jwt_token), 
+                    "message": "User created successfully",
+                    "refresh": str(jwt_token),
                     "access": str(jwt_token.access_token)
                 }, status=status.HTTP_201_CREATED)
         return JsonResponse({'error': 'No code provided'}, status=400)
@@ -209,8 +193,8 @@ class UserRegistrationAPIView(APIView):
         jwt_token = RefreshToken.for_user(user)
         player = getattr(user, 'player', None) #debug
         return Response({
-            "message": "User created successfully", 
-            "refresh": str(jwt_token), 
+            "message": "User created successfully",
+            "refresh": str(jwt_token),
             "access": str(jwt_token.access_token)
         }, status=status.HTTP_201_CREATED)
 
@@ -236,7 +220,7 @@ class UserLoginAPIView(APIView):
                 send_mail(
                     'Your OTP',
                     f'Your one-time password is {otp_token}. Please enter it to complete your login.',
-                    os.getenv('EMAIL_HOST_USER'), 
+                    os.getenv('EMAIL_HOST_USER'),
                     [user.email],
                     fail_silently=False,
                 )
@@ -247,7 +231,7 @@ class UserLoginAPIView(APIView):
                 return Response({
                     'access': str(jwt_token.access_token),
                     'refresh': str(jwt_token)
-                }, status=status.HTTP_200_OK)        
+                }, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -286,7 +270,7 @@ class VerifyLoginOTPAPIView(APIView):
             return Response({'error': 'OTP setup not found for user'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# JWT tokens are not issued in the initial login because the OTP verification 
+# JWT tokens are not issued in the initial login because the OTP verification
 # step is pending. Once the OTP is verified, user’s identity is fully confirmed.
 # JWT tokens are issued here because this marks the completion of the authentication process.
 class VerifyOTPAPIView(APIView):
@@ -331,7 +315,7 @@ class Enable2FAAPIView(APIView):
         if not player.secret_key:
             player.generate_secret_key()
             player.save()
-        player.two_fa_requested = True 
+        player.two_fa_requested = True
         player.save()
         totp = TOTP(key=player.secret_key.encode('utf-8'), step=200, digits=6)
         otp_token = totp.token()
@@ -357,7 +341,7 @@ class Disable2FAAPIView(APIView):
         player.secret_key = ''  # clear the secret key
         player.save()
         return Response({"message": "Two-factor authentication has been disabled."}, status=status.HTTP_200_OK)
-    
+
 
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -374,7 +358,7 @@ class UserProfileUpdateAPIView(APIView):
             return Response(data)
         except Player.DoesNotExist:
             return Response({"error": "Player profile does not exist"}, status=status.HTTP_404_NOT_FOUND)
-    
+
     def put(self, request, *args, **kwargs):
         user = request.user
         old_username = user.username # store old username
@@ -402,7 +386,7 @@ class UserProfileUpdateAPIView(APIView):
                     MyMatch.objects.filter(player1=old_username).update(player1=username)
                     MyMatch.objects.filter(player2=old_username).update(player2=username)
                     MyMatch.objects.filter(winner=old_username).update(winner=username)
-                
+
                 if email and email != user.email:
                     try:
                         validate_email(email)  # Validate email format
@@ -487,35 +471,9 @@ class UserStatsAPIView(APIView):
         Retrieve the win/loss stats for the logged-in user.
         """
         player = request.user.player
-        wins = Match.objects.filter(winner=player).count()
         total_games = player.matches.count()
         data = {'wins': wins, 'losses': total_games - wins}
         return Response(data, status=status.HTTP_200_OK)
-
-class MatchHistoryAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    def get(self, request):
-        """
-        Retrieve the match history for for any user, if authenticated.
-        """
-        #If a username is provided, it fetches the Player object for that user. 
-        username = request.query_params.get('username', None)
-        if username:
-            user = get_object_or_404(User, username=username)
-            player = user.player
-        else:# Otherwise, it uses the logged-in user's Player.
-            player = request.user.player
-        ordering = request.query_params.get('ordering', '-played_on')
-        matches = Match.objects.filter(players=player).order_by(ordering).annotate(
-            is_winner=Case(
-                When(winner=player, then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()
-            )
-        )
-        data = MatchSerializer(matches, many=True).data
-        player_data = {'display_name': player.display_name, 'matches': data}
-        return Response(player_data, status=status.HTTP_200_OK)# Modified to return player display name and match data
 
 
 class MyMatchHistoryAPIView(APIView):
@@ -535,7 +493,7 @@ class TestEmailView(View):
         try:
             send_mail(
                 'Test Email',  # Subject
-                'This is a test email sent from Django.', 
+                'This is a test email sent from Django.',
                 os.getenv('EMAIL_HOST_USER'),  # From email of the dev
                 [os.getenv('TEST_RECIPIENT_EMAIL')],  # To email of a test user
                 fail_silently=False,
@@ -549,5 +507,5 @@ class TestEmailView(View):
 #    Serializer Class:  linked to their respective serializers.
 
 # API View for sending friend requests
-# to do : preventing duplicate friend requests, handling non-existent user IDs 
+# to do : preventing duplicate friend requests, handling non-existent user IDs
 #securing endpoints against unauthorized access.

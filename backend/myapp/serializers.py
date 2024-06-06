@@ -20,16 +20,16 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = [
-            'id', 'user', 'profile_picture', 'created_at', 'display_name', 
+            'id', 'user', 'profile_picture', 'created_at', 'display_name',
             'online_status', 'friends', 'two_fa_requested', 'two_fa_activated'
         ]
         extra_kwargs = {
             'profile_picture': {'required': False},
             'two_fa_requested': {'read_only': True},
-            'two_fa_activated': {'read_only': True}#read_only prevents from being 
-            #altered through API endpoints 
+            'two_fa_activated': {'read_only': True}#read_only prevents from being
+            #altered through API endpoints
         }
-    
+
     def get_friends(self, obj):
         friends = obj.friends.all()
         return PlayerFriendSerializer(friends, many=True).data
@@ -58,10 +58,10 @@ class MatchSerializer(serializers.ModelSerializer):
         child=serializers.CharField(),  # Accept usernames as strings
         write_only=True
     )
-    winner = serializers.CharField(write_only=True) 
+    winner = serializers.CharField(write_only=True)
     players_detail = PublicPlayerSerializer(read_only=True, many=True, source='players')
     # winner_detail = PublicPlayerSerializer(read_only=True, source='winner')
-    user_score = serializers.IntegerField()  
+    user_score = serializers.IntegerField()
     opponent_score = serializers.IntegerField()
 
     class Meta:
@@ -71,12 +71,6 @@ class MatchSerializer(serializers.ModelSerializer):
 
     def validate_players(self, value):
         players = []
-        # for username in value: # removed because we need to validate only the logged in user, the other user is a guest
-        #     try:
-        #         player = Player.objects.get(user__username=username)
-        #         players.append(player)
-        #     except Player.DoesNotExist:
-        #         raise serializers.ValidationError(f"Player with username '{username}' does not exist.")
         try:
             player = Player.objects.get(user__username=value[0])
             players.append(player)
@@ -85,10 +79,6 @@ class MatchSerializer(serializers.ModelSerializer):
         return players
 
     def validate_winner(self, value):
-        # try:
-        #     winner = Player.objects.get(user__username=value)
-        # except Player.DoesNotExist:
-        #     raise serializers.ValidationError(f"Player with username '{value}' does not exist.")
         winner = value
         return winner
 
@@ -118,5 +108,5 @@ class MyMatchSerializer(serializers.ModelSerializer):
 #Serializers help convert  Django models (or querysets) into JSON format,
 # which can then be used by APIs to communicate with the frontend.
 #extend ModelSerializer, which simplifies serialization of model instances:
-#  Fields Specification: enumerating fields that should be serialized/deserialized. 
+#  Fields Specification: enumerating fields that should be serialized/deserialized.
 #   Meta Class Usage: Standard practice for DRF serializers.

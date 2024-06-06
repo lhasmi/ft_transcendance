@@ -95,6 +95,10 @@ const toFriendProfile = async (friendItem) => {
   // loadFriend(friendItem.id);
   // fetch friends game history
   await fetchFriendsGames(friendItem.user.username)
+  if (store.userAuthorised == false) {
+    errorMsg.value = 'fetch request failed'
+    return
+  }
   title.value = friendItem.user.username
   friendData = friendItem
   friendProfile.value = true

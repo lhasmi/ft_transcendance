@@ -16,6 +16,10 @@ const errorMsg = ref('')
 // funcions
 const submit = async (e) => {
   e.preventDefault()
+  if (store.userAuthorised) {
+    logout()
+  }
+
   // client side validation
   if (!username.value) {
     errorMsg.value = getError('usernameEmpty', store.lang)
@@ -62,8 +66,6 @@ const submit = async (e) => {
     } else {
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
-      // store.userAuthorised = true
-      // router.push('/')
     }
   } catch {
     errorMsg.value = 'fetch request failed'
@@ -76,7 +78,6 @@ const submit = async (e) => {
     if (!response.ok) {
       console.log("couldn't fetch profile data")
       errorMsg.value = 'JWT invalid'
-      // logout ???
       return
     }
     const data = await response.json()

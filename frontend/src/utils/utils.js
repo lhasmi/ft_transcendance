@@ -1,4 +1,5 @@
 import { store } from '../store/store.js'
+import { getText } from '../language/language.js'
 
 const refreshAccessToken = async () => {
   const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/token/refresh/`, {
@@ -11,11 +12,13 @@ const refreshAccessToken = async () => {
     }),
   })
   if (!response.ok) {
-    console.log("couldn't refresh token")
+    console.log("JWT is invalid. Please login again")
+    alert(getText('jwtInvalid', store.lang))
+    logout()
     return false
   }
   const data = await response.json()
-  console.log('refreshed')
+  console.log('JWT is refreshed')
   console.log(data)
   localStorage.setItem('access', data.access)
   return true
@@ -65,7 +68,7 @@ export const fetchWithJWTJson = async (url, method = 'GET', data = null) => {
 
   if (!response.ok && response.status === 401) {
     console.log(response)
-    await refreshAccessToken()
+    if ((await refreshAccessToken()) == false) return response
     response = await fetch(url, {
       method: method,
       headers: {
@@ -79,16 +82,18 @@ export const fetchWithJWTJson = async (url, method = 'GET', data = null) => {
 }
 
 export const logout = () => {
-  console.log('LOGOUT')
+  console.log('logout')
   localStorage.removeItem('access')
   localStorage.removeItem('refresh')
-  localStorage.removeItem('lang')
+  // localStorage.removeItem('lang')
   store.userAuthorised = false
   store.username = ''
   store.email = ''
   store.picture = ''
-  store.socket.close()
-  store.socket = null
+  if (store.socket) {
+    store.socket.close()
+    store.socket = null
+  }
 }
 
 export const connectWithSocket = () => {
@@ -99,9 +104,9 @@ export const connectWithSocket = () => {
 	store.socket = new WebSocket(
 		`${wsProtocol}//${import.meta.env.VITE_APP_API_URL}/ws/status/?token=${localStorage.getItem('access')}`
 	)
-	store.socket.onopen = () => {
-		console.log(
-			'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
-		)
-	}
+	// store.socket.onopen = () => {
+	// 	console.log(
+	// 		'CONNECTED TO STATUS CONSUMER (my online status should be online now)'
+	// 	)
+	// }
 }

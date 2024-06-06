@@ -32,6 +32,13 @@ const requested2FA = ref(false)
 const activated2FA = ref(false)
 
 // functions
+const resetData = () => {
+  data.username = ''
+  data.email = ''
+  data.picture = ''
+  data.gamesHistory = []
+} 
+
 const loadData = async () => {
   loader.value = true
   try {
@@ -42,7 +49,10 @@ const loadData = async () => {
     const newData = await response.json()
     console.log(newData)
     if (!response.ok) {
-      errorMsg.value = `${response.status}: ${response.statusText}`
+      errorMsg.value = response.statusText
+      resetData()
+      loader.value = false
+      return
     } else {
       data.username = newData.user.username
       data.email = newData.user.email
@@ -79,7 +89,6 @@ const loadData = async () => {
     console.log('fetch error')
     errorMsg.value = 'fetch request failed'
   }
-  // PROTECT FETCH WITH JWT IF TOKEN WAS INVALID
 
   loader.value = false
 }
@@ -317,7 +326,7 @@ onUnmounted(() => {
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
-      <div class="profile-modal modal-content myshadow border-0 rounded-4" style="height: 400px;">
+      <div class="profile-modal modal-content myshadow border-0 rounded-4" style="max-height: 450px;">
         <div class="modal-header border-0 d-flex flex-column m-0 p-0">
           <div class="d-flex position-relative w-100">
             <button
@@ -370,7 +379,7 @@ onUnmounted(() => {
               class="profile-img my-2 mx-auto rounded-4"
             />
           </div>
-          <form action="">
+          <form action="" autocomplete="off">
             <div
               class="d-flex col-9 col-md-7 mx-auto align-items-center mb-2 mb-md-3"
             >

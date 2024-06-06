@@ -16,6 +16,9 @@ const canFetchProfile = ref(false)
 
 // functions
 const redirectTo42 = async () => {
+  if (store.userAuthorised) {
+    logout()
+  }
   try {
     const response = await fetch(
       `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/oauth/login/`
@@ -36,6 +39,9 @@ const redirectTo42 = async () => {
 const submit = async (e) => {
   e.preventDefault()
   canFetchProfile.value = false
+  if (store.userAuthorised) {
+    logout()
+  }
 
   if (!username.value) {
     errorMsg.value = getError('usernameEmpty', store.lang)
@@ -109,10 +115,6 @@ const submit = async (e) => {
 }
 
 const sendOTP = async () => {
-  console.log('verify-otp')
-  console.log('username: ' + username.value)
-  console.log('otp code: ' + otpCode.value)
-
   canFetchProfile.value = false
   try {
     const response = await fetch(
@@ -144,6 +146,7 @@ const sendOTP = async () => {
     }
   } catch (error) {
     console.log('verify-otp fetch error: ' + error)
+    errorMsg.value = 'fetch request failed'
   }
   if (!canFetchProfile.value) return
   try {
@@ -166,6 +169,7 @@ const sendOTP = async () => {
     }
   } catch (error) {
     console.log('catch: ' + error)
+    errorMsg.value = 'fetch request failed'
   }
 }
 
@@ -182,7 +186,6 @@ onMounted(async () => {
   const query = window.location.search
   query ? console.log('query:' + query) : null
   if (query && query.startsWith('?code=')) {
-    // check if query starts with '?code=' ???
     try {
       const response = await fetch(
         `${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/oauth/callback/${query}`
@@ -200,7 +203,6 @@ onMounted(async () => {
           data.message ==
           'OTP sent to your email. Please verify to complete login.'
         ) {
-          // NEED TO GET USERNAME IN CALLBACK RESPONSE
           renderOtpPrompt.value = true
           console.log('NEED TO PROMPT OTP CODE')
           username.value = data.username
@@ -212,6 +214,7 @@ onMounted(async () => {
       }
     } catch (error) {
       console.log('catch: ' + error)
+      errorMsg.value = 'fetch request failed'
     }
     if (!canFetchProfile.value) return
     try {
@@ -235,6 +238,7 @@ onMounted(async () => {
       router.push('/')
     } catch (error) {
       console.log('catch: ' + error)
+      errorMsg.value = 'fetch request failed'
     }
   }
 })

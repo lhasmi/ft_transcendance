@@ -274,6 +274,11 @@ const texts = {
 		de: 'verloren',
 		ru: 'проигрыши'
 	},
+	jwtInvalid: {
+		en: 'JWT is invalid. Please login again',
+		de: 'JWT ist ungültig. Bitte einloggen erneut',
+		ru: 'JWT недействителен. Войдите еще раз'
+	},
 }
 
 const errors =	 {

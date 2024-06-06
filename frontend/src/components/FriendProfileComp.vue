@@ -80,14 +80,14 @@ onMounted(() => {
       class="col-9 col-md-7 d-flex justify-content-around my-3 mx-auto roboto-bold mb-2 mb-md-3 text-white"
     >
       <div class="fs-4 roboto-bold" style="color: #f58562">
-        won
+        {{ getText('won', store.lang) }}
         <p class="text-center text-white m-0">{{ getWonAmount() }}</p>
       </div>
       <div
         style="border-right: 1px solid #f58562; border-left: 2px solid #f58562"
       ></div>
       <div class="fs-4 roboto-bold" style="color: #f58562">
-        lost
+        {{ getText('lost', store.lang) }}
         <p class="text-center text-white m-0">{{ getLostAmount() }}</p>
       </div>
     </div>

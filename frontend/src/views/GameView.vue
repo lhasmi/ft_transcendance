@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import ButtonComp from '../components/ButtonComp.vue'
 import { store } from '@/store/store'
 import GameComp from '../components/GameComp.vue'
+import { fetchWithJWTJson } from '@/utils/utils';
 
 // variables
 const test = ref(false)
@@ -25,25 +26,32 @@ const handleFinishedMatch = async (player1, player2, score1, score2) => {
 }
 
 const sendTestData = async (player1, player2, score1, score2) => {
-  const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/my-games/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access')}`,
-    },
-    body: JSON.stringify({
+  // const response = await fetch(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/my-games/`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     Authorization: `Bearer ${localStorage.getItem('access')}`,
+  //   },
+  //   body: JSON.stringify({
+  //     player1: player1,
+  //     player2: player2,
+  //     score1: score1,
+  //     score2: score2,
+  //     winner: score1 > score2 ? player1 : player2,
+  //   }),
+  // })
+  const response = await fetchWithJWTJson(`${window.location.protocol}//${import.meta.env.VITE_APP_API_URL}/my-games/`, 'POST', {
       player1: player1,
       player2: player2,
       score1: score1,
       score2: score2,
       winner: score1 > score2 ? player1 : player2,
-    }),
   })
 
   const data = await response.json()
   console.log(data)
   if (!response.ok) {
-    console.log('error: ' + data.error)
+    console.log('error: ' + data.detail)
   }
 }
 </script>

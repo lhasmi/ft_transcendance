@@ -55,7 +55,9 @@ We welcome contributions to **ft_transcendence**! To contribute:
 
 ## Authors
 
-- **lhasmi** - [Your GitHub Profile](https://github.com/lhasmi)
+- **lhasmi** - (https://github.com/lhasmi)
+- **pvznuzda** 
+- **ccompote** - (https://github.com/ccompote)
 
 See also the list of [contributors](https://github.com/lhasmi/ft_transcendence/contributors) who participated in this project.
 
